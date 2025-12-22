@@ -2,14 +2,12 @@ import streamlit as st
 import datetime
 
 # ==========================================
-# 1. 設定 App 圖示 (使用你提供的圖片)
+# 1. 設定 App 圖示
 # ==========================================
-# 這是你剛剛提供的正確 Raw 網址
 icon_url = "https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg"
 
 st.set_page_config(page_title="Fairy.L 報價系統", page_icon=icon_url)
 
-# 👇 強制讓 iOS 主畫面抓到這張圖的重要語法 👇
 st.markdown(
     f"""
     <head>
@@ -20,7 +18,7 @@ st.markdown(
 )
 
 # ==========================================
-# 2. CSS 美化設定 (奶茶色底 + 深咖啡字)
+# 2. CSS 美化設定 (奶茶色 + 隱藏加減按鈕)
 # ==========================================
 custom_css = """
 <style>
@@ -47,10 +45,19 @@ header[data-testid="stHeader"] {
     border-color: #DCC7A1 !important;
 }
 
-/* 優化選單間距，方便手機點擊 */
+/* 優化選單間距 */
 div[role="radiogroup"] > label, div[data-testid="stCheckbox"] label {
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+/* 👇👇👇 新增：隱藏數字輸入框的 +/- 按鈕 👇👇👇 */
+[data-testid="stNumberInput"] button {
+    display: none !important;
+}
+/* 讓輸入框內的數字置中 (選項) */
+[data-testid="stNumberInput"] input {
+    text-align: center;
 }
 </style>
 """
@@ -63,7 +70,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 st.title("💅 Fairy.L 報價計算機")
 st.write("---")
 
-# --- 基礎服務 (Radio 單選) ---
+# --- 基礎服務 ---
 service_options = {
     "單色": 1000,
     "貓眼": 1100,
@@ -76,7 +83,7 @@ service_unit_price = service_options[service_name]
 
 st.write("") 
 
-# --- 位置 (Checkbox 複選) ---
+# --- 位置 ---
 st.write("位置 (可複選)")
 col_p1, col_p2 = st.columns(2)
 with col_p1:
@@ -84,16 +91,16 @@ with col_p1:
 with col_p2:
     pos_foot = st.checkbox("足部 (+200)")
 
-# 位置邏輯計算
+# 位置邏輯
 selected_pos = []
 if pos_hand: selected_pos.append("手部")
 if pos_foot: selected_pos.append("足部")
 pos_count = len(selected_pos)
-pos_surcharge = 200 if pos_foot else 0 # 有選足部就加 200
+pos_surcharge = 200 if pos_foot else 0 
 
 st.write("") 
 
-# --- 卸甲服務 (Radio 單選) ---
+# --- 卸甲服務 ---
 remove_options = {
     "無": 0,
     "本店卸甲": 200,
@@ -103,25 +110,27 @@ remove_options = {
 remove_name = st.radio("卸甲服務", list(remove_options.keys()))
 remove_price = remove_options[remove_name]
 
-# --- 加購項目 ---
+# --- 加購項目 (這邊的按鈕會被隱藏，點擊直接跳鍵盤) ---
 col1, col2 = st.columns(2)
 with col1:
     st.write("")
+    # 這裡的 step=1 代表只能輸入整數，這會幫助鍵盤判斷
     art_count = st.number_input("跳色數量 (指)", min_value=0, step=1)
     art_price = art_count * 100
 with col2:
+    # 這裡 step=50 代表每次跳50，但我們隱藏按鈕了，所以主要是防呆
     addon_price = st.number_input("延甲/飾品金額 ($)", min_value=0, step=50)
 
 st.write("") 
 
-# --- 優惠 (獨立顯眼區塊) ---
+# --- 優惠 ---
 with st.container(border=True):
     st.markdown("#### 🎉 優惠活動")
     is_birthday = st.toggle("🎂 壽星優惠 (9折)", value=False)
 
 
 # ==========================================
-# 4. 金額計算邏輯
+# 4. 金額計算
 # ==========================================
 base_service_total = service_unit_price * pos_count
 subtotal = base_service_total + pos_surcharge + remove_price + art_price + addon_price
@@ -139,7 +148,6 @@ discount_text = " (已折抵壽星優惠)" if is_birthday else ""
 remove_text = "無" if remove_name == "無" else remove_name
 pos_text = "+".join(selected_pos) if selected_pos else "未選擇"
 
-# 原始報價文字
 quote_text = f"""【Fairy. L NAIL ART 報價明細】
 📅 日期：{date_str}
 ---------------------------
@@ -154,9 +162,7 @@ st.write("---")
 st.markdown(f"### 💰 總金額：`${int(final_total)}`")
 
 st.caption("👇 可在此直接編輯報價單內容")
-# 讓使用者編輯，並將編輯後的結果存起來
 edited_quote = st.text_area("報價單預覽", value=quote_text, height=200, label_visibility="collapsed")
 
-# 複製按鈕顯示的是「編輯後」的內容
 st.code(edited_quote, language="text")
 st.caption("👆 點擊右上角的複製圖示即可複製")
