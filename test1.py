@@ -2,7 +2,7 @@ import streamlit as st
 import datetime
 
 # 👇 把你剛剛複製的 Raw 圖片網址貼在下面引號內 👇
-icon_url = "https://github.com/machael090807/nail-calculator/blob/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg" 
+icon_url = "https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg" 
 # (注意：請確認你的檔名是 logo.jpg 還是 image.jpg，網址要對喔)
 
 st.set_page_config(page_title="Fairy.L 報價系統", page_icon=icon_url)
