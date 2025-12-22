@@ -1,13 +1,15 @@
 import streamlit as st
 import datetime
 
-# 👇 把你剛剛複製的 Raw 圖片網址貼在下面引號內 👇
-icon_url = "https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg" 
-# (注意：請確認你的檔名是 logo.jpg 還是 image.jpg，網址要對喔)
+# ==========================================
+# 1. 設定 App 圖示 (使用你提供的圖片)
+# ==========================================
+# 這是你剛剛提供的正確 Raw 網址
+icon_url = "https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg"
 
 st.set_page_config(page_title="Fairy.L 報價系統", page_icon=icon_url)
 
-# 👇這段是專門寫給 iOS 看的，強制它用這張圖當 App 圖示 👇
+# 👇 強制讓 iOS 主畫面抓到這張圖的重要語法 👇
 st.markdown(
     f"""
     <head>
@@ -18,16 +20,16 @@ st.markdown(
 )
 
 # ==========================================
-# 👇 CSS 樣式設定區塊 👇
+# 2. CSS 美化設定 (奶茶色底 + 深咖啡字)
 # ==========================================
 custom_css = """
 <style>
-/* 1. 設定背景為奶茶色 */
+/* 設定背景為奶茶色 */
 .stApp {
     background-color: #F3E5D8;
 }
 
-/* 2. 設定全站主要文字顏色為深咖啡色 */
+/* 設定全站主要文字顏色為深咖啡色 */
 h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContainer"] p, .stRadio label, .stCheckbox label, .stToggle label {
     color: #4E342E !important;
 }
@@ -45,7 +47,7 @@ header[data-testid="stHeader"] {
     border-color: #DCC7A1 !important;
 }
 
-/* 優化 Radio 和 Checkbox 的間距 */
+/* 優化選單間距，方便手機點擊 */
 div[role="radiogroup"] > label, div[data-testid="stCheckbox"] label {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -53,17 +55,15 @@ div[role="radiogroup"] > label, div[data-testid="stCheckbox"] label {
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-# ==========================================
-# 👆 CSS 設定結束 👆
-# ==========================================
 
 
+# ==========================================
+# 3. 介面與輸入區塊
+# ==========================================
 st.title("💅 Fairy.L 報價計算機")
 st.write("---")
 
-# --- 輸入區塊 ---
-
-# 1. 基礎服務
+# --- 基礎服務 (Radio 單選) ---
 service_options = {
     "單色": 1000,
     "貓眼": 1100,
@@ -76,7 +76,7 @@ service_unit_price = service_options[service_name]
 
 st.write("") 
 
-# 2. 位置 (複選 Checkbox)
+# --- 位置 (Checkbox 複選) ---
 st.write("位置 (可複選)")
 col_p1, col_p2 = st.columns(2)
 with col_p1:
@@ -84,15 +84,16 @@ with col_p1:
 with col_p2:
     pos_foot = st.checkbox("足部 (+200)")
 
+# 位置邏輯計算
 selected_pos = []
 if pos_hand: selected_pos.append("手部")
 if pos_foot: selected_pos.append("足部")
 pos_count = len(selected_pos)
-pos_surcharge = 200 if pos_foot else 0
+pos_surcharge = 200 if pos_foot else 0 # 有選足部就加 200
 
 st.write("") 
 
-# 3. 卸甲服務
+# --- 卸甲服務 (Radio 單選) ---
 remove_options = {
     "無": 0,
     "本店卸甲": 200,
@@ -102,7 +103,7 @@ remove_options = {
 remove_name = st.radio("卸甲服務", list(remove_options.keys()))
 remove_price = remove_options[remove_name]
 
-# 4. 加購項目
+# --- 加購項目 ---
 col1, col2 = st.columns(2)
 with col1:
     st.write("")
@@ -113,13 +114,15 @@ with col2:
 
 st.write("") 
 
-# 5. 優惠 (✨修改處：加上外框與標題，讓它變明顯)
+# --- 優惠 (獨立顯眼區塊) ---
 with st.container(border=True):
     st.markdown("#### 🎉 優惠活動")
     is_birthday = st.toggle("🎂 壽星優惠 (9折)", value=False)
 
 
-# --- 計算邏輯 ---
+# ==========================================
+# 4. 金額計算邏輯
+# ==========================================
 base_service_total = service_unit_price * pos_count
 subtotal = base_service_total + pos_surcharge + remove_price + art_price + addon_price
 final_total = subtotal * 0.9 if is_birthday else subtotal
@@ -127,12 +130,16 @@ final_total = subtotal * 0.9 if is_birthday else subtotal
 if pos_count == 0:
     final_total = 0
 
-# --- 產生報價單文字 ---
+
+# ==========================================
+# 5. 輸出報價單
+# ==========================================
 date_str = datetime.date.today().strftime("%Y/%m/%d")
 discount_text = " (已折抵壽星優惠)" if is_birthday else ""
 remove_text = "無" if remove_name == "無" else remove_name
 pos_text = "+".join(selected_pos) if selected_pos else "未選擇"
 
+# 原始報價文字
 quote_text = f"""【Fairy. L NAIL ART 報價明細】
 📅 日期：{date_str}
 ---------------------------
@@ -143,15 +150,13 @@ quote_text = f"""【Fairy. L NAIL ART 報價明細】
 💰 預估總額：${int(final_total)}{discount_text}
 ＊提醒：本店作品享有一週保固"""
 
-# --- 顯示結果區 ---
 st.write("---")
 st.markdown(f"### 💰 總金額：`${int(final_total)}`")
 
-# ✨修改處：接收編輯後的文字
-# 我們將 st.text_area 的結果存入 edited_quote 變數
 st.caption("👇 可在此直接編輯報價單內容")
+# 讓使用者編輯，並將編輯後的結果存起來
 edited_quote = st.text_area("報價單預覽", value=quote_text, height=200, label_visibility="collapsed")
 
-# ✨修改處：下方的複製區塊現在會顯示「編輯過」的文字
+# 複製按鈕顯示的是「編輯後」的內容
 st.code(edited_quote, language="text")
 st.caption("👆 點擊右上角的複製圖示即可複製")
