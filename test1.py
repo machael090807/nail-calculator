@@ -18,7 +18,7 @@ st.markdown(
 )
 
 # ==========================================
-# 2. CSS 美化設定 (奶茶色 + 隱藏加減按鈕)
+# 2. CSS 美化設定 (奶茶色 + 響應式標題 + 隱藏按鈕)
 # ==========================================
 custom_css = """
 <style>
@@ -32,10 +32,24 @@ h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContai
     color: #4E342E !important;
 }
 
+/* 👇👇👇 新增：標題響應式設定 👇👇👇 */
+h1 {
+    text-align: center !important; /* 強制置中 */
+    /* clamp(最小字體, 視窗縮放比例, 最大字體) */
+    /* 這樣設定可以讓標題在手機上變小，不會爆版 */
+    font-size: clamp(1.5rem, 6vw, 2.5rem) !important; 
+    padding-bottom: 10px;
+    white-space: nowrap; /* 盡量不換行 */
+}
+
 /* 讓上方標題列變透明 */
 header[data-testid="stHeader"] {
     background-color: rgba(0,0,0,0);
 }
+
+/* (加碼) 隱藏右上角的 Streamlit 選單(三條線)與浮水印，讓介面更像原生 App */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
 
 /* 調整輸入框與按鈕的邊框顏色 */
 .stSelectbox div[data-baseweb="select"] > div,
@@ -51,11 +65,10 @@ div[role="radiogroup"] > label, div[data-testid="stCheckbox"] label {
     padding-bottom: 5px;
 }
 
-/* 👇👇👇 新增：隱藏數字輸入框的 +/- 按鈕 👇👇👇 */
+/* 隱藏數字輸入框的 +/- 按鈕 */
 [data-testid="stNumberInput"] button {
     display: none !important;
 }
-/* 讓輸入框內的數字置中 (選項) */
 [data-testid="stNumberInput"] input {
     text-align: center;
 }
@@ -67,7 +80,8 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # ==========================================
 # 3. 介面與輸入區塊
 # ==========================================
-st.title("💅 Fairy.L 報價計算機")
+# 這裡不需要改，CSS 會自動處理標題
+st.title("💅 Fairy.L 報價計算機") 
 st.write("---")
 
 # --- 基礎服務 ---
@@ -110,15 +124,13 @@ remove_options = {
 remove_name = st.radio("卸甲服務", list(remove_options.keys()))
 remove_price = remove_options[remove_name]
 
-# --- 加購項目 (這邊的按鈕會被隱藏，點擊直接跳鍵盤) ---
+# --- 加購項目 ---
 col1, col2 = st.columns(2)
 with col1:
     st.write("")
-    # 這裡的 step=1 代表只能輸入整數，這會幫助鍵盤判斷
     art_count = st.number_input("跳色數量 (指)", min_value=0, step=1)
     art_price = art_count * 100
 with col2:
-    # 這裡 step=50 代表每次跳50，但我們隱藏按鈕了，所以主要是防呆
     addon_price = st.number_input("延甲/飾品金額 ($)", min_value=0, step=50)
 
 st.write("") 
