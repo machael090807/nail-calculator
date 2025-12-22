@@ -2,7 +2,7 @@ import streamlit as st
 import datetime
 
 # --- 設定網頁標題與介面 ---
-st.set_page_config(page_title="Fairy.L 報價系統", page_icon="💅")
+st.set_page_config(page_title="Fairy.L 報價", page_icon="💅")
 
 st.title("💅 Fairy.L 報價計算機")
 st.write("---")
