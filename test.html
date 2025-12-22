@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fairy.L 報價系統</title>
+    
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg">
+    <link rel="icon" href="https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <style>
+        /* 🎨 奶茶色主題設定 */
+        :root {
+            --bg-color: #F3E5D8; /* 奶茶底 */
+            --text-color: #4E342E; /* 深咖啡字 */
+            --border-color: #DCC7A1;
+            --white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 20px;
+            margin: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 標題設定 */
+        h1 {
+            text-align: center;
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        /* 區塊樣式 */
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* 自訂 Radio 和 Checkbox 樣式 (讓介面更好看) */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.4);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-label:active {
+            background: var(--border-color);
+        }
+
+        input[type="radio"], input[type="checkbox"] {
+            accent-color: var(--text-color);
+            transform: scale(1.2);
+            margin-right: 10px;
+        }
+
+        /* 輸入框樣式 */
+        .input-group {
+            display: flex;
+            gap: 15px;
+        }
+        .input-wrapper {
+            flex: 1;
+        }
+        .input-wrapper label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.6);
+            font-size: 1.1rem;
+            color: var(--text-color);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* 優惠區塊 */
+        .promo-box {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            background: rgba(255,255,255,0.3);
+        }
+        .toggle-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* 結果區 */
+        .result-section {
+            margin-top: 30px;
+            border-top: 2px dashed var(--border-color);
+            padding-top: 20px;
+        }
+        .total-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 1rem;
+            color: var(--text-color);
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button.copy-btn {
+            width: 100%;
+            background-color: var(--text-color);
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button.copy-btn:active {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+
+        /* 隱藏右下角可能的廣告或標誌 */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <h1>💅 Fairy.L 報價計算機</h1>
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 20px;">
+
+    <div class="section">
+        <div class="section-title">基礎服務</div>
+        <div class="options-grid">
+            <label class="option-label"><input type="radio" name="service" value="1000" data-name="單色" checked> 單色 ($1000)</label>
+            <label class="option-label"><input type="radio" name="service" value="1100" data-name="貓眼"> 貓眼 ($1100)</label>
+            <label class="option-label"><input type="radio" name="service" value="1300" data-name="鏡面"> 鏡面 ($1300)</label>
+            <label class="option-label"><input type="radio" name="service" value="1500" data-name="法式"> 法式 ($1500)</label>
+            <label class="option-label"><input type="radio" name="service" value="1300" data-name="漸層"> 漸層 ($1300)</label>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">位置 (可複選)</div>
+        <div class="input-group">
+            <label class="option-label" style="flex:1"><input type="checkbox" id="pos_hand" checked> 手部</label>
+            <label class="option-label" style="flex:1"><input type="checkbox" id="pos_foot"> 足部 (+$200)</label>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">卸甲服務</div>
+        <div class="options-grid">
+            <label class="option-label"><input type="radio" name="remove" value="0" data-name="無" checked> 無</label>
+            <label class="option-label"><input type="radio" name="remove" value="200" data-name="本店卸甲"> 本店卸甲 ($200)</label>
+            <label class="option-label"><input type="radio" name="remove" value="300" data-name="他店卸甲"> 他店卸甲 ($300)</label>
+            <label class="option-label"><input type="radio" name="remove" value="500" data-name="純卸甲"> 純卸甲 ($500)</label>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="input-group">
+            <div class="input-wrapper">
+                <label>跳色數量 (指)</label>
+                <input type="number" id="art_count" value="" placeholder="0" inputmode="numeric">
+            </div>
+            <div class="input-wrapper">
+                <label>飾品金額 ($)</label>
+                <input type="number" id="addon_price" value="" placeholder="0" inputmode="numeric">
+            </div>
+        </div>
+    </div>
+
+    <div class="promo-box">
+        <div class="section-title">🎉 優惠活動</div>
+        <div class="toggle-wrapper">
+            <label for="birthday">🎂 壽星優惠 (9折)</label>
+            <input type="checkbox" id="birthday" style="width: 25px; height: 25px;">
+        </div>
+    </div>
+
+    <div class="result-section">
+        <div class="total-display" id="total_display">$0</div>
+        <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">👇 可在此直接編輯報價單內容</div>
+        <textarea id="quote_area"></textarea>
+        <button class="copy-btn" onclick="copyQuote()">📋 複製報價單</button>
+    </div>
+
+    <script>
+        // 取得今天的日期 YYYY/MM/DD
+        function getTodayDate() {
+            const d = new Date();
+            return `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
+        }
+
+        function calculate() {
+            // 1. 取得基礎服務
+            const serviceEl = document.querySelector('input[name="service"]:checked');
+            const servicePrice = parseInt(serviceEl.value);
+            const serviceName = serviceEl.dataset.name;
+
+            // 2. 取得位置
+            const isHand = document.getElementById('pos_hand').checked;
+            const isFoot = document.getElementById('pos_foot').checked;
+            
+            let posCount = 0;
+            let posTextArr = [];
+            if (isHand) { posCount++; posTextArr.push("手部"); }
+            if (isFoot) { posCount++; posTextArr.push("足部"); }
+            
+            const posSurcharge = isFoot ? 200 : 0;
+            const posText = posTextArr.length > 0 ? posTextArr.join("+") : "未選擇";
+
+            // 3. 卸甲
+            const removeEl = document.querySelector('input[name="remove"]:checked');
+            const removePrice = parseInt(removeEl.value);
+            const removeName = removeEl.dataset.name;
+            const removeText = removePrice === 0 ? "無" : removeName;
+
+            // 4. 加購
+            const artCount = parseInt(document.getElementById('art_count').value) || 0;
+            const artPrice = artCount * 100;
+            const addonPrice = parseInt(document.getElementById('addon_price').value) || 0;
+            const extraTotal = artPrice + addonPrice;
+
+            // 5. 優惠
+            const isBirthday = document.getElementById('birthday').checked;
+
+            // --- 計算核心邏輯 ---
+            // 基礎價格 * 位置數量 + 足部加價 + 卸甲 + 跳色 + 飾品
+            let baseTotal = (servicePrice * posCount) + posSurcharge + removePrice + extraTotal;
+            
+            // 沒選位置的話，總額歸零 (避免誤會)
+            if (posCount === 0) baseTotal = 0;
+
+            let finalTotal = isBirthday ? Math.round(baseTotal * 0.9) : baseTotal;
+            let discountText = isBirthday ? " (已折抵壽星優惠)" : "";
+
+            // 更新總金額顯示
+            document.getElementById('total_display').innerText = `$${finalTotal}`;
+
+            // 生成報價單文字
+            // 注意：這裡我們只在「使用者沒有手動修改過」的情況下才自動更新文字
+            // 但為了簡化，每次數值變動都重新生成，符合Streamlit版的行為
+            const quote = `【Fairy. L NAIL ART 報價明細】
+📅 日期：${getTodayDate()}
+---------------------------
+■ 項目：${serviceName} (${posText})
+■ 卸甲：${removeText}
+■ 額外加購：$${extraTotal}
+---------------------------
+💰 預估總額：$${finalTotal}${discountText}
+＊提醒：本店作品享有一週保固`;
+
+            document.getElementById('quote_area').value = quote;
+        }
+
+        function copyQuote() {
+            const textArea = document.getElementById("quote_area");
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // Mobile
+            navigator.clipboard.writeText(textArea.value).then(() => {
+                alert("✅ 報價單已複製！");
+            });
+        }
+
+        // 綁定所有輸入事件，一有變動就重算
+        document.querySelectorAll('input').forEach(el => {
+            el.addEventListener('change', calculate);
+            el.addEventListener('input', calculate); // 針對數字輸入框
+        });
+
+        // 初始化
+        calculate();
+    </script>
+</body>
+</html>
