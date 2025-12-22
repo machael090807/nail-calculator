@@ -2,7 +2,31 @@ import streamlit as st
 import datetime
 
 # --- 設定網頁標題與介面 ---
-st.set_page_config(page_title="Fairy.L 報價", page_icon="💅")
+st.set_page_config(page_title="Fairy.L 報價系統", page_icon="💅")
+
+# ==========================================
+# 👇 新增的區塊：設定背景為奶茶色 👇
+# ==========================================
+# 你可以修改下面的 #F3E5D8 來調整顏色
+# 淺奶茶: #F3E5D8
+# 經典奶茶: #DCC7A1
+# 偏粉調奶茶: #EBD4C8
+background_css = """
+<style>
+.stApp {
+    background-color: #F3E5D8;
+}
+/* 讓上方標題列變透明，才不會有一條白色的 */
+header[data-testid="stHeader"] {
+    background-color: rgba(0,0,0,0);
+}
+</style>
+"""
+st.markdown(background_css, unsafe_allow_html=True)
+# ==========================================
+# 👆 新增結束 👆
+# ==========================================
+
 
 st.title("💅 Fairy.L 報價計算機")
 st.write("---")
