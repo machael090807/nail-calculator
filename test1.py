@@ -7,6 +7,16 @@ icon_url = "https://github.com/machael090807/nail-calculator/blob/07e29efbbce983
 
 st.set_page_config(page_title="Fairy.L 報價系統", page_icon=icon_url)
 
+# 👇這段是專門寫給 iOS 看的，強制它用這張圖當 App 圖示 👇
+st.markdown(
+    f"""
+    <head>
+        <link rel="apple-touch-icon" href="{icon_url}">
+    </head>
+    """,
+    unsafe_allow_html=True
+)
+
 # ==========================================
 # 👇 CSS 樣式設定區塊 👇
 # ==========================================
