@@ -4,21 +4,26 @@ import datetime
 # ==========================================
 # 1. 設定 App 圖示
 # ==========================================
+# 這是你的 Logo 圖片網址
 icon_url = "https://raw.githubusercontent.com/machael090807/nail-calculator/07e29efbbce9832dec754699d7a2afdc9660c024/2025-12-22%2019.08.45.jpg"
 
 st.set_page_config(page_title="Fairy.L 報價系統", page_icon=icon_url)
 
+# 👇【關鍵修正】針對 iOS 的圖示設定 👇
+# 我們同時設定 apple-touch-icon 和 icon，並加上 !important 嘗試覆蓋
 st.markdown(
     f"""
     <head>
-        <link rel="apple-touch-icon" href="{icon_url}">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="apple-touch-icon" sizes="180x180" href="{icon_url}">
+        <link rel="icon" type="image/jpg" href="{icon_url}">
     </head>
     """,
     unsafe_allow_html=True
 )
 
 # ==========================================
-# 2. CSS 美化設定 (奶茶色 + 隱藏所有選單按鈕)
+# 2. CSS 美化設定 (暴力隱藏 Logo 版)
 # ==========================================
 custom_css = """
 <style>
@@ -40,27 +45,31 @@ h1 {
     white-space: nowrap;
 }
 
-/* 👇👇👇 新增：隱藏上方工具列 (Fork按鈕) 與下方 Footer (Logo) 👇👇👇 */
+/* 👇👇👇【強力隱藏區】👇👇👇 */
 
-/* 1. 隱藏最上方的 Header (包含 Fork 按鈕、Deploy 按鈕、三條線選單) */
+/* 1. 隱藏上方工具列 (Header) */
 header[data-testid="stHeader"] {
     display: none !important;
+    visibility: hidden !important;
 }
 
-/* 2. 隱藏最下方的 Footer (Made with Streamlit) */
+/* 2. 隱藏下方 Footer (Made with Streamlit) */
 footer {
     display: none !important;
+    visibility: hidden !important;
+    height: 0px !important;
 }
 
-/* 3. 隱藏主選單 (雙重保險) */
-#MainMenu {
-    visibility: hidden;
-}
+/* 3. 隱藏右下角的 Streamlit Logo (Viewer Badge) */
+/* 這裡使用了多種寫法，確保抓到它 */
+.viewerBadge_container__1QSob { display: none !important; }
+[data-testid="stStatusWidget"] { display: none !important; }
+div[class*="viewerBadge"] { display: none !important; }
+div[class*="stStatusWidget"] { display: none !important; }
 
-/* 4. 隱藏右下角的 viewer badge (如果有的話) */
-.viewerBadge_container__1QSob {
-    display: none !important;
-}
+/* 4. 隱藏主選單與部署按鈕 */
+#MainMenu { visibility: hidden !important; }
+.stDeployButton { display: none !important; }
 
 /* 👆👆👆 隱藏設定結束 👆👆👆 */
 
@@ -92,7 +101,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 
 
 # ==========================================
-# 3. 介面與輸入區塊
+# 3. 介面與輸入區塊 (內容不變)
 # ==========================================
 st.title("💅 Fairy.L 報價計算機") 
 st.write("---")
@@ -118,7 +127,6 @@ with col_p1:
 with col_p2:
     pos_foot = st.checkbox("足部 (+200)")
 
-# 位置邏輯
 selected_pos = []
 if pos_hand: selected_pos.append("手部")
 if pos_foot: selected_pos.append("足部")
