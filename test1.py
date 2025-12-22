@@ -18,7 +18,7 @@ st.markdown(
 )
 
 # ==========================================
-# 2. CSS 美化設定 (奶茶色 + 響應式標題 + 隱藏按鈕)
+# 2. CSS 美化設定 (奶茶色 + 隱藏所有選單按鈕)
 # ==========================================
 custom_css = """
 <style>
@@ -32,24 +32,38 @@ h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContai
     color: #4E342E !important;
 }
 
-/* 👇👇👇 新增：標題響應式設定 👇👇👇 */
+/* 標題響應式設定 */
 h1 {
-    text-align: center !important; /* 強制置中 */
-    /* clamp(最小字體, 視窗縮放比例, 最大字體) */
-    /* 這樣設定可以讓標題在手機上變小，不會爆版 */
+    text-align: center !important;
     font-size: clamp(1.5rem, 6vw, 2.5rem) !important; 
     padding-bottom: 10px;
-    white-space: nowrap; /* 盡量不換行 */
+    white-space: nowrap;
 }
 
-/* 讓上方標題列變透明 */
+/* 👇👇👇 新增：隱藏上方工具列 (Fork按鈕) 與下方 Footer (Logo) 👇👇👇 */
+
+/* 1. 隱藏最上方的 Header (包含 Fork 按鈕、Deploy 按鈕、三條線選單) */
 header[data-testid="stHeader"] {
-    background-color: rgba(0,0,0,0);
+    display: none !important;
 }
 
-/* (加碼) 隱藏右上角的 Streamlit 選單(三條線)與浮水印，讓介面更像原生 App */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
+/* 2. 隱藏最下方的 Footer (Made with Streamlit) */
+footer {
+    display: none !important;
+}
+
+/* 3. 隱藏主選單 (雙重保險) */
+#MainMenu {
+    visibility: hidden;
+}
+
+/* 4. 隱藏右下角的 viewer badge (如果有的話) */
+.viewerBadge_container__1QSob {
+    display: none !important;
+}
+
+/* 👆👆👆 隱藏設定結束 👆👆👆 */
+
 
 /* 調整輸入框與按鈕的邊框顏色 */
 .stSelectbox div[data-baseweb="select"] > div,
@@ -80,7 +94,6 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # ==========================================
 # 3. 介面與輸入區塊
 # ==========================================
-# 這裡不需要改，CSS 會自動處理標題
 st.title("💅 Fairy.L 報價計算機") 
 st.write("---")
 
