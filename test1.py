@@ -15,7 +15,7 @@ custom_css = """
 }
 
 /* 2. 設定全站主要文字顏色為深咖啡色 */
-h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContainer"] p, .stRadio label, .stCheckbox label {
+h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContainer"] p, .stRadio label, .stCheckbox label, .stToggle label {
     color: #4E342E !important;
 }
 
@@ -27,7 +27,8 @@ header[data-testid="stHeader"] {
 /* 調整輸入框與按鈕的邊框顏色 */
 .stSelectbox div[data-baseweb="select"] > div,
 .stTextInput input,
-.stNumberInput input {
+.stNumberInput input,
+.stTextArea textarea {
     border-color: #DCC7A1 !important;
 }
 
@@ -62,21 +63,18 @@ service_unit_price = service_options[service_name]
 
 st.write("") 
 
-# 2. 位置 (改為複選 Checkbox)
+# 2. 位置 (複選 Checkbox)
 st.write("位置 (可複選)")
 col_p1, col_p2 = st.columns(2)
 with col_p1:
-    pos_hand = st.checkbox("手部", value=True) # 預設勾選手部
+    pos_hand = st.checkbox("手部", value=True)
 with col_p2:
     pos_foot = st.checkbox("足部 (+200)")
 
-# 邏輯處理：計算選了幾個位置
 selected_pos = []
 if pos_hand: selected_pos.append("手部")
 if pos_foot: selected_pos.append("足部")
-pos_count = len(selected_pos) # 1 或 2，或 0
-
-# 計算位置加價：如果有選足部，加 200
+pos_count = len(selected_pos)
 pos_surcharge = 200 if pos_foot else 0
 
 st.write("") 
@@ -100,17 +98,19 @@ with col1:
 with col2:
     addon_price = st.number_input("延甲/飾品金額 ($)", min_value=0, step=50)
 
-# 5. 優惠
 st.write("") 
-is_birthday = st.toggle("🎂 壽星優惠 (9折)")
+
+# 5. 優惠 (✨修改處：加上外框與標題，讓它變明顯)
+with st.container(border=True):
+    st.markdown("#### 🎉 優惠活動")
+    is_birthday = st.toggle("🎂 壽星優惠 (9折)", value=False)
+
 
 # --- 計算邏輯 ---
-# 總金額 = (基礎單價 * 位置數量) + 足部加價 + 卸甲 + 跳色 + 其他
 base_service_total = service_unit_price * pos_count
 subtotal = base_service_total + pos_surcharge + remove_price + art_price + addon_price
 final_total = subtotal * 0.9 if is_birthday else subtotal
 
-# 避免沒選位置時顯示金額 (或保持 0)
 if pos_count == 0:
     final_total = 0
 
@@ -134,7 +134,11 @@ quote_text = f"""【Fairy. L NAIL ART 報價明細】
 st.write("---")
 st.markdown(f"### 💰 總金額：`${int(final_total)}`")
 
-st.text_area("報價單預覽", value=quote_text, height=200)
+# ✨修改處：接收編輯後的文字
+# 我們將 st.text_area 的結果存入 edited_quote 變數
+st.caption("👇 可在此直接編輯報價單內容")
+edited_quote = st.text_area("報價單預覽", value=quote_text, height=200, label_visibility="collapsed")
 
-st.code(quote_text, language="text")
+# ✨修改處：下方的複製區塊現在會顯示「編輯過」的文字
+st.code(edited_quote, language="text")
 st.caption("👆 點擊右上角的複製圖示即可複製")
