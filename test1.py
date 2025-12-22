@@ -11,12 +11,12 @@ custom_css = """
 <style>
 /* 1. 設定背景為奶茶色 */
 .stApp {
-    background-color: #F3E5D8; /* 淺奶茶色 */
+    background-color: #F3E5D8;
 }
 
 /* 2. 設定全站主要文字顏色為深咖啡色 */
-h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContainer"] p, .stRadio label {
-    color: #4E342E !important; /* 深咖啡色 */
+h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div[data-testid="stMarkdownContainer"] p, .stRadio label, .stCheckbox label {
+    color: #4E342E !important;
 }
 
 /* 讓上方標題列變透明 */
@@ -24,15 +24,15 @@ header[data-testid="stHeader"] {
     background-color: rgba(0,0,0,0);
 }
 
-/* (選項) 調整輸入框與按鈕的邊框顏色 */
+/* 調整輸入框與按鈕的邊框顏色 */
 .stSelectbox div[data-baseweb="select"] > div,
 .stTextInput input,
 .stNumberInput input {
     border-color: #DCC7A1 !important;
 }
 
-/* 優化 Radio Button 的間距，讓手指比較好點 */
-div[role="radiogroup"] > label {
+/* 優化 Radio 和 Checkbox 的間距 */
+div[role="radiogroup"] > label, div[data-testid="stCheckbox"] label {
     padding-top: 5px;
     padding-bottom: 5px;
 }
@@ -49,7 +49,7 @@ st.write("---")
 
 # --- 輸入區塊 ---
 
-# 1. 基礎服務 (改成 Radio 單選清單，解決下拉選單難收合的問題)
+# 1. 基礎服務
 service_options = {
     "單色": 1000,
     "貓眼": 1100,
@@ -57,26 +57,37 @@ service_options = {
     "法式": 1500,
     "漸層": 1300
 }
-# 這裡把 st.selectbox 改成 st.radio
 service_name = st.radio("基礎服務", list(service_options.keys())) 
-service_price = service_options[service_name]
+service_unit_price = service_options[service_name]
 
-st.write("") # 空行間距
+st.write("") 
 
-# 2. 位置
-position = st.radio("位置", ["手部", "足部"], horizontal=True)
-pos_price = 200 if position == "足部" else 0
+# 2. 位置 (改為複選 Checkbox)
+st.write("位置 (可複選)")
+col_p1, col_p2 = st.columns(2)
+with col_p1:
+    pos_hand = st.checkbox("手部", value=True) # 預設勾選手部
+with col_p2:
+    pos_foot = st.checkbox("足部 (+200)")
 
-st.write("") # 空行間距
+# 邏輯處理：計算選了幾個位置
+selected_pos = []
+if pos_hand: selected_pos.append("手部")
+if pos_foot: selected_pos.append("足部")
+pos_count = len(selected_pos) # 1 或 2，或 0
 
-# 3. 卸甲服務 (也改成 Radio，操作更順手)
+# 計算位置加價：如果有選足部，加 200
+pos_surcharge = 200 if pos_foot else 0
+
+st.write("") 
+
+# 3. 卸甲服務
 remove_options = {
     "無": 0,
     "本店卸甲": 200,
     "他店卸甲": 300,
     "純卸甲": 500
 }
-# 這裡把 st.selectbox 改成 st.radio
 remove_name = st.radio("卸甲服務", list(remove_options.keys()))
 remove_price = remove_options[remove_name]
 
@@ -94,18 +105,25 @@ st.write("")
 is_birthday = st.toggle("🎂 壽星優惠 (9折)")
 
 # --- 計算邏輯 ---
-subtotal = service_price + pos_price + remove_price + art_price + addon_price
+# 總金額 = (基礎單價 * 位置數量) + 足部加價 + 卸甲 + 跳色 + 其他
+base_service_total = service_unit_price * pos_count
+subtotal = base_service_total + pos_surcharge + remove_price + art_price + addon_price
 final_total = subtotal * 0.9 if is_birthday else subtotal
+
+# 避免沒選位置時顯示金額 (或保持 0)
+if pos_count == 0:
+    final_total = 0
 
 # --- 產生報價單文字 ---
 date_str = datetime.date.today().strftime("%Y/%m/%d")
 discount_text = " (已折抵壽星優惠)" if is_birthday else ""
 remove_text = "無" if remove_name == "無" else remove_name
+pos_text = "+".join(selected_pos) if selected_pos else "未選擇"
 
 quote_text = f"""【Fairy. L NAIL ART 報價明細】
 📅 日期：{date_str}
 ---------------------------
-■ 項目：{service_name} ({position})
+■ 項目：{service_name} ({pos_text})
 ■ 卸甲：{remove_text}
 ■ 額外加購：${int(art_price + addon_price)}
 ---------------------------
