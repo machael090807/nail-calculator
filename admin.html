@@ -318,7 +318,7 @@
                 }).then(r=>{if(!r.ok) throw new Error(); return r.json()}).then(d=>{fileSha=d.content.sha});
                 
                 originalData = JSON.parse(JSON.stringify(currentData)); checkChanges();
-                alert('✅ 成功！');
+                alert('✅ 成功！前台需待1-2分鐘刷新');
             } catch(e) { alert('失敗'); }
             btn.innerHTML = '<i class="fas fa-save"></i> 儲存'; btn.disabled = false;
         }
