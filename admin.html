@@ -10,24 +10,19 @@
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px; }
         h1 { text-align: center; margin-bottom: 5px; }
         .subtitle { text-align: center; font-size: 0.9rem; color: var(--accent); margin-bottom: 30px; }
-        
         #login-panel { max-width: 400px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
         input { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         button { background: var(--text); color: white; border: none; padding: 12px 24px; border-radius: 50px; font-size: 1rem; margin-top: 20px; cursor: pointer; width: 100%; transition: 0.2s; }
         button:active { transform: scale(0.98); opacity: 0.9; }
-        
         #editor-panel { display: none; max-width: 600px; margin: 0 auto; }
-        .welcome-msg { text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--accent); }
         .section-card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .section-title { font-weight: bold; font-size: 1.1rem; border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        
         .item-row { border-bottom: 1px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; }
         .item-row:last-child { border-bottom: none; margin-bottom: 0; }
         .label { font-size: 0.85rem; color: #888; margin-bottom: 4px; display: block; }
         .flex-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .col { flex: 1; }
         input.price-input { text-align: center; background: #FAFAFA; margin-top: 0; }
-        
         #save-btn { position: fixed; bottom: 20px; right: 20px; width: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100; }
         details summary { cursor: pointer; font-weight: bold; list-style: none; outline: none; }
     </style>
@@ -39,91 +34,72 @@
 
     <div id="login-panel">
         <h3 style="margin-top:0;">管理者登入</h3>
-        <input type="text" id="username" placeholder="帳號">
-        <input type="password" id="password" placeholder="密碼">
-        <button onclick="login()">登入</button>
+        <p style="font-size:0.8rem; color:#666;">專案為公開模式，請直接輸入 GitHub Token</p>
+        <input type="password" id="token-input" placeholder="貼上您的 Token (ghp_...)">
+        <button onclick="login()">驗證並登入</button>
     </div>
 
     <div id="editor-panel">
-        <div class="welcome-msg" id="welcome-text"></div>
         <div id="content-area"></div>
         <button id="save-btn" onclick="saveToGithub()">💾 儲存修改</button>
     </div>
 
     <script>
-        // 👇👇👇 請在這裡設定您的 GitHub 專案資訊 👇👇👇
+        // 設定
         const REPO_CONFIG = {
             owner: 'machael090807',     
             repo: 'nail-calculator',    
             path: 'data.json'           
         };
-        // 👆👆👆 設定結束 👆👆👆
 
         let currentData = null;
         let fileSha = null;
         let realToken = null; 
 
-        // 登入邏輯：讀取 admin_user.json -> 比對帳密 -> 取得 Token
-        async function login() {
-            const inputUser = document.getElementById('username').value.trim();
-            const inputPass = document.getElementById('password').value.trim();
-            const btn = document.querySelector('#login-panel button');
-
-            if(!inputUser || !inputPass) return alert("請輸入帳號密碼");
-
-            btn.innerText = '驗證身分中...';
-            btn.disabled = true;
-
-            try {
-                // 1. 讀取 admin_user.json (加上時間戳記防止快取)
-                const userRes = await fetch('admin_user.json?v=' + new Date().getTime());
-                if(!userRes.ok) throw new Error("找不到使用者檔案 (admin_user.json)");
-                
-                const users = await userRes.json();
-                
-                // 2. 比對帳號密碼
-                const foundUser = users.find(u => u.user === inputUser && u.pass === inputPass);
-
-                if (foundUser) {
-                    // 登入成功
-                    document.getElementById('welcome-text').innerText = `👋 歡迎回來，${foundUser.name}`;
-                    
-                    // 3. 直接讀取 Token (不解碼)
-                    realToken = foundUser.encodedToken;
-
-                    // 4. 連線 GitHub 讀取價格表
-                    btn.innerText = '讀取價格表中...';
-                    await loadPricingData();
-
-                    // 5. 切換畫面
-                    document.getElementById('login-panel').style.display = 'none';
-                    document.getElementById('editor-panel').style.display = 'block';
-
-                } else {
-                    alert('❌ 帳號或密碼錯誤');
-                    btn.innerText = '登入';
-                    btn.disabled = false;
-                }
-
-            } catch (e) {
-                alert('登入錯誤：' + e.message);
-                btn.innerText = '登入';
-                btn.disabled = false;
+        // 檢查瀏覽器是否記得 Token
+        window.onload = function() {
+            const savedToken = localStorage.getItem('gh_token');
+            if(savedToken) {
+                document.getElementById('token-input').value = savedToken;
             }
         }
 
-        async function loadPricingData() {
-            const response = await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
-                headers: { 'Authorization': `token ${realToken}` }
-            });
+        async function login() {
+            const inputToken = document.getElementById('token-input').value.trim();
+            const btn = document.querySelector('#login-panel button');
 
-            if(!response.ok) throw new Error('連線 GitHub 失敗，請檢查 Token 權限');
+            if(!inputToken) return alert("請輸入 Token");
 
-            const data = await response.json();
-            fileSha = data.sha; 
-            const content = decodeURIComponent(escape(window.atob(data.content)));
-            currentData = JSON.parse(content);
-            renderEditor();
+            btn.innerText = '驗證中...';
+            btn.disabled = true;
+
+            try {
+                // 嘗試連線
+                const response = await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
+                    headers: { 'Authorization': `token ${inputToken}` }
+                });
+
+                if(!response.ok) throw new Error('Token 無效或無權限');
+
+                const data = await response.json();
+                fileSha = data.sha; 
+                // 解碼
+                const content = decodeURIComponent(escape(window.atob(data.content)));
+                currentData = JSON.parse(content);
+
+                // 登入成功，把 Token 記在瀏覽器裡 (方便下次不用貼)
+                localStorage.setItem('gh_token', inputToken);
+                realToken = inputToken;
+
+                renderEditor();
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('editor-panel').style.display = 'block';
+
+            } catch (e) {
+                alert('登入失敗：' + e.message);
+                btn.innerText = '登入';
+                btn.disabled = false;
+            }
         }
 
         function renderEditor() {
@@ -212,7 +188,7 @@
         }
 
         async function saveToGithub() {
-            if(!confirm('確定要儲存修改嗎？')) return;
+            if(!confirm('確定要儲存修改並更新前台嗎？')) return;
             const btn = document.getElementById('save-btn');
             btn.innerText = '上傳中...';
             btn.disabled = true;
