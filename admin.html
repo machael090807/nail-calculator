@@ -6,8 +6,8 @@
     <title>Fairy. L 後台管理</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- 全域變數與重置 --- */
-        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --btn: #4E342E; --btn-hover: #3E2723; --danger: #E57373; --input-bg: #F5F5F5; }
+        /* --- 全域變數 --- */
+        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --btn: #4E342E; --danger: #E57373; --input-bg: #F5F5F5; }
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; margin: 0; padding: 0; height: 100vh; }
         
         /* --- 登入畫面 --- */
@@ -29,49 +29,38 @@
         .btn-login:active { transform: scale(0.98); }
         .error-msg { color: #E57373; font-size: 0.85rem; margin-top: 15px; min-height: 20px; }
 
-        /* --- 隱藏按鈕 (忍者模式) --- */
+        /* --- 🥷 忍者按鈕 --- */
         .btn-ninja { 
-            margin-top: 50px; 
-            background: var(--bg); /* 與背景同色 */
-            color: var(--bg);      /* 文字與背景同色 */
-            border: none; 
-            cursor: default;       /* 滑鼠游標不變，讓人更難發現 */
-            font-size: 0.8rem;
+            margin-top: 60px; 
+            background: var(--bg); color: var(--bg); border: none; font-size: 0.8rem;
+            cursor: default; transition: 0.2s;
         }
-        .btn-ninja:hover {
-            cursor: pointer;       /* 只有滑鼠剛好移上去時才會變手手 */
-        }
+        .btn-ninja:hover { cursor: pointer; }
 
-        /* --- 產生器視窗 (Modal) --- */
+        /* --- 產生器視窗 --- */
         #gen_modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .gen-box { background: white; padding: 30px; border-radius: 16px; width: 350px; position: relative; }
+        .gen-box { background: white; padding: 30px; border-radius: 16px; width: 320px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.2rem; color: #999; }
-        .gen-result { background: #EEE; padding: 10px; border-radius: 8px; margin-top: 10px; word-break: break-all; font-family: monospace; display: none; color: #333; }
+        .gen-result { background: #EEE; padding: 10px; border-radius: 8px; margin-top: 15px; word-break: break-all; font-family: monospace; display: none; color: #333; font-size: 0.9rem; }
 
         /* --- 後台主介面 --- */
         #admin_view { display: none; padding: 20px; padding-bottom: 80px; max-width: 800px; margin: 0 auto; }
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .tab { flex: 1; min-width: 80px; text-align: center; padding: 10px; background: #E0D8D4; border-radius: 10px; cursor: pointer; color: #795548; font-weight: bold; white-space: nowrap; transition: 0.2s; }
         .tab.active { background: #8D7B6F; color: white; transform: scale(1.02); }
-        
         .page { display: none; animation: fadeIn 0.3s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
         .section-header { font-size: 1.1rem; font-weight: bold; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        
         label { display: block; margin-top: 12px; font-size: 0.9rem; color: #8D6E63; font-weight: bold; margin-bottom: 4px; }
         input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: none; background: var(--input-bg); border-radius: 8px; font-size: 1rem; color: var(--text); outline: none; box-sizing: border-box; }
-        
         button.btn-act { border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
         .btn-add { background: #81C784; color: white; width: 100%; margin-top: 10px; padding: 12px; }
         .btn-del { background: transparent; color: var(--danger); border: 1px solid var(--danger); position: absolute; top: 15px; right: 15px; padding: 4px 10px; font-size: 0.8rem; }
-        
         .btn-save { background: #4E342E; color: white; width: 100%; padding: 16px; font-size: 1.1rem; position: fixed; bottom: 0; left: 0; border:none; border-radius: 20px 20px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 50; cursor: pointer; }
-
         .price-group { background: #FAFAFA; padding: 10px; border-radius: 10px; margin-top: 8px; border: 1px dashed #E0E0E0; }
         .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .price-label { width: 50px; font-size: 0.85rem; color: #999; }
@@ -86,45 +75,42 @@
         </div>
         <div class="login-card">
             <div class="login-title">管理者登入</div>
-            
             <div class="form-group">
                 <select id="user_select" class="form-control">
                     <option value="" disabled selected>讀取使用者中...</option>
                 </select>
             </div>
-            
             <div class="form-group">
                 <input type="password" id="password_input" class="form-control" placeholder="•••••">
             </div>
-            
             <button class="btn-login" onclick="attemptLogin()">登入</button>
             <div id="login_msg" class="error-msg"></div>
         </div>
-
         <button class="btn-ninja" onclick="document.getElementById('gen_modal').style.display='flex'">• 產生金鑰 •</button>
     </div>
 
     <div id="gen_modal">
         <div class="gen-box">
             <div class="close-btn" onclick="document.getElementById('gen_modal').style.display='none'">✕</div>
-            <h3 style="margin-top:0; text-align:center;">🔐 產生 Cipher 亂碼</h3>
+            <h3 style="margin-top:0; text-align:center; color:#4E342E">🔐 產生 Cipher 亂碼</h3>
+            <p style="text-align:center; color:#999; font-size:0.85rem; margin-bottom:15px;">資訊將會被打包並加密</p>
             
             <label>GitHub Token</label>
-            <input type="text" id="g_token" placeholder="ghp_xxx...">
+            <input type="text" id="g_token" placeholder="ghp_xxxxxxxx...">
             
-            <label>User (帳號)</label>
+            <label>GitHub 帳號 (User)</label>
             <input type="text" id="g_user" placeholder="machael090807">
-            
-            <label>Repo (儲存庫)</label>
+
+            <label>Repo 名稱</label>
             <input type="text" id="g_repo" placeholder="nail-calculator" value="nail-calculator">
-            
+
             <label>設定密碼</label>
             <input type="text" id="g_pass" placeholder="輸入你想設定的密碼">
 
-            <button class="btn-login" style="margin-top:20px" onclick="generateCipher()">產生並顯示</button>
+            <button class="btn-login" style="margin-top:25px" onclick="generateCipher()">產生並顯示</button>
             
             <div id="g_result" class="gen-result"></div>
-            <div id="g_msg" style="color:green; font-size:0.8rem; text-align:center; margin-top:5px; display:none;">✅ 已複製！請貼回 JSON</div>
+            <div id="g_msg" style="color:green; font-size:0.8rem; text-align:center; margin-top:5px; display:none;">✅ 已複製！請貼到 JSON 的 cipher 欄位</div>
         </div>
     </div>
 
@@ -163,16 +149,9 @@
         </div>
 
         <div id="tab_others" class="page">
-            <div class="section-header">
-                <span>💅 卸甲項目</span>
-                <button class="btn-act" style="background:#8D6E63; color:white;" onclick="addRemoval()">+ 新增</button>
-            </div>
+            <div class="section-header"><span>💅 卸甲項目</span><button class="btn-act" style="background:#8D6E63; color:white;" onclick="addRemoval()">+ 新增</button></div>
             <div id="removals_container"></div>
-
-            <div class="section-header" style="margin-top:30px">
-                <span>➕ 加購項目</span>
-                <button class="btn-act" style="background:#8D6E63; color:white;" onclick="addAddon()">+ 新增</button>
-            </div>
+            <div class="section-header" style="margin-top:30px"><span>➕ 加購項目</span><button class="btn-act" style="background:#8D6E63; color:white;" onclick="addAddon()">+ 新增</button></div>
             <div id="addons_container"></div>
         </div>
 
@@ -207,7 +186,7 @@
             });
         }
 
-        // --- 產生亂碼功能 (後門) ---
+        // --- 產生亂碼 (打包所有資訊) ---
         function generateCipher() {
             const t = document.getElementById('g_token').value.trim();
             const u = document.getElementById('g_user').value.trim();
@@ -216,8 +195,9 @@
             
             if(!t || !u || !r || !p) return alert("請填寫所有欄位");
 
+            // 格式：token|user|repo
             const raw = `${t}|${u}|${r}`;
-            const cipher = btoa(xor_process(raw, p)); // 加密
+            const cipher = btoa(xor_process(raw, p)); 
 
             const box = document.getElementById('g_result');
             box.innerText = cipher;
@@ -228,7 +208,7 @@
             });
         }
 
-        // --- 登入功能 ---
+        // --- 登入功能 (解密並拆解) ---
         function attemptLogin() {
             const userIdx = document.getElementById('user_select').value;
             const pwd = document.getElementById('password_input').value;
@@ -244,6 +224,7 @@
             const decrypted = xor_process(atob(targetUser.cipher), pwd);
             const parts = decrypted.split('|');
 
+            // 檢查格式是否正確 (必須包含 gh_token, user, repo)
             if(parts.length >= 3 && parts[0].startsWith('ghp_')) {
                 CURRENT_CONFIG.token = parts[0];
                 CURRENT_CONFIG.user = parts[1];
@@ -256,14 +237,13 @@
                         document.getElementById('admin_view').style.display = 'block';
                     }, 300);
                 }).catch(() => {
-                    msg.innerText = "❌ Token 失效或網路錯誤";
+                    msg.innerText = "❌ 密碼正確但無法連線 GitHub (請檢查 Token)";
                 });
             } else {
                 msg.innerText = "❌ 密碼錯誤";
             }
         }
 
-        // 共用的 XOR 加解密函式 (因為 XOR 是對稱的，加密解密用同一段程式)
         function xor_process(text, key) {
             let result = '';
             for (let i = 0; i < text.length; i++) {
@@ -272,7 +252,6 @@
             return result;
         }
 
-        // --- GitHub API & 渲染 ---
         async function loadDataFromGitHub() {
             const { token, user, repo, path } = CURRENT_CONFIG;
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
@@ -286,6 +265,7 @@
             renderAll();
         }
 
+        // --- 渲染與操作邏輯 ---
         function switchTab(id) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -294,13 +274,11 @@
         }
 
         function renderAll() {
-            // Settings
             document.getElementById('set_birthday').value = DATA.settings.birthday_discount || 0.9;
             document.getElementById('set_hand_name').value = DATA.settings.location_hand_name || "🖐️ 手部";
             document.getElementById('set_foot_name').value = DATA.settings.location_foot_name || "🦶 足部";
             document.getElementById('set_foot_price').value = DATA.settings.location_foot_surcharge || 200;
 
-            // Categories
             const catContainer = document.getElementById('categories_container');
             catContainer.innerHTML = '';
             (DATA.categories || []).forEach((cat, cIdx) => {
@@ -312,14 +290,10 @@
                     <button class="btn-del" onclick="delCategory(${cIdx})">刪除分類</button>
                     <label>分類標題</label>
                     <input type="text" value="${cat.title}" onchange="DATA.categories[${cIdx}].title = this.value" style="font-weight:bold; font-size:1.1rem; color:#4E342E;">
-                    <div style="margin-top:15px; padding-left:10px; border-left: 3px solid #EFEBE9;">
-                        ${itemsHtml}
-                        <button class="btn-act" style="background:#D7CCC8; color:#4E342E; margin-top:10px; width:100%" onclick="addItem(${cIdx})">+ 新增項目</button>
-                    </div>`;
+                    <div style="margin-top:15px; padding-left:10px; border-left: 3px solid #EFEBE9;">${itemsHtml}<button class="btn-act" style="background:#D7CCC8; color:#4E342E; margin-top:10px; width:100%" onclick="addItem(${cIdx})">+ 新增項目</button></div>`;
                 catContainer.appendChild(div);
             });
 
-            // Removals
             const rmContainer = document.getElementById('removals_container');
             rmContainer.innerHTML = '';
             (DATA.removals || []).forEach((item, idx) => {
@@ -329,7 +303,6 @@
                 rmContainer.appendChild(div);
             });
 
-            // Add-ons
             const addContainer = document.getElementById('addons_container');
             addContainer.innerHTML = '';
             (DATA.add_ons || []).forEach((item, idx) => {
@@ -340,10 +313,8 @@
                     : `<label>單價</label><input type="number" value="${item.price||0}" onchange="updateAddonSimplePrice(${idx}, this.value)">`;
                 div.innerHTML = `
                     <button class="btn-del" onclick="delAddon(${idx})">刪除</button>
-                    <label>項目名稱</label>
-                    <input type="text" value="${item.name}" onchange="DATA.add_ons[${idx}].name = this.value">
-                    <div style="display:flex; gap:10px"><div style="flex:1"><label>單位</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div></div>
-                    ${priceHtml}`;
+                    <label>項目名稱</label><input type="text" value="${item.name}" onchange="DATA.add_ons[${idx}].name = this.value">
+                    <div style="display:flex; gap:10px"><div style="flex:1"><label>單位</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div></div>${priceHtml}`;
                 addContainer.appendChild(div);
             });
         }
