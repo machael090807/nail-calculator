@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fairy. L 報價系統_v1.1.1<title>
+    <title>Fairy. L 報價系統</title>
     
     <link rel="apple-touch-icon" href="logo.jpg">
     <link rel="icon" href="logo.jpg">
@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
-        /* 🎨 奶茶色主題 (維持不變) */
+        /* 🎨 奶茶色主題 */
         :root {
             --bg-color: #F3E5D8;
             --text-color: #4E342E;
@@ -37,16 +37,13 @@
         }
 
         .subtitle {
-            text-align: center;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            opacity: 0.8;
+            text-align: center; font-size: 0.9rem; margin-bottom: 20px; opacity: 0.8;
         }
 
         .section { margin-bottom: 25px; }
         .section-title { font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; border-left: 4px solid var(--text-color); padding-left: 10px; }
 
-        /* 職級選擇器樣式 */
+        /* 職級選擇器 */
         .role-selector {
             display: flex;
             background: rgba(255,255,255,0.5);
@@ -56,42 +53,49 @@
             border: 1px solid var(--border-color);
         }
         .role-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s;
+            flex: 1; text-align: center; padding: 10px; cursor: pointer;
+            border-radius: 8px; font-weight: bold; transition: 0.3s;
         }
         .role-option.active {
-            background-color: var(--text-color);
-            color: var(--white);
+            background-color: var(--text-color); color: var(--white);
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 選項網格 */
-        .options-grid { display: flex; flex-direction: column; gap: 10px; }
+        /* 👇👇👇 修改重點：改成兩欄網格排列 👇👇👇 */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 切成兩等分 */
+            gap: 10px; /* 按鈕之間的間距 */
+        }
         
-        /* 單選/複選按鈕樣式 */
+        /* 選項按鈕樣式 */
         .option-label {
             display: flex; align-items: center; justify-content: space-between;
             background: rgba(255,255,255,0.4);
-            padding: 12px 15px; border-radius: 12px;
+            padding: 10px; /* 稍微縮小內距以適應兩欄 */
+            border-radius: 12px;
             border: 1px solid var(--border-color);
             cursor: pointer; transition: 0.2s;
+            font-size: 0.95rem; /* 字體稍微縮小一點點避免折行 */
         }
-        /* 選中時的樣式 */
         .option-label:has(input:checked) {
             background: rgba(255,255,255,0.9);
             border-color: var(--text-color);
             box-shadow: 0 0 0 1px var(--text-color);
         }
 
+        /* 標籤內的文字容器，避免文字跟圓點擠在一起 */
+        .label-text {
+            display: flex;
+            flex-direction: column; /* 讓標籤跟文字上下排或自動調整 */
+            gap: 2px;
+        }
+
         input[type="radio"], input[type="checkbox"] {
             accent-color: var(--text-color);
-            transform: scale(1.3);
-            margin-left: 10px;
+            transform: scale(1.2);
+            margin-left: 5px;
+            flex-shrink: 0; /* 防止按鈕被擠壓 */
         }
 
         /* 輸入框 */
@@ -133,7 +137,7 @@
             border: 1px solid var(--border-color); border-radius: 8px;
             padding: 15px; font-size: 1rem; color: var(--text-color);
             box-sizing: border-box; margin-bottom: 10px;
-            font-family: monospace; /* 讓排版對齊 */
+            font-family: monospace;
         }
 
         button.copy-btn {
@@ -146,12 +150,14 @@
         
         /* 分類標籤 (小字) */
         .cat-tag {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--white);
             background-color: var(--accent);
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 4px;
-            margin-right: 8px;
+            margin-right: 4px;
+            display: inline-block;
+            margin-bottom: 2px;
         }
     </style>
 </head>
@@ -169,20 +175,52 @@
     <div class="section">
         <div class="section-title">選擇項目</div>
         <div class="options-grid">
-            <label class="option-label"><span><span class="cat-tag">單色</span>單色凝膠</span> <input type="radio" name="service" value="single" checked></label>
-            <label class="option-label"><span><span class="cat-tag">單色</span>貓眼凝膠</span> <input type="radio" name="service" value="cateye"></label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">單色</span>單色凝膠</div>
+                <input type="radio" name="service" value="single" checked>
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">單色</span>貓眼凝膠</div>
+                <input type="radio" name="service" value="cateye">
+            </label>
             
-            <label class="option-label"><span><span class="cat-tag">造型</span>十指鏡面</span> <input type="radio" name="service" value="mirror"></label>
-            <label class="option-label"><span><span class="cat-tag">造型</span>十指法式</span> <input type="radio" name="service" value="french"></label>
-            <label class="option-label"><span><span class="cat-tag">造型</span>十指漸層</span> <input type="radio" name="service" value="gradient"></label>
-            <label class="option-label"><span><span class="cat-tag">造型</span>自帶圖</span> <input type="radio" name="service" value="custom"></label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">造型</span>十指鏡面</div>
+                <input type="radio" name="service" value="mirror">
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">造型</span>十指法式</div>
+                <input type="radio" name="service" value="french">
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">造型</span>十指漸層</div>
+                <input type="radio" name="service" value="gradient">
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">造型</span>自帶圖</div>
+                <input type="radio" name="service" value="custom">
+            </label>
             
-            <label class="option-label"><span><span class="cat-tag">盲盒</span>超值不挑款</span> <input type="radio" name="service" value="blind_value"></label>
-            <label class="option-label"><span><span class="cat-tag">盲盒</span>含鑽不挑款</span> <input type="radio" name="service" value="blind_diamond"></label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">盲盒</span>超值不挑</div>
+                <input type="radio" name="service" value="blind_value">
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">盲盒</span>含鑽不挑</div>
+                <input type="radio" name="service" value="blind_diamond">
+            </label>
 
-            <label class="option-label"><span><span class="cat-tag">延甲</span>十指半貼延甲</span> <input type="radio" name="service" value="ext_half"></label>
-            <label class="option-label"><span><span class="cat-tag">延甲</span>淺貼加長延甲</span> <input type="radio" name="service" value="ext_long"></label>
-            <label class="option-label"><span><span class="cat-tag">延甲</span>十指半貼含造型</span> <input type="radio" name="service" value="ext_styled"></label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">延甲</span>十指半貼</div>
+                <input type="radio" name="service" value="ext_half">
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">延甲</span>淺貼加長</div>
+                <input type="radio" name="service" value="ext_long">
+            </label>
+            <label class="option-label" style="grid-column: span 2;"> <div class="label-text"><span class="cat-tag">延甲</span>十指半貼含造型</div>
+                <input type="radio" name="service" value="ext_styled">
+            </label>
         </div>
     </div>
 
@@ -201,7 +239,7 @@
             <label class="option-label"><span>無</span> <input type="radio" name="remove" value="none" checked></label>
             <label class="option-label"><span>本店卸甲</span> <input type="radio" name="remove" value="our_shop"></label>
             <label class="option-label"><span>他店卸甲</span> <input type="radio" name="remove" value="other_shop"></label>
-            <label class="option-label"><span>純卸甲 (不含保養)</span> <input type="radio" name="remove" value="pure"></label>
+            <label class="option-label"><span>純卸甲</span> <input type="radio" name="remove" value="pure"></label>
         </div>
     </div>
 
@@ -232,82 +270,56 @@
     </div>
 
     <script>
-        // --- 1. 定義價目表數據 (資料來源：你的圖片) ---
-        // 格式：[店長價, 美甲師價, 助理價]
-        // null 代表該職級不提供此服務
+        // 資料與邏輯部分 (保持不變)
         const PRICES = {
-            // 手足分開計價項目 [手部價, 足部價]
-            'single': { 
-                'manager': [1200, 1300], 'artist': [1000, 1200], 'assistant': [900, 1000],
-                name: "單色凝膠" 
-            },
-            'cateye': { 
-                'manager': [1300, 1400], 'artist': [1100, 1300], 'assistant': [1000, 1100],
-                name: "貓眼凝膠" 
-            },
-            
-            // 統一底價 + 足部加價項目 (造型類)
-            // 這裡存的是 [底價]，足部邏輯在計算時 +200
+            'single': { 'manager': [1200, 1300], 'artist': [1000, 1200], 'assistant': [900, 1000], name: "單色凝膠" },
+            'cateye': { 'manager': [1300, 1400], 'artist': [1100, 1300], 'assistant': [1000, 1100], name: "貓眼凝膠" },
             'mirror': { 'manager': 1500, 'artist': 1300, 'assistant': 1100, name: "十指鏡面" },
             'french': { 'manager': 1600, 'artist': 1500, 'assistant': 1200, name: "十指法式" },
             'gradient': { 'manager': 1300, 'artist': 1300, 'assistant': 1100, name: "十指漸層" },
-            'custom': { 'manager': 1300, 'artist': 1000, 'assistant': 800, name: "自帶圖" }, // 自帶圖店長是1300up，這邊先設1300
-            
-            // 盲盒 (無足部加價說明，假設統一或不分)
+            'custom': { 'manager': 1300, 'artist': 1000, 'assistant': 800, name: "自帶圖" },
             'blind_value': { 'manager': 1500, 'artist': 1200, 'assistant': null, name: "超值不挑款" },
             'blind_diamond': { 'manager': 1700, 'artist': 1500, 'assistant': null, name: "含鑽不挑款" },
-
-            // 延甲 (無足部加價，除了單指)
             'ext_half': { 'manager': 1200, 'artist': 1000, 'assistant': 1000, name: "十指半貼延甲" },
             'ext_long': { 'manager': 1500, 'artist': null, 'assistant': null, name: "淺貼加長延甲" },
             'ext_styled': { 'manager': 2500, 'artist': 2000, 'assistant': 2000, name: "十指半貼含造型" }
         };
 
-        // 卸甲價格 [店長, 美甲師, 助理]
         const REMOVE_PRICES = {
             'none': [0, 0, 0],
             'our_shop': [300, 200, 200],
             'other_shop': [300, 300, 300],
-            'pure': [0, 500, 500] // 店長純卸甲圖片寫 - ，暫設0或需手動
+            'pure': [0, 500, 500]
         };
 
-        // 當前選中的職級 (預設美甲師)
         let currentRole = 'artist'; 
         const roleNames = {'manager': '店長', 'artist': '美甲師', 'assistant': '助理'};
 
-        // --- 2. 職級切換邏輯 ---
         function setRole(role) {
             currentRole = role;
-            // 更新按鈕樣式
             document.querySelectorAll('.role-option').forEach(el => el.classList.remove('active'));
             document.querySelector(`.role-option[onclick="setRole('${role}')"]`).classList.add('active');
             calculate();
         }
 
-        // --- 3. 取得日期 ---
         function getTodayDate() {
             const d = new Date();
             return `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
         }
 
-        // --- 4. 核心計算邏輯 ---
         function calculate() {
-            // 取得選中的服務
             const serviceVal = document.querySelector('input[name="service"]:checked').value;
             const serviceData = PRICES[serviceVal];
             
-            // 檢查該職級是否有此服務 (例如助理沒有盲盒)
             let basePriceData = null;
             let isServiceAvailable = true;
 
-            // 判斷數據結構是 [手, 足] 還是 單一數字
             if (serviceData[currentRole] === null) {
                 isServiceAvailable = false;
             } else {
                 basePriceData = serviceData[currentRole];
             }
 
-            // 取得位置
             const isHand = document.getElementById('pos_hand').checked;
             const isFoot = document.getElementById('pos_foot').checked;
             
@@ -315,35 +327,15 @@
             let posTextArr = [];
             
             if (isServiceAvailable) {
-                // 邏輯分支 A: 單色/貓眼 (手足不同價)
                 if (serviceVal === 'single' || serviceVal === 'cateye') {
-                    if (isHand) {
-                        serviceTotal += basePriceData[0];
-                        posTextArr.push(`手部$${basePriceData[0]}`);
-                    }
+                    if (isHand) { serviceTotal += basePriceData[0]; posTextArr.push(`手部$${basePriceData[0]}`); }
+                    if (isFoot) { serviceTotal += basePriceData[1]; posTextArr.push(`足部$${basePriceData[1]}`); }
+                } else {
+                    let itemPrice = basePriceData;
+                    if (isHand) { serviceTotal += itemPrice; posTextArr.push("手部"); }
                     if (isFoot) {
-                        serviceTotal += basePriceData[1];
-                        posTextArr.push(`足部$${basePriceData[1]}`);
-                    }
-                } 
-                // 邏輯分支 B: 造型/延甲 (底價 + 足部固定加價200)
-                else {
-                    let itemPrice = basePriceData; // 這是數字
-                    if (isHand) {
-                        serviceTotal += itemPrice;
-                        posTextArr.push("手部");
-                    }
-                    if (isFoot) {
-                        // 造型類足部加200，延甲類表單沒寫足部加價，但通常延甲是手部，這裡假設如果選足部就加200，或是依實際情況
-                        // 根據圖片：凝膠造型區塊有寫「足部項目+$200」。甲片延甲區塊沒寫，只有足部單指延長。
-                        // 為了防呆，如果是造型類 (mirror, french, gradient, custom) 足部+200
                         let surcharge = 0;
-                        if (['mirror', 'french', 'gradient', 'custom'].includes(serviceVal)) {
-                            surcharge = 200;
-                        }
-                        
-                        // 如果手足都選，通常是做兩套，所以價格累加
-                        // 但如果是單純選足部，就是 底價+200
+                        if (['mirror', 'french', 'gradient', 'custom'].includes(serviceVal)) { surcharge = 200; }
                         serviceTotal += (itemPrice + surcharge);
                         posTextArr.push(`足部(+$${surcharge})`);
                     }
@@ -353,42 +345,31 @@
             }
 
             const posText = posTextArr.length > 0 ? posTextArr.join("+") : "未選擇";
-
-            // 卸甲
             const removeVal = document.querySelector('input[name="remove"]:checked').value;
-            // 根據職級取得卸甲價索引：0=店長, 1=美甲師, 2=助理
-            // 為了方便，我們改了數據結構用 key 取值
-            // REMOVE_PRICES 結構: key: [店長, 美甲師, 助理]
             let roleIdx = 0;
             if (currentRole === 'artist') roleIdx = 1;
             if (currentRole === 'assistant') roleIdx = 2;
             
             const removePrice = REMOVE_PRICES[removeVal][roleIdx];
             const removeEl = document.querySelector(`input[name="remove"][value="${removeVal}"]`);
-            // 取得標籤文字 (移除 input 標籤後的純文字)
-            const removeName = removeEl.parentElement.querySelector('span').innerText;
+            const removeName = removeEl.closest('.option-label').querySelector('span').innerText;
             const removeText = removePrice === 0 ? removeName : `${removeName} ($${removePrice})`;
 
-            // 加購
             const jumpCount = parseInt(document.getElementById('jump_color').value) || 0;
             const jumpPrice = jumpCount * 100;
             const addonPrice = parseInt(document.getElementById('addon_price').value) || 0;
             const extraTotal = jumpPrice + addonPrice;
 
-            // 優惠
             const isBirthday = document.getElementById('birthday').checked;
 
-            // 總計
             let baseTotal = serviceTotal + removePrice + extraTotal;
-            if (!isHand && !isFoot) baseTotal = 0; // 沒選位置歸零
+            if (!isHand && !isFoot) baseTotal = 0;
 
             let finalTotal = isBirthday ? Math.round(baseTotal * 0.9) : baseTotal;
             let discountText = isBirthday ? " (已折壽星9折)" : "";
 
-            // 顯示
             document.getElementById('total_display').innerText = `$${finalTotal}`;
 
-            // 生成報價單
             const quote = `【Fairy. L NAIL ART 報價單】
 📅 日期：${getTodayDate()}
 👤 服務人員：${roleNames[currentRole]}
@@ -414,13 +395,11 @@
             });
         }
 
-        // 綁定事件
         document.querySelectorAll('input').forEach(el => {
             el.addEventListener('change', calculate);
             el.addEventListener('input', calculate);
         });
 
-        // 初始化
         calculate();
     </script>
 </body>
