@@ -8,8 +8,18 @@
     <style>
         :root { --bg:#F8F6F4; --card:#FFF; --text:#4E342E; --sub:#8D6E63; --main:#5D4037; --danger:#EF5350; --input:#F2F2F7; }
         * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; }
-        body { background:var(--bg); color:var(--text); font-family:'Noto Sans TC',sans-serif; margin:0; padding-bottom:100px; }
+        body { background:var(--bg); color:var(--text); font-family:'Noto Sans TC',sans-serif; margin:0; padding-bottom:100px; font-size:16px; }
         
+        /* --- RWD 自適應設定 --- */
+        /* 手機版優化 */
+        @media (max-width: 480px) {
+            .app-header { padding: 12px 15px !important; }
+            .card { padding: 15px !important; }
+            .btn-icon { width: 36px !important; height: 36px !important; } /* 手機按鈕加大好點 */
+            h1 { font-size: 1.5rem !important; }
+            .box { width: 90% !important; padding: 25px !important; }
+        }
+
         /* 介面元件 */
         .app-header { background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); padding:15px 20px; position:sticky; top:0; z-index:50; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
         .tabs-wrap { padding:10px 20px; position:sticky; top:60px; z-index:40; background:var(--bg); }
@@ -17,7 +27,7 @@
         .tab { flex:1; text-align:center; padding:8px 0; border-radius:9px; font-size:0.9rem; font-weight:bold; color:#9E9E9E; cursor:pointer; transition:0.2s; }
         .tab.active { background:var(--card); color:var(--text); box-shadow:0 2px 5px rgba(0,0,0,0.1); }
         
-        .page { display:none; padding:10px 20px; animation:fadeIn 0.3s; }
+        .page { display:none; padding:10px 20px; animation:fadeIn 0.3s; max-width: 800px; margin: 0 auto; }
         .page.active { display:block; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
 
@@ -32,13 +42,14 @@
         .btn { border:none; border-radius:12px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s; }
         .btn:active { transform:scale(0.96); }
         .btn-add { background:var(--main); color:#FFF; width:100%; padding:12px; margin-top:15px; }
-        .btn-icon { width:32px; height:32px; border-radius:50%; background:#F5F5F5; color:#757575; font-size:1rem; }
-        .btn-del { background:#FFEBEE; color:var(--danger); position:absolute; top:10px; right:10px; }
+        .btn-icon { width:32px; height:32px; border-radius:50%; background:#F5F5F5; color:#757575; font-size:1rem; cursor: pointer; }
+        .btn-del { background:#FFEBEE; color:var(--danger); }
         .actions { position:absolute; top:10px; right:10px; display:flex; gap:8px; z-index:5; }
 
-        /* 價格群組 */
-        .p-grp { display:flex; align-items:center; gap:10px; margin-top:8px; }
-        .p-lbl { width:50px; font-size:0.85rem; color:#9E9E9E; font-weight:bold; }
+        /* 價格群組 (RWD: 小螢幕直排，大螢幕橫排) */
+        .p-grp { display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap: wrap; }
+        .p-item { flex: 1; min-width: 80px; display: flex; align-items: center; gap: 5px; }
+        .p-lbl { font-size:0.8rem; color:#9E9E9E; font-weight:bold; white-space: nowrap; }
 
         /* 底部浮動區 */
         .bar { position:fixed; bottom:0; left:0; width:100%; background:#FFF; padding:15px 20px calc(15px + env(safe-area-inset-bottom)); box-shadow:0 -5px 20px rgba(0,0,0,0.08); z-index:90; display:flex; gap:12px; transform:translateY(100%); transition:0.3s; }
@@ -49,8 +60,13 @@
         /* 登入與視窗 */
         #login, #gen { position:fixed; inset:0; background:var(--bg); z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:0.3s; }
         #gen { background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); display:none; }
-        .box { background:#FFF; width:85%; max-width:350px; padding:30px; border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,0.1); text-align:center; position:relative; }
-        select { width:100%; padding:12px 15px; border:none; background:var(--input); border-radius:10px; font-size:1rem; margin-bottom:15px; -webkit-appearance:none; text-align-last:center; background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234E342E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat:no-repeat; background-position:right 15px center; background-size:10px; }
+        .box { background:#FFF; width:90%; max-width:350px; padding:30px; border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,0.1); text-align:center; position:relative; }
+        
+        select { width:100%; padding:12px 15px; border:none; background:var(--input); border-radius:10px; font-size:1rem; margin-bottom:15px; -webkit-appearance:none; text-align:center; text-align-last:center; background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234E342E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat:no-repeat; background-position:right 15px center; background-size:10px; }
+
+        /* 密碼眼睛按鈕容器 */
+        .pwd-wrap { position: relative; width: 100%; }
+        .eye-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 1.2rem; user-select: none; }
     </style>
 </head>
 <body>
@@ -61,9 +77,14 @@
         <div class="box">
             <h3 style="margin-top:0">管理者登入</h3>
             <select id="user_list"><option disabled selected>讀取中...</option></select>
-            <input type="password" id="pwd" placeholder="輸入密碼" style="text-align:center; letter-spacing:3px;">
-            <button class="btn btn-add" onclick="login()">登入</button>
-            <p id="msg" style="color:var(--danger); font-size:0.8rem; height:20px; margin-top:10px;"></p>
+            
+            <div class="pwd-wrap">
+                <input type="password" id="pwd" placeholder="輸入密碼" style="text-align:center; letter-spacing:2px; padding-right: 40px;">
+                <span class="eye-btn" onclick="togglePwd()">👁️</span>
+            </div>
+
+            <button class="btn btn-add" id="btn-login" onclick="login()">登入</button>
+            <p id="msg" style="color:var(--danger); font-size:0.85rem; height:20px; margin-top:10px; font-weight:bold;"></p>
         </div>
         <button onclick="el('gen').style.display='flex'" style="margin-top:50px; opacity:0; cursor:default;">.</button>
     </div>
@@ -82,14 +103,14 @@
     <div id="admin" style="display:none;">
         <div class="app-header">
             <span style="font-weight:800; font-size:1.2rem;">後台管理</span>
-            <button class="btn" style="background:#EEE; color:var(--sub); padding:6px 12px;" onclick="location.reload()">登出</button>
+            <button class="btn" style="background:#EEE; color:var(--sub); padding:6px 12px;" onclick="logout()">登出</button>
         </div>
 
         <div class="tabs-wrap">
             <div class="tabs">
                 <div class="tab active" onclick="tab('settings')">全域</div>
-                <div class="tab" onclick="tab('categories')">菜單</div>
-                <div class="tab" onclick="tab('others')">其他</div>
+                <div class="tab" onclick="switchTab('categories')">菜單</div>
+                <div class="tab" onclick="switchTab('others')">其他</div>
             </div>
         </div>
 
@@ -121,31 +142,87 @@
         let DATA={}, ORIG="", USERS=[], TOKEN="";
         const el = id => document.getElementById(id);
 
-        // --- 初始化 & 登入 ---
+        // --- 初始化 & 自動登入 ---
         window.onload = async () => {
+            // 1. 讀取使用者列表
             try { USERS = await (await fetch('admin_user.json?v='+Date.now())).json(); } catch(e){}
             el('user_list').innerHTML = USERS.map((u,i)=>`<option value="${i}">${u.name}</option>`).join('');
+
+            // 2. 檢查是否有已儲存的 Token (自動登入)
+            const savedToken = localStorage.getItem('fairy_admin_token');
+            if(savedToken) {
+                TOKEN = savedToken;
+                loadData(true); // true 代表是自動登入，靜默模式
+            }
         };
 
-        function login() {
-            let u = USERS[el('user_list').value], p = el('pwd').value;
-            if(!p) return el('msg').innerText = "請輸入密碼";
-            let t = xor(atob(u.cipher), p);
-            if(t.startsWith('ghp_') || t.length>20) { TOKEN=t; loadData(); } 
-            else el('msg').innerText = "密碼錯誤";
+        function togglePwd() {
+            const p = el('pwd');
+            p.type = p.type === 'password' ? 'text' : 'password';
         }
 
-        async function loadData() {
-            el('msg').innerText = "讀取中...";
+        async function login() {
+            let u = USERS[el('user_list').value], p = el('pwd').value;
+            if(!p) return el('msg').innerText = "請輸入密碼";
+            
+            el('msg').innerText = "驗證中...";
+            el('btn-login').disabled = true;
+
+            // 解出 Token (這步還沒驗證正確性)
+            let t = xor(atob(u.cipher), p);
+            TOKEN = t;
+
+            // 嘗試連線 (真正的驗證在這裡)
+            loadData(false);
+        }
+
+        function logout() {
+            if(confirm("確定要登出嗎？")) {
+                localStorage.removeItem('fairy_admin_token');
+                location.reload();
+            }
+        }
+
+        async function loadData(isAuto) {
             try {
-                let r = await fetch(`https://api.github.com/repos/${CFG.user}/${CFG.repo}/contents/${CFG.path}`, { headers:{'Authorization':`token ${TOKEN}`} });
+                // 使用 Token 嘗試抓取資料
+                let r = await fetch(`https://api.github.com/repos/${CFG.user}/${CFG.repo}/contents/${CFG.path}`, { 
+                    headers:{'Authorization':`token ${TOKEN}`} 
+                });
+
+                // 錯誤處理：區分密碼錯誤 (401) 和其他錯誤
+                if(r.status === 401) throw new Error("密碼錯誤");
+                if(r.status === 404) throw new Error("找不到檔案 (Repo設定錯誤)");
+                if(!r.ok) throw new Error("連線失敗");
+
+                // 連線成功：解析資料
                 let j = await r.json();
                 DATA = JSON.parse(decodeURIComponent(escape(atob(j.content))));
-                DATA.sha = j.sha; if(!DATA.settings) DATA.settings={};
-                ORIG = JSON.stringify(DATA);
+                DATA.sha = j.sha; 
+                if(!DATA.settings) DATA.settings={};
+                
+                ORIG = JSON.stringify(DATA); // 備份原始資料
+                
+                // 登入成功處理
+                localStorage.setItem('fairy_admin_token', TOKEN); // 記住 Token
                 render();
-                el('login').style.opacity=0; setTimeout(()=> { el('login').style.display='none'; el('admin').style.display='block'; },300);
-            } catch(e) { el('msg').innerText = "連線失敗"; }
+                
+                el('login').style.opacity=0; 
+                setTimeout(()=> { 
+                    el('login').style.display='none'; 
+                    el('admin').style.display='block'; 
+                }, 300);
+
+            } catch(e) { 
+                el('btn-login').disabled = false;
+                if(isAuto) {
+                    // 自動登入失敗 (可能是 Token 過期)，安靜地清除紀錄
+                    localStorage.removeItem('fairy_admin_token');
+                } else {
+                    // 手動登入失敗，顯示錯誤
+                    el('msg').innerText = e.message; 
+                }
+            }
         }
 
         // --- 核心渲染邏輯 ---
@@ -168,7 +245,6 @@
         }
 
         // --- HTML 生成輔助 (DRY) ---
-        // type: 'cat' | 'rm' | 'add' | 'item'
         function acts(type, pIdx, idx, len) {
             let up = idx>0 ? '' : 'visibility:hidden', dn = idx<len-1 ? '' : 'visibility:hidden';
             let fn = type==='cat' ? [`move('cat',${idx},-1)`, `move('cat',${idx},1)`, `del('cat',${idx})`] :
@@ -193,18 +269,16 @@
         function htmlItem(pIdx, idx, item, type='item') {
             let list = type==='item' ? DATA.categories[pIdx].items : (type==='rm' ? DATA.removals : DATA.add_ons);
             let p = item.prices, isObj = typeof p === 'object' && p !== null;
-            // 如果是數字轉成物件顯示，如果是 null 顯示空
             let v = k => isObj ? (p[k]===null?'':p[k]) : (k==='manager'? (p||0) : (p||0)); 
             
-            // 判斷是複雜價格還是單一價格 (加購是單一價格)
             let priceHTML = '';
             if (type === 'add' && !isObj) {
                 priceHTML = `<label>單價</label><input type="number" value="${item.price||0}" oninput="upd(this.value, 'add_ons', ${idx}, 'price')">`;
             } else {
                 priceHTML = `<div class="p-grp">
-                    <span class="p-lbl">店長</span><input type="number" value="${v('manager')}" oninput="updP('${type}',${idx},${pIdx},'manager',this.value)">
-                    <span class="p-lbl">美甲</span><input type="number" value="${v('artist')}" oninput="updP('${type}',${idx},${pIdx},'artist',this.value)">
-                    <span class="p-lbl">助理</span><input type="number" value="${v('assistant')}" oninput="updP('${type}',${idx},${pIdx},'assistant',this.value)">
+                    <div class="p-item"><span class="p-lbl">店長</span><input type="number" value="${v('manager')}" oninput="updP('${type}',${idx},${pIdx},'manager',this.value)"></div>
+                    <div class="p-item"><span class="p-lbl">美甲</span><input type="number" value="${v('artist')}" oninput="updP('${type}',${idx},${pIdx},'artist',this.value)"></div>
+                    <div class="p-item"><span class="p-lbl">助理</span><input type="number" value="${v('assistant')}" oninput="updP('${type}',${idx},${pIdx},'assistant',this.value)"></div>
                 </div>`;
             }
 
@@ -225,7 +299,6 @@
         }
         function cancel() { if(confirm("放棄修改？")) { DATA=JSON.parse(ORIG); render(); chk(); } }
 
-        // 通用更新: upd(值, 路徑...)
         function upd(val, ...path) {
             let t = DATA; for(let i=0; i<path.length-1; i++) t = t[path[i]];
             t[path[path.length-1]] = val; chk();
@@ -256,7 +329,6 @@
             arr.splice(idx, 1); render(); chk();
         }
 
-        // 新增
         function addCat() { DATA.categories.push({title:"新分類", items:[]}); render(); chk(); }
         function addItem(cIdx) { DATA.categories[cIdx].items.push({id:'i'+Date.now(), name:"新項目", prices:{manager:0,artist:0,assistant:0}}); render(); chk(); }
         function addSimple(key) { 
@@ -264,17 +336,22 @@
             DATA[key].push(obj); render(); chk(); 
         }
 
-        // 儲存與加密
+        // 儲存
         async function save() {
-            let btn = document.querySelector('.btn-save'); btn.innerText="⏳...";
+            let btn = document.querySelector('.btn-save'); 
+            let oldTxt = btn.innerText;
+            btn.innerText="⏳ 儲存中...";
             try {
                 let body = { message:"Update", content:btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2)))), sha:DATA.sha };
                 let r = await fetch(`https://api.github.com/repos/${CFG.user}/${CFG.repo}/contents/${CFG.path}`, {
                     method:'PUT', headers:{'Authorization':`token ${TOKEN}`, 'Content-Type':'application/json'}, body:JSON.stringify(body)
                 });
-                if(r.ok) { let j=await r.json(); DATA.sha=j.content.sha; ORIG=JSON.stringify(DATA); chk(); alert("✅ 成功"); } 
+                if(r.ok) { 
+                    let j=await r.json(); DATA.sha=j.content.sha; ORIG=JSON.stringify(DATA); chk(); 
+                    alert("✅ 儲存成功！"); 
+                } 
                 else throw 1;
-            } catch(e) { alert("❌ 失敗"); } finally { btn.innerText="儲存變更"; }
+            } catch(e) { alert("❌ 儲存失敗"); } finally { btn.innerText=oldTxt; }
         }
 
         function makeKey() {
@@ -283,7 +360,18 @@
             let c = btoa(xor(t, p)); el('gr').innerText=c; el('gr').style.display='block';
         }
         function xor(t, k) { let r=''; for(let i=0;i<t.length;i++) r+=String.fromCharCode(t.charCodeAt(i)^k.charCodeAt(i%k.length)); return r; }
-        function tab(id) { document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active')); el('p-'+id).classList.add('active'); event.target.classList.add('active'); }
+        
+        function tab(id) { switchTab(id); } // alias
+        function switchTab(id) { 
+            document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); 
+            document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active')); 
+            el('p-'+id).classList.add('active'); 
+            // 找到對應的 tab 按鈕並加 active
+            const tabs = document.querySelectorAll('.tab');
+            if(id === 'settings') tabs[0].classList.add('active');
+            if(id === 'categories') tabs[1].classList.add('active');
+            if(id === 'others') tabs[2].classList.add('active');
+        }
     </script>
 </body>
 </html>
