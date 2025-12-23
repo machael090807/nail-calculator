@@ -1,232 +1,232 @@
 {
-  "settings": {
-    "birthday_discount": 0.9,
-    "location_hand_name": "🖐️ 手部",
-    "location_foot_name": "🦶 足部",
-    "location_foot_surcharge": 200
-  },
-  "categories": [
-    {
-      "title": "✨ 基礎凝膠服務",
-      "items": [
+    "settings": {
+        "birthday_discount": 0.9,
+        "location_hand_name": "🖐️ 手部",
+        "location_foot_name": "🦶 足部",
+        "location_foot_surcharge": 200
+    },
+    "categories": [
         {
-          "id": "cateye",
-          "name": "貓眼凝膠",
-          "prices": {
-            "manager": [
-              1300,
-              1400
-            ],
-            "artist": [
-              1100,
-              1300
-            ],
-            "assistant": [
-              1000,
-              1100
+            "title": "✨ 基礎凝膠服務",
+            "items": [
+                {
+                    "id": "cateye",
+                    "name": "貓眼凝膠",
+                    "prices": {
+                        "manager": [
+                            1300,
+                            1400
+                        ],
+                        "artist": [
+                            1100,
+                            1300
+                        ],
+                        "assistant": [
+                            1000,
+                            1100
+                        ]
+                    }
+                },
+                {
+                    "id": "single",
+                    "name": "單色凝膠",
+                    "prices": {
+                        "manager": [
+                            1200,
+                            1300
+                        ],
+                        "artist": [
+                            1000,
+                            1200
+                        ],
+                        "assistant": [
+                            900,
+                            1000
+                        ]
+                    }
+                }
             ]
-          }
         },
         {
-          "id": "single",
-          "name": "單色凝膠",
-          "prices": {
-            "manager": [
-              1200,
-              1300
-            ],
-            "artist": [
-              1000,
-              1200
-            ],
-            "assistant": [
-              900,
-              1000
+            "title": "🎨 設計與造型",
+            "items": [
+                {
+                    "id": "mirror",
+                    "name": "十指鏡面",
+                    "prices": {
+                        "manager": 1500,
+                        "artist": 1300,
+                        "assistant": 1100
+                    }
+                },
+                {
+                    "id": "french",
+                    "name": "十指法式",
+                    "prices": {
+                        "manager": 1600,
+                        "artist": 1500,
+                        "assistant": 1200
+                    }
+                },
+                {
+                    "id": "gradient",
+                    "name": "十指漸層",
+                    "prices": {
+                        "manager": 1300,
+                        "artist": 1300,
+                        "assistant": 1100
+                    }
+                },
+                {
+                    "id": "custom",
+                    "name": "自帶圖",
+                    "prices": {
+                        "manager": 1300,
+                        "artist": 1000,
+                        "assistant": 800
+                    }
+                }
             ]
-          }
+        },
+        {
+            "title": "🎁 盲盒系列",
+            "items": [
+                {
+                    "id": "blind_value",
+                    "name": "超值不挑款",
+                    "prices": {
+                        "manager": 1500,
+                        "artist": 1200,
+                        "assistant": null
+                    }
+                },
+                {
+                    "id": "blind_diamond",
+                    "name": "含鑽不挑款",
+                    "prices": {
+                        "manager": 1700,
+                        "artist": 1500,
+                        "assistant": null
+                    }
+                }
+            ]
+        },
+        {
+            "title": "💅 延甲服務",
+            "items": [
+                {
+                    "id": "ext_half",
+                    "name": "十指半貼延甲",
+                    "prices": {
+                        "manager": 1200,
+                        "artist": 1000,
+                        "assistant": 1000
+                    }
+                },
+                {
+                    "id": "ext_styled",
+                    "name": "十指半貼含造型",
+                    "prices": {
+                        "manager": 2500,
+                        "artist": 2000,
+                        "assistant": 2000
+                    }
+                },
+                {
+                    "id": "ext_long",
+                    "name": "淺貼加長延甲",
+                    "prices": {
+                        "manager": 1500,
+                        "artist": null,
+                        "assistant": null
+                    }
+                }
+            ]
+        },
+        {
+            "title": "我是新增分類1",
+            "items": [
+                {
+                    "id": "item_1766475419331",
+                    "name": "新項目1",
+                    "prices": {
+                        "manager": 1000,
+                        "artist": 500,
+                        "assistant": 100
+                    }
+                },
+                {
+                    "id": "i1766481235578",
+                    "name": "新項目2",
+                    "prices": {
+                        "manager": 1500,
+                        "artist": 100,
+                        "assistant": null
+                    }
+                }
+            ]
         }
-      ]
-    },
-    {
-      "title": "🎨 設計與造型",
-      "items": [
+    ],
+    "removals": [
         {
-          "id": "mirror",
-          "name": "十指鏡面",
-          "prices": {
-            "manager": 1500,
-            "artist": 1300,
-            "assistant": 1100
-          }
+            "id": "none",
+            "name": "無",
+            "prices": {
+                "manager": 0,
+                "artist": 0,
+                "assistant": 0
+            }
         },
         {
-          "id": "french",
-          "name": "十指法式",
-          "prices": {
-            "manager": 1600,
-            "artist": 1500,
-            "assistant": 1200
-          }
+            "id": "our_shop",
+            "name": "本店卸甲",
+            "prices": {
+                "manager": 300,
+                "artist": 200,
+                "assistant": 200
+            }
         },
         {
-          "id": "gradient",
-          "name": "十指漸層",
-          "prices": {
-            "manager": 1300,
-            "artist": 1300,
-            "assistant": 1100
-          }
+            "id": "other_shop",
+            "name": "他店卸甲",
+            "prices": {
+                "manager": 300,
+                "artist": 300,
+                "assistant": 300
+            }
         },
         {
-          "id": "custom",
-          "name": "自帶圖",
-          "prices": {
-            "manager": 1300,
-            "artist": 1000,
-            "assistant": 800
-          }
+            "id": "pure",
+            "name": "純卸甲",
+            "prices": {
+                "manager": null,
+                "artist": 500,
+                "assistant": 500
+            }
         }
-      ]
-    },
-    {
-      "title": "🎁 盲盒系列",
-      "items": [
+    ],
+    "add_ons": [
         {
-          "id": "blind_value",
-          "name": "超值不挑款",
-          "prices": {
-            "manager": 1500,
-            "artist": 1200,
-            "assistant": null
-          }
+            "id": "jump_color",
+            "name": "跳色",
+            "unit_desc": "/ 指",
+            "price": 100
         },
         {
-          "id": "blind_diamond",
-          "name": "含鑽不挑款",
-          "prices": {
-            "manager": 1700,
-            "artist": 1500,
-            "assistant": null
-          }
+            "id": "toe_ext",
+            "name": "足部單指延甲",
+            "unit_desc": "/ 指",
+            "prices": {
+                "manager": 120,
+                "artist": 120,
+                "assistant": 100
+            }
+        },
+        {
+            "id": "a1766489287165",
+            "name": "新加購",
+            "price": 100
         }
-      ]
-    },
-    {
-      "title": "💅 延甲服務",
-      "items": [
-        {
-          "id": "ext_half",
-          "name": "十指半貼延甲",
-          "prices": {
-            "manager": 1200,
-            "artist": 1000,
-            "assistant": 1000
-          }
-        },
-        {
-          "id": "ext_styled",
-          "name": "十指半貼含造型",
-          "prices": {
-            "manager": 2500,
-            "artist": 2000,
-            "assistant": 2000
-          }
-        },
-        {
-          "id": "ext_long",
-          "name": "淺貼加長延甲",
-          "prices": {
-            "manager": 1500,
-            "artist": null,
-            "assistant": null
-          }
-        }
-      ]
-    },
-    {
-      "title": "我是新增分類1",
-      "items": [
-        {
-          "id": "item_1766475419331",
-          "name": "新項目1",
-          "prices": {
-            "manager": 1000,
-            "artist": 500,
-            "assistant": 100
-          }
-        },
-        {
-          "id": "i1766481235578",
-          "name": "新項目2",
-          "prices": {
-            "manager": 1500,
-            "artist": 100,
-            "assistant": null
-          }
-        }
-      ]
-    }
-  ],
-  "removals": [
-    {
-      "id": "none",
-      "name": "無",
-      "prices": {
-        "manager": 0,
-        "artist": 0,
-        "assistant": 0
-      }
-    },
-    {
-      "id": "our_shop",
-      "name": "本店卸甲",
-      "prices": {
-        "manager": 300,
-        "artist": 200,
-        "assistant": 200
-      }
-    },
-    {
-      "id": "other_shop",
-      "name": "他店卸甲",
-      "prices": {
-        "manager": 300,
-        "artist": 300,
-        "assistant": 300
-      }
-    },
-    {
-      "id": "pure",
-      "name": "純卸甲",
-      "prices": {
-        "manager": null,
-        "artist": 500,
-        "assistant": 500
-      }
-    }
-  ],
-  "add_ons": [
-    {
-      "id": "jump_color",
-      "name": "跳色",
-      "unit_desc": "/ 指",
-      "price": 100
-    },
-    {
-      "id": "toe_ext",
-      "name": "足部單指延甲",
-      "unit_desc": "/ 指",
-      "prices": {
-        "manager": 120,
-        "artist": 120,
-        "assistant": null
-      }
-    },
-    {
-      "id": "a1766489287165",
-      "name": "新加購",
-      "price": 100
-    }
-  ],
-  "sha": "5cbed726d55c5f851779414e9f12a6ee3a881cbe"
+    ],
+    "sha": "5cbed726d55c5f851779414e9f12a6ee3a881cbe"
 }
