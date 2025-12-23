@@ -218,3 +218,28 @@
         }
     ]
 }
+{
+  "settings": {
+    "birthday_discount": 0.9,
+    "location_hand_name": "🖐️ 手部",
+    "location_foot_name": "🦶 足部",
+    "location_foot_surcharge": 200
+  },
+  "categories": [
+    {
+      "title": "🎨 設計與造型",
+      "items": [
+        { "id": "design_01", "name": "十指鏡面", "prices": 1100 },
+        { "id": "design_02", "name": "十指法式", "prices": 1200 }
+      ]
+    }
+  ],
+  "removals": [
+    { "id": "rm_01", "name": "本店卸甲", "prices": 0 },
+    { "id": "rm_02", "name": "他店卸甲", "prices": 300 }
+  ],
+  "add_ons": [
+    { "id": "add_01", "name": "單色", "price": 100 },
+    { "id": "add_02", "name": "貓眼", "price": 200 }
+  ]
+}
