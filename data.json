@@ -148,6 +148,15 @@
                         "artist": 500,
                         "assistant": 100
                     }
+                },
+                {
+                    "id": "i1766481235578",
+                    "name": "新項目2",
+                    "prices": {
+                        "manager": 1500,
+                        "artist": 100,
+                        "assistant": null
+                    }
                 }
             ]
         }
