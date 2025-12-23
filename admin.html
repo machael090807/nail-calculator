@@ -23,33 +23,9 @@
             width: 100%;
         }
 
-        .app-header { 
-            padding: 15px 20px; 
-            text-align: center; 
-            position: relative; /* 讓絕對定位的按鈕參考這裡 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .app-header { padding: 15px 0 10px; text-align: center; }
         h1 { margin: 0; font-size: 1.3rem; }
         .subtitle { font-size: 0.8rem; color: var(--accent); }
-
-        /* 右上角登出按鈕 */
-        .btn-logout {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #EFEBE9;
-            color: var(--accent);
-            border: none;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: none; /* 預設隱藏，登入後顯示 */
-        }
 
         /* 分頁導航 */
         .tab-container {
@@ -84,7 +60,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 卡片與面板 */
-        .card-panel { max-width: 400px; margin: 40px auto 20px; background: var(--card); padding: 30px 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
+        .card-panel { max-width: 400px; margin: 20px auto; background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
         
         /* 輸入框 */
         select, input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; background: var(--gray); }
@@ -95,18 +71,9 @@
         .btn-main:active { transform: scale(0.98); opacity: 0.9; }
         .btn-link { background: none; border: none; color: var(--accent); cursor: pointer; margin-top: 15px; text-decoration: underline; font-size: 0.9rem; }
 
-        /* 隱藏的神秘按鈕 (最底部) */
-        .btn-secret {
-            margin-top: 50px;
-            width: 100%;
-            padding: 20px;
-            background: transparent;
-            border: none;
-            color: var(--bg); /* 與背景同色，達成隱藏效果 */
-            font-size: 0.8rem;
-            cursor: default;
-        }
-        .btn-secret:hover { cursor: pointer; } /* 滑鼠移上去變手手 */
+        /* 隱藏的神秘按鈕 */
+        .btn-secret { margin-top: 50px; width: 100%; padding: 20px; background: transparent; border: none; color: var(--bg); font-size: 0.8rem; cursor: default; }
+        .btn-secret:hover { cursor: pointer; }
 
         /* 編輯器元件 */
         .section-card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
@@ -126,6 +93,7 @@
         
         .btn-group { display: flex; gap: 5px; }
         .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--gray); color: #666; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .btn-icon:hover { transform: scale(1.1); }
         .btn-del { color: var(--danger); background: #ffebee; }
         
         .btn-add-item { width: 100%; padding: 12px; background: #fcfcfc; border: 2px dashed #ddd; border-radius: 10px; color: #888; font-size: 0.9rem; margin-top: 5px; cursor: pointer; transition: 0.2s; }
@@ -136,19 +104,20 @@
         .btn-save { background: white; color: var(--text); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .btn-cancel { background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 15px; border-radius: 30px; cursor: pointer; }
 
-        #generator-panel, #editor-panel { display: none; }
+        /* 彈出視窗 (Modal) */
+        #generator-panel, #editor-panel, #type-modal { display: none; }
         .result-box { margin-top: 15px; padding: 10px; background: #eee; word-break: break-all; font-family: monospace; font-size: 0.8rem; border-radius: 8px; user-select: all; display: none; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="sticky-wrapper">
         <div class="app-header">
-            <div>
-                <h1>Fairy. L 後台管理</h1>
-                <div class="subtitle">Fairy. L System</div>
-            </div>
-            <button id="logout-btn" class="btn-logout" onclick="logout()">登出</button>
+            <h1>Fairy. L 後台管理</h1>
+            <div class="subtitle">Fairy. L System</div>
         </div>
 
         <div class="tab-container" id="main-tabs" style="display:none;">
@@ -216,9 +185,18 @@
         </div>
     </div>
 
+    <div id="type-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <h3>選擇計價方式</h3>
+            <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">請問這項加購商品是「單一價格」還是依照「職級」收費？</p>
+            <button class="btn-main" onclick="addAddonItem(true)">單一價格 (例如: $100)</button>
+            <button class="btn-main" style="background:#8D6E63; margin-top:10px" onclick="addAddonItem(false)">區分職級 (店長/美甲/助理)</button>
+            <button class="btn-link" onclick="closeTypeModal()">取消</button>
+        </div>
+    </div>
+
     <script>
         const REPO_CONFIG = { owner: 'machael090807', repo: 'nail-calculator', path: 'data.json' };
-        const TOKEN_KEY = 'fairy_admin_token'; // LocalStorage Key
         
         let usersList = [];
         let currentData = null;
@@ -226,10 +204,8 @@
         let fileSha = null;
         let ghToken = null;
 
-        // --- 初始化 (自動登入) ---
         window.onload = async function() {
             try {
-                // 1. 載入使用者清單
                 const res = await fetch('admin_user.json?v=' + new Date().getTime());
                 if(res.ok) {
                     usersList = await res.json();
@@ -240,92 +216,18 @@
                         opt.value = idx; opt.innerText = u.name; select.appendChild(opt);
                     });
                     if(usersList.length > 0) select.value = 0;
+                } else {
+                    document.getElementById('user-select').innerHTML = '<option>找不到 admin_user.json</option>';
                 }
-
-                // 2. 檢查是否有已儲存的 Token (自動登入)
-                const savedToken = localStorage.getItem(TOKEN_KEY);
-                if(savedToken) {
-                    verifyAndLoad(savedToken, true); // true = 自動模式 (失敗不跳 alert)
-                }
+                
+                // 自動登入
+                const savedToken = localStorage.getItem('fairy_admin_token');
+                if(savedToken) verifyAndLoad(savedToken, true);
 
             } catch(e) { console.error(e); }
         };
 
-        // --- 通用驗證與讀取函式 ---
-        async function verifyAndLoad(token, isAutoMode) {
-            const btn = document.querySelector('#login-panel .btn-main');
-            if(!isAutoMode) { btn.innerText = '驗證中...'; btn.disabled = true; }
-
-            try {
-                // 驗證 Token 並讀取資料
-                const response = await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-
-                if(response.status === 401) throw new Error('密碼錯誤 (Token 無效)');
-                if(!response.ok) throw new Error('連線失敗 (Repo 可能不存在)');
-
-                const data = await response.json();
-                fileSha = data.sha; 
-                currentData = JSON.parse(decodeURIComponent(escape(window.atob(data.content))));
-                
-                // 資料補完
-                if(!currentData.categories) currentData.categories = [];
-                if(!currentData.removals) currentData.removals = []; 
-                if(!currentData.add_ons) currentData.add_ons = [];
-                if(!currentData.settings) currentData.settings = {};
-
-                originalData = JSON.parse(JSON.stringify(currentData)); 
-                ghToken = token;
-                
-                // 登入成功：儲存 Token
-                localStorage.setItem(TOKEN_KEY, token);
-
-                // 切換介面
-                renderEditor();
-                document.getElementById('login-panel').style.display = 'none';
-                document.getElementById('secret-area').style.display = 'none'; // 登入後隱藏產生器按鈕
-                document.getElementById('editor-panel').style.display = 'block';
-                document.getElementById('main-tabs').style.display = 'flex';
-                document.getElementById('logout-btn').style.display = 'block'; // 顯示登出鈕
-
-            } catch (e) {
-                if(!isAutoMode) {
-                    alert('❌ ' + e.message);
-                    btn.innerText = '登入'; btn.disabled = false;
-                    document.getElementById('password-input').value = '';
-                } else {
-                    // 自動登入失敗 (可能是 Token 過期)，清除紀錄
-                    localStorage.removeItem(TOKEN_KEY);
-                }
-            }
-        }
-
-        // --- 登入 (手動) ---
-        function login() {
-            const select = document.getElementById('user-select');
-            const pass = document.getElementById('password-input').value.trim();
-            if(select.value === "" || !pass) return alert("請輸入完整資訊");
-
-            const user = usersList[select.value];
-            const unlockedToken = decipher(user.cipher, pass);
-            
-            // 初步檢查
-            if(!unlockedToken.startsWith('ghp_') && unlockedToken.length < 20) return alert("❌ 密碼錯誤");
-
-            // 執行驗證
-            verifyAndLoad(unlockedToken, false);
-        }
-
-        // --- 登出 ---
-        function logout() {
-            if(confirm("確定要登出嗎？")) {
-                localStorage.removeItem(TOKEN_KEY);
-                location.reload();
-            }
-        }
-
-        // --- 分頁切換 ---
+        // --- 核心邏輯 ---
         function switchView(viewId, btn) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -334,7 +236,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- 加解密 ---
         function cipher(text, pass) {
             let result = ''; for (let i = 0; i < text.length; i++) result += String.fromCharCode(text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
             return btoa(result);
@@ -351,16 +252,8 @@
             const login = document.getElementById('login-panel');
             const gen = document.getElementById('generator-panel');
             const sec = document.getElementById('secret-area');
-            
-            if(gen.style.display === 'block') { 
-                gen.style.display = 'none'; 
-                login.style.display = 'block'; 
-                sec.style.display = 'block';
-            } else { 
-                gen.style.display = 'block'; 
-                login.style.display = 'none'; 
-                sec.style.display = 'none';
-            }
+            if(gen.style.display === 'block') { gen.style.display = 'none'; login.style.display = 'block'; sec.style.display = 'block'; } 
+            else { gen.style.display = 'block'; login.style.display = 'none'; sec.style.display = 'none'; }
         }
 
         function generateCode() {
@@ -369,16 +262,76 @@
             if(!token || !pass) return alert("請輸入 Token 和密碼");
             document.getElementById('gen-result').style.display = 'block';
             document.getElementById('gen-result').innerText = cipher(token, pass);
-            alert("✅ 代碼已產生！請複製下方灰色區塊的亂碼。");
+            alert("✅ 代碼已產生！");
         }
 
+        async function verifyAndLoad(token, isAutoMode) {
+            const btn = document.querySelector('#login-panel .btn-main');
+            if(!isAutoMode) { btn.innerText = '驗證中...'; btn.disabled = true; }
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+
+                if(response.status === 401) throw new Error('密碼錯誤 (Token 無效)');
+                if(!response.ok) throw new Error('連線失敗 (Repo 可能不存在)');
+
+                const data = await response.json();
+                fileSha = data.sha; 
+                currentData = JSON.parse(decodeURIComponent(escape(window.atob(data.content))));
+                
+                if(!currentData.categories) currentData.categories = [];
+                if(!currentData.removals) currentData.removals = []; 
+                if(!currentData.add_ons) currentData.add_ons = [];
+                if(!currentData.settings) currentData.settings = {};
+
+                originalData = JSON.parse(JSON.stringify(currentData)); 
+                ghToken = token;
+                localStorage.setItem('fairy_admin_token', token);
+                
+                renderEditor();
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('secret-area').style.display = 'none';
+                document.getElementById('editor-panel').style.display = 'block';
+                document.getElementById('main-tabs').style.display = 'flex';
+                
+                // 增加登出按鈕
+                if(!document.getElementById('logout-btn')) {
+                    const logoutBtn = document.createElement('button');
+                    logoutBtn.id = 'logout-btn';
+                    logoutBtn.innerText = '登出';
+                    logoutBtn.style.cssText = "position:absolute; right:15px; top:50%; transform:translateY(-50%); background:#EFEBE9; color:#8D6E63; border:none; padding:5px 12px; border-radius:20px; font-size:0.85rem; font-weight:bold; cursor:pointer;";
+                    logoutBtn.onclick = () => { if(confirm("確定登出？")) { localStorage.removeItem('fairy_admin_token'); location.reload(); }};
+                    document.querySelector('.app-header').appendChild(logoutBtn);
+                }
+
+            } catch (e) {
+                if(!isAutoMode) {
+                    alert('❌ ' + e.message);
+                    btn.innerText = '登入'; btn.disabled = false;
+                    document.getElementById('password-input').value = '';
+                } else { localStorage.removeItem('fairy_admin_token'); }
+            }
+        }
+
+        function login() {
+            const select = document.getElementById('user-select');
+            const pass = document.getElementById('password-input').value.trim();
+            if(select.value === "" || !pass) return alert("請輸入完整資訊");
+            const user = usersList[select.value];
+            const unlockedToken = decipher(user.cipher, pass);
+            if(!unlockedToken.startsWith('ghp_') && unlockedToken.length < 20) return alert("❌ 密碼錯誤");
+            verifyAndLoad(unlockedToken, false);
+        }
+
+        // --- 渲染與更新 ---
         function renderEditor() { 
             document.getElementById('gs_discount').value = currentData.settings.birthday_discount || 0.9;
             document.getElementById('gs_hand').value = currentData.settings.location_hand_name || "手部";
             document.getElementById('gs_foot').value = currentData.settings.location_foot_name || "足部";
             document.getElementById('gs_surcharge').value = currentData.settings.location_foot_surcharge || 200;
-            renderCategories(); 
-            renderOthers(); 
+            renderCategories(); renderOthers(); 
         }
         
         function checkChanges() {
@@ -429,11 +382,33 @@
             rmContainer.innerHTML = rmHtml + `</div>`;
 
             const addContainer = document.getElementById('addons-area');
-            let addHtml = `<div class="section-card"><div class="section-header"><b>➕ 加購設定</b><button class="btn-add-item" style="width:auto;margin:0;padding:5px 15px;" onclick="addSimple('add_ons')">新增</button></div>`;
+            // ★ 修改：新增按鈕改成開啟 Modal
+            let addHtml = `<div class="section-card"><div class="section-header"><b>➕ 加購設定</b><button class="btn-add-item" style="width:auto;margin:0;padding:5px 15px;" onclick="openTypeModal()">新增</button></div>`;
             currentData.add_ons.forEach((item, idx) => { addHtml += buildSimpleRow('add_ons', idx, item); });
             addContainer.innerHTML = addHtml + `</div>`;
         }
 
+        // --- 加購選擇視窗邏輯 ---
+        function openTypeModal() {
+            document.getElementById('type-modal').style.display = 'flex';
+        }
+        function closeTypeModal() {
+            document.getElementById('type-modal').style.display = 'none';
+        }
+        function addAddonItem(isSingle) {
+            let newItem;
+            if(isSingle) {
+                newItem = { id:'a'+Date.now(), name:"新加購", price:100 };
+            } else {
+                newItem = { id:'a'+Date.now(), name:"新加購", prices:{manager:100, artist:100, assistant:100} };
+            }
+            currentData.add_ons.push(newItem);
+            renderOthers();
+            checkChanges();
+            closeTypeModal();
+        }
+
+        // --- HTML 產生器 ---
         function buildItemRow(catIdx, itemIdx, item) {
             return `
             <div class="item-row">
@@ -454,12 +429,18 @@
         }
 
         function buildSimpleRow(type, idx, item) {
-            let val = type==='add_ons' && typeof item.price === 'number' ? item.price : getPrice(item.prices.manager);
-            let inputHtml = type==='add_ons' && typeof item.price === 'number' 
-                ? `<div class="price-col"><span class="price-label">單價</span><input type="number" class="price-input" value="${val}" onchange="updateSimplePrice('${type}', ${idx}, 'price', this.value)"></div>`
-                : `<div class="price-col"><span class="price-label">店長</span><input type="number" class="price-input" value="${getPrice(item.prices.manager)}" onchange="updateSimplePrice('${type}', ${idx}, 'manager', this.value)"></div>
-                   <div class="price-col"><span class="price-label">美甲</span><input type="number" class="price-input" value="${getPrice(item.prices.artist)}" onchange="updateSimplePrice('${type}', ${idx}, 'artist', this.value)"></div>
-                   <div class="price-col"><span class="price-label">助理</span><input type="number" class="price-input" value="${getPrice(item.prices.assistant)}" onchange="updateSimplePrice('${type}', ${idx}, 'assistant', this.value)"></div>`;
+            // 自動判斷是單價還是多價
+            let isSingle = type==='add_ons' && typeof item.price === 'number';
+            
+            let inputHtml = '';
+            if(isSingle) {
+                inputHtml = `<div class="price-col"><span class="price-label">單價</span><input type="number" class="price-input" value="${item.price}" onchange="updateSimplePrice('${type}', ${idx}, 'price', this.value)"></div>`;
+            } else {
+                let p = item.prices || {manager:0, artist:0, assistant:0}; // 防呆
+                inputHtml = `<div class="price-col"><span class="price-label">店長</span><input type="number" class="price-input" value="${getPrice(p.manager)}" onchange="updateSimplePrice('${type}', ${idx}, 'manager', this.value)"></div>
+                   <div class="price-col"><span class="price-label">美甲</span><input type="number" class="price-input" value="${getPrice(p.artist)}" onchange="updateSimplePrice('${type}', ${idx}, 'artist', this.value)"></div>
+                   <div class="price-col"><span class="price-label">助理</span><input type="number" class="price-input" value="${getPrice(p.assistant)}" onchange="updateSimplePrice('${type}', ${idx}, 'assistant', this.value)"></div>`;
+            }
 
             return `
             <div class="item-row">
@@ -467,7 +448,7 @@
                     <input type="text" class="name-input" value="${item.name}" onchange="currentData['${type}'][${idx}].name=this.value; checkChanges();">
                     <button class="btn-icon btn-del" onclick="deleteSimple('${type}', ${idx})"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="price-grid" style="grid-template-columns: repeat(${type==='add_ons'&& typeof item.price==='number'?1:3}, 1fr)">${inputHtml}</div>
+                <div class="price-grid" style="grid-template-columns: repeat(${isSingle?1:3}, 1fr)">${inputHtml}</div>
             </div>`;
         }
 
@@ -500,7 +481,8 @@
         function moveItem(ci, ii, d) { let it = currentData.categories[ci].items; if(ii+d<0 || ii+d>=it.length) return; [it[ii], it[ii+d]] = [it[ii+d], it[ii]]; renderCategories(); checkChanges(); }
 
         function addSimple(type) {
-            let newItem = type==='add_ons' ? { id:'a'+Date.now(), name:"新加購", price:100 } : { id:'r'+Date.now(), name:"新卸甲", prices:{manager:0,artist:0,assistant:0} };
+            // 只有 add_ons 會透過 modal，removals 直接新增多價
+            let newItem = { id:'r'+Date.now(), name:"新卸甲", prices:{manager:0,artist:0,assistant:0} };
             currentData[type].push(newItem); renderOthers(); checkChanges();
         }
         function deleteSimple(type, idx) { if(!confirm("刪除？")) return; currentData[type].splice(idx,1); renderOthers(); checkChanges(); }
