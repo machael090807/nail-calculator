@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "user": "00",
+        "pass": "88888888",
+        "name": "店長",
+        "encodedToken": "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"
+    },
+    {
+        "id": "2",
+        "user": "nini",
+        "pass": "123456",
+        "name": "美甲師 Nini",
+        "encodedToken": "這裡貼上您的加密亂碼(Base64)"
+    },
+    {
+        "id": "3",
+        "user": "ling",
+        "pass": "000000",
+        "name": "助理 Ling",
+        "encodedToken": "這裡貼上您的加密亂碼(Base64)"
+    }
+]
