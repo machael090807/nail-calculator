@@ -3,277 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fairy. L 報價系統</title>
+    <title>Fairy. L 美甲計算機</title>
     
     <link rel="apple-touch-icon" href="logo.jpg">
     <link rel="icon" href="logo.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* 🎨 奶茶色主題 */
         :root {
-            --bg-color: #F3E5D8;
-            --text-color: #4E342E;
-            --border-color: #DCC7A1;
-            --white: #ffffff;
-            --accent: #8D6E63;
+            --bg-color: #F6F1ED; /* 參考圖的淺米色背景 */
+            --card-bg: #FFFFFF;
+            --text-primary: #4E342E; /* 深咖啡色 */
+            --text-secondary: #8D6E63; /* 淺咖啡色 */
+            --accent-color: #A1887F; /* 裝飾色 */
+            --total-bg: #8D7B6F; /* 下方總計區塊的深色背景 */
+            --border-radius: 16px;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            padding: 20px;
+            color: var(--text-primary);
+            font-family: 'Noto Sans TC', sans-serif;
             margin: 0;
+            padding: 20px;
+            padding-bottom: 40px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        h1 {
+        /* 標題區 */
+        header {
             text-align: center;
-            font-size: clamp(1.5rem, 6vw, 2.2rem);
-            margin-bottom: 10px;
-            margin-top: 10px;
+            margin-bottom: 25px;
         }
-
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: var(--text-primary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
         .subtitle {
-            text-align: center; font-size: 0.9rem; margin-bottom: 20px; opacity: 0.8;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
         }
 
-        .section { margin-bottom: 25px; }
-        .section-title { font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; border-left: 4px solid var(--text-color); padding-left: 10px; }
-
-        /* 職級選擇器 */
-        .role-selector {
+        /* 職級切換 (保留功能但美化) */
+        .role-tabs {
             display: flex;
-            background: rgba(255,255,255,0.5);
-            border-radius: 12px;
-            padding: 5px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            background: #EBE5DF;
+            border-radius: 50px;
+            padding: 4px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
-        .role-option {
-            flex: 1; text-align: center; padding: 10px; cursor: pointer;
-            border-radius: 8px; font-weight: bold; transition: 0.3s;
+        .role-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #9E9E9E;
+            cursor: pointer;
+            transition: 0.3s;
         }
-        .role-option.active {
-            background-color: var(--text-color); color: var(--white);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .role-tab.active {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* 兩欄網格排列 */
-        .options-grid {
+        /* 分區標題 */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        /* 卡片網格系統 */
+        .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        /* 選項按鈕樣式 */
-        .option-label {
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.4);
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            cursor: pointer; transition: 0.2s;
-            font-size: 0.95rem;
-        }
-        .option-label:has(input:checked) {
-            background: rgba(255,255,255,0.9);
-            border-color: var(--text-color);
-            box-shadow: 0 0 0 1px var(--text-color);
+            gap: 12px;
         }
 
-        .label-text {
+        /* 服務卡片樣式 */
+        .service-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            justify-content: center;
+            height: 80px;
         }
-
-        input[type="radio"], input[type="checkbox"] {
-            accent-color: var(--text-color);
-            transform: scale(1.2);
-            margin-left: 5px;
-            flex-shrink: 0;
-        }
-
-        /* 輸入框 */
-        .input-group { display: flex; gap: 15px; }
-        .input-wrapper { flex: 1; }
-        .input-wrapper label { display: block; font-size: 0.9rem; margin-bottom: 5px; }
-        input[type="number"] {
-            width: 100%; padding: 12px;
-            border: 1px solid var(--border-color); border-radius: 8px;
-            background: rgba(255,255,255,0.6);
-            font-size: 1.1rem; color: var(--text-color);
-            text-align: center; box-sizing: border-box;
-            -moz-appearance: textfield;
-        }
-
-        /* 優惠區塊 */
-        .promo-box {
-            border: 2px dashed var(--border-color); border-radius: 12px;
-            padding: 15px; margin-top: 20px;
-            background: rgba(255,255,255,0.3);
-        }
-        .toggle-wrapper {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 1.1rem; font-weight: bold;
-        }
-
-        /* 結果與輸出 */
-        .result-section {
-            margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px;
-        }
-        .total-display {
-            text-align: center; font-size: 2.2rem; font-weight: 800; margin-bottom: 15px;
-            color: var(--text-color);
-        }
-
-        textarea {
-            width: 100%; height: 220px;
-            background: rgba(255,255,255,0.7);
-            border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 15px; font-size: 1rem; color: var(--text-color);
-            box-sizing: border-box; margin-bottom: 10px;
-            font-family: monospace;
-        }
-
-        button.copy-btn {
-            width: 100%; background-color: var(--text-color); color: #fff;
-            padding: 15px; border: none; border-radius: 12px;
-            font-size: 1.1rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        button.copy-btn:active { transform: scale(0.98); }
         
-        .cat-tag {
-            font-size: 0.75rem;
-            color: var(--white);
-            background-color: var(--accent);
-            padding: 2px 5px;
-            border-radius: 4px;
-            margin-right: 4px;
-            display: inline-block;
-            margin-bottom: 2px;
+        /* 選中狀態 */
+        .service-card.active {
+            border-color: var(--text-secondary);
+            background-color: #FFFBF8;
         }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .card-price {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* 隱藏原生 Radio/Checkbox */
+        input[type="radio"], input[type="checkbox"] {
+            display: none;
+        }
+
+        /* 位置選擇 (改成更像按鈕) */
+        .pos-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .pos-card.active {
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+        }
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #DDD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: 0.2s;
+        }
+        .pos-card.active .check-icon {
+            background: var(--text-secondary);
+            border-color: var(--text-secondary);
+        }
+
+        /* 計數器樣式 (Stepper) */
+        .stepper-row {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .stepper-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .stepper-name {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .stepper-price {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .stepper-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #F5F5F5;
+            padding: 4px;
+            border-radius: 20px;
+        }
+        .btn-step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-step:active {
+            transform: scale(0.9);
+        }
+        .step-val {
+            font-weight: bold;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 總計與明細卡片 (深色區塊) */
+        .total-card {
+            background-color: var(--total-bg);
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3);
+            text-align: center;
+        }
+        .total-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        .total-price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+        
+        .detail-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            min-height: 100px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+            padding-bottom: 5px;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .btn-copy {
+            width: 100%;
+            background: white;
+            color: var(--total-bg);
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-copy:active {
+            opacity: 0.9;
+            transform: translateY(2px);
+        }
+
+        .btn-reset {
+            margin-top: 15px;
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        /* 優惠 Toggle */
+        .promo-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .switch input { display:none; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--text-secondary);
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>Fairy. L NAIL ART</h1>
-    <div class="subtitle">2025/11 價目表</div>
+    <header>
+        <h1>COKICLAWS</h1>
+        <div class="subtitle">美甲計算機</div>
+    </header>
 
-    <div class="role-selector" id="roleContainer">
-        <div class="role-option" onclick="setRole('manager')">店長</div>
-        <div class="role-option active" onclick="setRole('artist')">美甲師</div>
-        <div class="role-option" onclick="setRole('assistant')">助理</div>
+    <div class="role-tabs">
+        <div class="role-tab active" onclick="setRole('manager')">店長</div>
+        <div class="role-tab" onclick="setRole('artist')">美甲師</div>
+        <div class="role-tab" onclick="setRole('assistant')">助理</div>
     </div>
 
-    <div class="section">
-        <div class="section-title">選擇項目</div>
-        <div class="options-grid">
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">單色</span>單色凝膠</div>
-                <input type="radio" name="service" value="single" checked>
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">單色</span>貓眼凝膠</div>
-                <input type="radio" name="service" value="cateye">
-            </label>
-            
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">造型</span>十指鏡面</div>
-                <input type="radio" name="service" value="mirror">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">造型</span>十指法式</div>
-                <input type="radio" name="service" value="french">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">造型</span>十指漸層</div>
-                <input type="radio" name="service" value="gradient">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">造型</span>自帶圖</div>
-                <input type="radio" name="service" value="custom">
-            </label>
-            
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">盲盒</span>超值不挑</div>
-                <input type="radio" name="service" value="blind_value">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">盲盒</span>含鑽不挑</div>
-                <input type="radio" name="service" value="blind_diamond">
-            </label>
+    <div class="section-title">基礎服務</div>
+    <div class="grid-container" id="serviceGrid">
+        </div>
 
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">延甲</span>十指半貼</div>
-                <input type="radio" name="service" value="ext_half">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">延甲</span>淺貼加長</div>
-                <input type="radio" name="service" value="ext_long">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">延甲</span>半貼含造型</div>
-                <input type="radio" name="service" value="ext_styled">
-            </label>
-            <label class="option-label">
-                <div class="label-text"><span class="cat-tag">延甲</span>足部單指</div>
-                <input type="radio" name="service" value="ext_toe_single">
-            </label>
+    <div class="section-title">位置</div>
+    <label class="pos-card" id="card_pos_hand">
+        <span>🖐️ 手部</span>
+        <div class="check-icon">✓</div>
+        <input type="checkbox" id="pos_hand" checked onchange="togglePos('hand')">
+    </label>
+    <label class="pos-card" id="card_pos_foot">
+        <span>🦶 足部 (+$200)</span>
+        <div class="check-icon">✓</div>
+        <input type="checkbox" id="pos_foot" onchange="togglePos('foot')">
+    </label>
+
+    <div class="section-title">卸甲服務</div>
+    <div class="grid-container" id="removeGrid">
+        </div>
+
+    <div class="section-title">加購及延甲</div>
+    
+    <div class="stepper-row">
+        <div class="stepper-info">
+            <span class="stepper-name">跳色</span>
+            <span class="stepper-price">$100 / 指</span>
+        </div>
+        <div class="stepper-ctrl">
+            <button class="btn-step" onclick="updateStepper('jump_color', -1)">-</button>
+            <span class="step-val" id="val_jump_color">0</span>
+            <button class="btn-step" onclick="updateStepper('jump_color', 1)">+</button>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">位置 (可複選)</div>
-        <div class="input-group">
-            <label class="option-label" style="flex:1"><span>手部</span> <input type="checkbox" id="pos_hand" checked></label>
-            <label class="option-label" style="flex:1"><span>足部</span> <input type="checkbox" id="pos_foot"></label>
+    <div class="stepper-row">
+        <div class="stepper-info">
+            <span class="stepper-name">足部單指延甲</span>
+            <span class="stepper-price" id="price_toe_ext">$120 / 指</span>
         </div>
-        <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">*部分造型/延甲足部會自動加價或依價目表計算</div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">卸甲服務</div>
-        <div class="options-grid">
-            <label class="option-label"><span>無</span> <input type="radio" name="remove" value="none" checked></label>
-            <label class="option-label"><span>本店卸甲</span> <input type="radio" name="remove" value="our_shop"></label>
-            <label class="option-label"><span>他店卸甲</span> <input type="radio" name="remove" value="other_shop"></label>
-            <label class="option-label"><span>純卸甲</span> <input type="radio" name="remove" value="pure"></label>
+        <div class="stepper-ctrl">
+            <button class="btn-step" onclick="updateStepper('toe_ext', -1)">-</button>
+            <span class="step-val" id="val_toe_ext">0</span>
+            <button class="btn-step" onclick="updateStepper('toe_ext', 1)">+</button>
         </div>
     </div>
 
-    <div class="section">
-        <div class="input-group">
-            <div class="input-wrapper">
-                <label>跳色數量 ($100/指)</label>
-                <input type="number" id="jump_color" value="" placeholder="0" inputmode="numeric">
+    <div class="stepper-row">
+        <div class="stepper-info">
+            <span class="stepper-name">其他加購</span>
+            <span class="stepper-price">自訂金額</span>
+        </div>
+        <div style="flex:1; margin-left:15px;">
+            <input type="number" id="addon_price" placeholder="輸入金額" 
+                   style="width: 100%; padding: 8px; border:1px solid #ddd; border-radius:8px; text-align:right; font-size:1rem;"
+                   oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="promo-row">
+        <span style="font-weight:bold; color:var(--text-primary);">🎂 當月壽星優惠 (9折)</span>
+        <label class="switch">
+            <input type="checkbox" id="birthday" onchange="calculate()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="total-card">
+        <div class="total-label">總計</div>
+        <div class="total-price" id="total_display">$0</div>
+        
+        <div class="detail-box" id="detail_box">
             </div>
-            <div class="input-wrapper">
-                <label>其他加購/單指延甲 ($)</label>
-                <input type="number" id="addon_price" value="" placeholder="0" inputmode="numeric">
-            </div>
-        </div>
+
+        <button class="btn-copy" onclick="copyQuote()">
+            📄 複製價格明細
+        </button>
     </div>
 
-    <div class="promo-box">
-        <div class="toggle-wrapper">
-            <label for="birthday">🎂 當月壽星優惠 (9折)</label>
-            <input type="checkbox" id="birthday" style="width: 25px; height: 25px;">
-        </div>
+    <div style="text-align:center;">
+        <button class="btn-reset" onclick="location.reload()">重新計算</button>
     </div>
 
-    <div class="result-section">
-        <div class="total-display" id="total_display">$0</div>
-        <textarea id="quote_area"></textarea>
-        <button class="copy-btn" onclick="copyQuote()">📋 複製報價單</button>
-    </div>
 
     <script>
-        // 資料與邏輯部分
+        // --- 資料設定 (保持您的原始邏輯) ---
         const PRICES = {
             'single': { 'manager': [1200, 1300], 'artist': [1000, 1200], 'assistant': [900, 1000], name: "單色凝膠" },
             'cateye': { 'manager': [1300, 1400], 'artist': [1100, 1300], 'assistant': [1000, 1100], name: "貓眼凝膠" },
@@ -283,12 +439,9 @@
             'custom': { 'manager': 1300, 'artist': 1000, 'assistant': 800, name: "自帶圖" },
             'blind_value': { 'manager': 1500, 'artist': 1200, 'assistant': null, name: "超值不挑款" },
             'blind_diamond': { 'manager': 1700, 'artist': 1500, 'assistant': null, name: "含鑽不挑款" },
-            
-            // 👇 新增/更新的延甲服務 👇
             'ext_half': { 'manager': 1200, 'artist': 1000, 'assistant': 1000, name: "十指半貼延甲" },
             'ext_long': { 'manager': 1500, 'artist': null, 'assistant': null, name: "淺貼加長延甲" },
-            'ext_styled': { 'manager': 2500, 'artist': 2000, 'assistant': 2000, name: "十指半貼含造型(up)" },
-            'ext_toe_single': { 'manager': 120, 'artist': 120, 'assistant': null, name: "足部單指延甲" }
+            'ext_styled': { 'manager': 2500, 'artist': 2000, 'assistant': 2000, name: "十指半貼含造型" }
         };
 
         const REMOVE_PRICES = {
@@ -297,131 +450,241 @@
             'other_shop': [300, 300, 300],
             'pure': [0, 500, 500]
         };
+        const REMOVE_NAMES = {'none':'無', 'our_shop':'本店卸甲', 'other_shop':'他店卸甲', 'pure':'純卸甲'};
 
-        let currentRole = 'artist'; 
-        const roleNames = {'manager': '店長', 'artist': '美甲師', 'assistant': '助理'};
+        let currentRole = 'artist'; // 預設美甲師
+        let selectedService = 'single';
+        let selectedRemove = 'none';
+        
+        // 計數器數值
+        let counts = {
+            'jump_color': 0,
+            'toe_ext': 0
+        };
 
-        function setRole(role) {
-            currentRole = role;
-            document.querySelectorAll('.role-option').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.role-option[onclick="setRole('${role}')"]`).classList.add('active');
+        // 初始化
+        function init() {
+            renderServices();
+            renderRemoves();
+            togglePos('hand'); // 初始化樣式
+            togglePos('foot'); // 初始化樣式
             calculate();
         }
 
-        function getTodayDate() {
-            const d = new Date();
-            return `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
+        // 1. 職級切換
+        function setRole(role) {
+            currentRole = role;
+            // 更新 UI
+            document.querySelectorAll('.role-tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 重新渲染價格
+            renderServices();
+            calculate();
         }
 
-        function calculate() {
-            const serviceVal = document.querySelector('input[name="service"]:checked').value;
-            const serviceData = PRICES[serviceVal];
+        // 2. 渲染服務卡片 (根據職級顯示不同價格)
+        function renderServices() {
+            const grid = document.getElementById('serviceGrid');
+            grid.innerHTML = '';
             
-            let basePriceData = null;
-            let isServiceAvailable = true;
+            for (const key in PRICES) {
+                const item = PRICES[key];
+                const priceData = item[currentRole];
+                
+                // 如果該職級沒有此服務，跳過
+                if (priceData === null) continue;
 
-            if (serviceData[currentRole] === null) {
-                isServiceAvailable = false;
-            } else {
-                basePriceData = serviceData[currentRole];
+                let priceDisplay = '';
+                if (Array.isArray(priceData)) {
+                    // 手足不同價，顯示手部價當代表
+                    priceDisplay = `$${priceData[0]} / 次`;
+                } else {
+                    priceDisplay = `$${priceData} / 次`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `service-card ${selectedService === key ? 'active' : ''}`;
+                card.onclick = () => selectService(key);
+                card.innerHTML = `
+                    <div class="card-title">${item.name}</div>
+                    <div class="card-price">${priceDisplay}</div>
+                `;
+                grid.appendChild(card);
             }
+        }
 
+        function selectService(key) {
+            selectedService = key;
+            renderServices(); // 更新選中樣式
+            calculate();
+        }
+
+        // 3. 渲染卸甲卡片
+        function renderRemoves() {
+            const grid = document.getElementById('removeGrid');
+            grid.innerHTML = '';
+
+            const removeRoleIdx = currentRole === 'manager' ? 0 : (currentRole === 'artist' ? 1 : 2);
+
+            for (const key in REMOVE_PRICES) {
+                const price = REMOVE_PRICES[key][removeRoleIdx];
+                const name = REMOVE_NAMES[key];
+                
+                const card = document.createElement('div');
+                card.className = `service-card ${selectedRemove === key ? 'active' : ''}`;
+                card.onclick = () => {
+                    selectedRemove = key;
+                    renderRemoves();
+                    calculate();
+                };
+                card.innerHTML = `
+                    <div class="card-title">${name}</div>
+                    <div class="card-price">${price === 0 ? '免費' : '$'+price}</div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        // 4. 位置切換 UI
+        function togglePos(type) {
+            const checkbox = document.getElementById(`pos_${type}`);
+            const card = document.getElementById(`card_pos_${type}`);
+            if (checkbox.checked) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+            calculate();
+        }
+
+        // 5. 計數器邏輯
+        function updateStepper(key, delta) {
+            counts[key] += delta;
+            if (counts[key] < 0) counts[key] = 0;
+            document.getElementById(`val_${key}`).innerText = counts[key];
+            calculate();
+        }
+
+        // --- 核心計算 (移植原本邏輯) ---
+        function calculate() {
+            let detailHtml = '';
+            let total = 0;
+
+            // 1. 基礎服務
+            const serviceData = PRICES[selectedService];
+            const priceInfo = serviceData[currentRole];
+            
             const isHand = document.getElementById('pos_hand').checked;
             const isFoot = document.getElementById('pos_foot').checked;
-            
-            let serviceTotal = 0;
-            let posTextArr = [];
-            
-            if (isServiceAvailable) {
-                if (serviceVal === 'single' || serviceVal === 'cateye') {
-                    if (isHand) { serviceTotal += basePriceData[0]; posTextArr.push(`手部$${basePriceData[0]}`); }
-                    if (isFoot) { serviceTotal += basePriceData[1]; posTextArr.push(`足部$${basePriceData[1]}`); }
+
+            if (isHand || isFoot) {
+                if (Array.isArray(priceInfo)) {
+                    // 分開計價 (單色/貓眼)
+                    if (isHand) {
+                        total += priceInfo[0];
+                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (手)</span><span>$${priceInfo[0]}</span></div>`;
+                    }
+                    if (isFoot) {
+                        total += priceInfo[1];
+                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (足)</span><span>$${priceInfo[1]}</span></div>`;
+                    }
                 } else {
-                    // 一般項目、延甲類
-                    let itemPrice = basePriceData;
-                    // 足部單指是個例外，它名稱已經包含足部，不需額外加價邏輯，直接累加
-                    if (serviceVal === 'ext_toe_single') {
-                        // 如果是足部單指，價格就是 itemPrice，不管勾選什麼位置 (因為名稱已定)
-                        // 但為了符合操作邏輯，至少要選一個位置才算有選，或者直接算價格
-                        // 這裡簡單處理：只要選了這個項目，就顯示價格
-                         serviceTotal += itemPrice;
-                         posTextArr.push("足部單指");
-                    } else {
-                        // 其他延甲或造型
-                        if (isHand) { serviceTotal += itemPrice; posTextArr.push("手部"); }
-                        if (isFoot) {
-                            let surcharge = 0;
-                            if (['mirror', 'french', 'gradient', 'custom'].includes(serviceVal)) { surcharge = 200; }
-                            serviceTotal += (itemPrice + surcharge);
-                            posTextArr.push(`足部(+$${surcharge})`);
+                    // 統一價 + 足部加價
+                    let itemPrice = priceInfo;
+                    if (isHand) {
+                        total += itemPrice;
+                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (手)</span><span>$${itemPrice}</span></div>`;
+                    }
+                    if (isFoot) {
+                        let surcharge = 0;
+                        if (['mirror', 'french', 'gradient', 'custom'].includes(selectedService)) {
+                            surcharge = 200;
                         }
+                        total += (itemPrice + surcharge);
+                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (足)</span><span>$${itemPrice+surcharge}</span></div>`;
                     }
                 }
-            } else {
-                posTextArr.push("(此職級不提供此項目)");
             }
 
-            const posText = posTextArr.length > 0 ? posTextArr.join("+") : "未選擇";
-            
-            // 卸甲
-            const removeVal = document.querySelector('input[name="remove"]:checked').value;
-            let roleIdx = 0;
-            if (currentRole === 'artist') roleIdx = 1;
-            if (currentRole === 'assistant') roleIdx = 2;
-            
-            const removePrice = REMOVE_PRICES[removeVal][roleIdx];
-            const removeEl = document.querySelector(`input[name="remove"][value="${removeVal}"]`);
-            const removeName = removeEl.closest('.option-label').querySelector('span').innerText;
-            const removeText = removePrice === 0 ? removeName : `${removeName} ($${removePrice})`;
+            // 2. 卸甲
+            const removeRoleIdx = currentRole === 'manager' ? 0 : (currentRole === 'artist' ? 1 : 2);
+            const removePrice = REMOVE_PRICES[selectedRemove][removeRoleIdx];
+            if (removePrice > 0) {
+                total += removePrice;
+                detailHtml += `<div class="detail-row"><span>卸甲: ${REMOVE_NAMES[selectedRemove]}</span><span>$${removePrice}</span></div>`;
+            }
 
-            // 加購
-            const jumpCount = parseInt(document.getElementById('jump_color').value) || 0;
-            const jumpPrice = jumpCount * 100;
-            const addonPrice = parseInt(document.getElementById('addon_price').value) || 0;
-            const extraTotal = jumpPrice + addonPrice;
+            // 3. 加購 (跳色)
+            const jumpPrice = counts['jump_color'] * 100;
+            if (jumpPrice > 0) {
+                total += jumpPrice;
+                detailHtml += `<div class="detail-row"><span>跳色 x${counts['jump_color']}</span><span>$${jumpPrice}</span></div>`;
+            }
 
+            // 4. 足部單指延甲
+            // 只有店長/美甲師有，助理 null
+            let toePriceUnit = 120; // 預設
+            if (currentRole === 'assistant') toePriceUnit = 0; // 助理不做
+            
+            const toeTotal = counts['toe_ext'] * toePriceUnit;
+            if (toeTotal > 0 && currentRole !== 'assistant') {
+                total += toeTotal;
+                detailHtml += `<div class="detail-row"><span>足部延甲 x${counts['toe_ext']}</span><span>$${toeTotal}</span></div>`;
+            }
+
+            // 5. 其他自訂金額
+            const addon = parseInt(document.getElementById('addon_price').value) || 0;
+            if (addon > 0) {
+                total += addon;
+                detailHtml += `<div class="detail-row"><span>其他加購</span><span>$${addon}</span></div>`;
+            }
+
+            // 6. 優惠
             const isBirthday = document.getElementById('birthday').checked;
+            if (isBirthday) {
+                let discount = Math.round(total * 0.1);
+                total = Math.round(total * 0.9);
+                detailHtml += `<div class="detail-row" style="color:#FFCC80;"><span>🎂 壽星優惠 (9折)</span><span>-$${discount}</span></div>`;
+            }
 
-            let baseTotal = serviceTotal + removePrice + extraTotal;
-            // 如果沒選位置且不是足部單指，則歸零
-            if (!isHand && !isFoot && serviceVal !== 'ext_toe_single') baseTotal = 0;
-
-            let finalTotal = isBirthday ? Math.round(baseTotal * 0.9) : baseTotal;
-            let discountText = isBirthday ? " (已折壽星9折)" : "";
-
-            document.getElementById('total_display').innerText = `$${finalTotal}`;
-
-            const quote = `【Fairy. L NAIL ART 報價單】
-📅 日期：${getTodayDate()}
-👤 服務人員：${roleNames[currentRole]}
----------------------------
-■ 項目：${serviceData.name}
-■ 部位：${posText}
-■ 卸甲：${removeText}
-■ 加購：跳色${jumpCount}指 / 其他$${addonPrice}
----------------------------
-💰 預估總額：$${finalTotal}${discountText}
-＊提醒：本店作品享有一週保固
-＊儲值會員另享專屬優惠`;
-
-            document.getElementById('quote_area').value = quote;
+            document.getElementById('total_display').innerText = `$${total}`;
+            document.getElementById('detail_box').innerHTML = detailHtml || '<div style="text-align:center; opacity:0.5;">尚未選擇項目</div>';
         }
 
+        // 複製功能
         function copyQuote() {
-            const textArea = document.getElementById("quote_area");
-            textArea.select();
-            textArea.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(textArea.value).then(() => {
-                alert("✅ 報價單已複製！");
+            const roleName = {'manager':'店長', 'artist':'美甲師', 'assistant':'助理'}[currentRole];
+            const date = new Date().toLocaleDateString();
+            const total = document.getElementById('total_display').innerText;
+            const details = document.getElementById('detail_box').innerText.replace(/\n/g, '\n'); // 簡單格式化
+            
+            // 重新組裝漂亮的文字
+            let text = `【Fairy. L 美甲報價單】\n`;
+            text += `📅 日期：${date}\n`;
+            text += `👤 服務人員：${roleName}\n`;
+            text += `----------------------\n`;
+            
+            // 抓取明細文字
+            const rows = document.querySelectorAll('.detail-row');
+            rows.forEach(row => {
+                const name = row.children[0].innerText;
+                const price = row.children[1].innerText;
+                text += `${name} ... ${price}\n`;
+            });
+            
+            text += `----------------------\n`;
+            text += `💰 總計：${total}\n`;
+            text += `\n＊提醒：本店作品享有一週保固`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ 價格明細已複製！');
             });
         }
 
-        document.querySelectorAll('input').forEach(el => {
-            el.addEventListener('change', calculate);
-            el.addEventListener('input', calculate);
-        });
+        // 啟動
+        init();
 
-        calculate();
     </script>
 </body>
 </html>
