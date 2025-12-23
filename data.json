@@ -1,0 +1,31 @@
+{
+    "PRICES": {
+        "single": { "manager": [1200, 1300], "artist": [1000, 1200], "assistant": [900, 1000], "name": "單色凝膠" },
+        "cateye": { "manager": [1300, 1400], "artist": [1100, 1300], "assistant": [1000, 1100], "name": "貓眼凝膠" },
+        "mirror": { "manager": 1500, "artist": 1300, "assistant": 1100, "name": "十指鏡面" },
+        "french": { "manager": 1600, "artist": 1500, "assistant": 1200, "name": "十指法式" },
+        "gradient": { "manager": 1300, "artist": 1300, "assistant": 1100, "name": "十指漸層" },
+        "custom": { "manager": 1300, "artist": 1000, "assistant": 800, "name": "自帶圖" },
+        "blind_value": { "manager": 1500, "artist": 1200, "assistant": null, "name": "超值不挑款" },
+        "blind_diamond": { "manager": 1700, "artist": 1500, "assistant": null, "name": "含鑽不挑款" },
+        "ext_half": { "manager": 1200, "artist": 1000, "assistant": 1000, "name": "十指半貼延甲" },
+        "ext_long": { "manager": 1500, "artist": null, "assistant": null, "name": "淺貼加長延甲" },
+        "ext_styled": { "manager": 2500, "artist": 2000, "assistant": 2000, "name": "十指半貼含造型" }
+    },
+    "REMOVE_PRICES": {
+        "none": [0, 0, 0],
+        "our_shop": [300, 200, 200],
+        "other_shop": [300, 300, 300],
+        "pure": [0, 500, 500]
+    },
+    "REMOVE_NAMES": {
+        "none": "無",
+        "our_shop": "本店卸甲",
+        "other_shop": "他店卸甲",
+        "pure": "純卸甲"
+    },
+    "EXTRA_PRICES": {
+        "jump_color": 100,
+        "toe_ext": 120
+    }
+}
