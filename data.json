@@ -219,7 +219,7 @@
             "prices": {
                 "manager": 120,
                 "artist": 120,
-                "assistant": 100
+                "assistant": null
             }
         },
         {
