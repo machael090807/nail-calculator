@@ -13,18 +13,36 @@
           "id": "cateye",
           "name": "貓眼凝膠",
           "prices": {
-            "manager": [1300, 1400],
-            "artist": [1100, 1300],
-            "assistant": [1000, 1100]
+            "manager": [
+              1300,
+              1400
+            ],
+            "artist": [
+              1100,
+              1300
+            ],
+            "assistant": [
+              1000,
+              1100
+            ]
           }
         },
         {
           "id": "single",
           "name": "單色凝膠",
           "prices": {
-            "manager": [1200, 1300],
-            "artist": [1000, 1200],
-            "assistant": [900, 1000]
+            "manager": [
+              1200,
+              1300
+            ],
+            "artist": [
+              1000,
+              1200
+            ],
+            "assistant": [
+              900,
+              1000
+            ]
           }
         }
       ]
@@ -181,7 +199,7 @@
       "id": "pure",
       "name": "純卸甲",
       "prices": {
-        "manager": 0,
+        "manager": 500,
         "artist": 500,
         "assistant": 500
       }
@@ -204,5 +222,6 @@
         "assistant": null
       }
     }
-  ]
+  ],
+  "sha": "16ec819f39d16ae675a6f6e7dcba31c46071dc77"
 }
