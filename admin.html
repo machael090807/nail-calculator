@@ -29,19 +29,15 @@
         .btn-login:active { transform: scale(0.98); }
         .error-msg { color: #E57373; font-size: 0.85rem; margin-top: 15px; min-height: 20px; }
 
-        /* --- 🥷 忍者按鈕 (隱藏版) --- */
+        /* --- 🥷 忍者按鈕 --- */
         .btn-ninja { 
             margin-top: 60px; 
-            background: var(--bg); 
-            color: var(--bg); 
-            border: none; 
-            font-size: 0.8rem;
-            cursor: default; 
-            transition: 0.2s;
+            background: var(--bg); color: var(--bg); border: none; font-size: 0.8rem;
+            cursor: default; transition: 0.2s;
         }
         .btn-ninja:hover { cursor: pointer; }
 
-        /* --- 產生器視窗 (Modal) --- */
+        /* --- 產生器視窗 --- */
         #gen_modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .gen-box { background: white; padding: 30px; border-radius: 16px; width: 320px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.2rem; color: #999; }
@@ -90,6 +86,7 @@
             <button class="btn-login" onclick="attemptLogin()">登入</button>
             <div id="login_msg" class="error-msg"></div>
         </div>
+        
         <button class="btn-ninja" onclick="document.getElementById('gen_modal').style.display='flex'">• 產生金鑰 •</button>
     </div>
 
@@ -97,7 +94,7 @@
         <div class="gen-box">
             <div class="close-btn" onclick="document.getElementById('gen_modal').style.display='none'">✕</div>
             <h3 style="margin-top:0; text-align:center; color:#4E342E">🔐 產生 Cipher 亂碼</h3>
-            <p style="text-align:center; color:#999; font-size:0.85rem; margin-bottom:20px;">僅加密 Token，其餘資訊請填於 JSON</p>
+            <p style="text-align:center; color:#999; font-size:0.85rem; margin-bottom:15px;">只需 Token，帳號與 Repo 已內建</p>
             
             <label>GitHub Token</label>
             <input type="text" id="g_token" placeholder="ghp_xxxxxxxx...">
@@ -108,7 +105,7 @@
             <button class="btn-login" style="margin-top:25px" onclick="generateCipher()">產生並顯示</button>
             
             <div id="g_result" class="gen-result"></div>
-            <div id="g_msg" style="color:green; font-size:0.8rem; text-align:center; margin-top:5px; display:none;">✅ 已複製！請貼到 JSON 的 cipher 欄位</div>
+            <div id="g_msg" style="color:green; font-size:0.8rem; text-align:center; margin-top:5px; display:none;">✅ 已複製！請貼到 JSON</div>
         </div>
     </div>
 
@@ -157,9 +154,16 @@
     </div>
 
     <script>
+        // --- 核心設定 (請確認這裡是否正確) ---
+        const GITHUB_CONFIG = {
+            user: "machael090807",     // 你的 GitHub 帳號
+            repo: "nail-calculator",   // 你的 Repo 名稱
+            path: "data.json"          // 檔案名稱
+        };
+
         let DATA = { settings: {}, categories: [], removals: [], add_ons: [], sha: "" };
         let USER_LIST = [];
-        let CURRENT_CONFIG = { token: "", user: "", repo: "", path: "data.json" };
+        let CURRENT_TOKEN = ""; // 登入後儲存 Token
 
         window.onload = async function() {
             try {
@@ -189,9 +193,9 @@
             const t = document.getElementById('g_token').value.trim();
             const p = document.getElementById('g_pass').value.trim();
             
-            if(!t || !p) return alert("請填寫 GitHub Token 和密碼");
+            if(!t || !p) return alert("請填寫 Token 和 密碼");
 
-            // 直接加密 Token (不包含 user/repo)
+            // 這裡只加密 Token
             const cipher = btoa(xor_process(t, p)); 
 
             const box = document.getElementById('g_result');
@@ -213,22 +217,16 @@
             const targetUser = USER_LIST[userIdx];
             if(!targetUser) return;
 
-            // 檢查 JSON 格式是否完整
-            if(!targetUser.user || !targetUser.repo) {
-                return msg.innerText = "❌ JSON 設定檔缺少 user 或 repo 欄位";
-            }
-
             msg.innerText = "驗證中...";
             
-            // 解密只會得到 Token
+            // 解密得到 Token
             const decryptedToken = xor_process(atob(targetUser.cipher), pwd);
 
-            // 簡單驗證 Token 格式 (ghp 開頭 或 長度足夠)
+            // 驗證 Token 格式
             if(decryptedToken.startsWith('ghp_') || decryptedToken.length > 20) {
-                CURRENT_CONFIG.token = decryptedToken;
-                CURRENT_CONFIG.user = targetUser.user;
-                CURRENT_CONFIG.repo = targetUser.repo;
+                CURRENT_TOKEN = decryptedToken;
                 
+                // 使用解開的 Token + 內建的 User/Repo 連線
                 loadDataFromGitHub().then(() => {
                     document.getElementById('login_view').style.opacity = '0';
                     setTimeout(() => {
@@ -237,7 +235,7 @@
                     }, 300);
                 }).catch((e) => {
                     console.log(e);
-                    msg.innerText = "❌ 密碼正確但 Token 無效或連線失敗";
+                    msg.innerText = "❌ 密碼正確但 Token 無效";
                 });
             } else {
                 msg.innerText = "❌ 密碼錯誤";
@@ -253,9 +251,9 @@
         }
 
         async function loadDataFromGitHub() {
-            const { token, user, repo, path } = CURRENT_CONFIG;
-            const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-            const res = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
+            // 使用 CURRENT_TOKEN 和 GITHUB_CONFIG 連線
+            const url = `https://api.github.com/repos/${GITHUB_CONFIG.user}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+            const res = await fetch(url, { headers: { 'Authorization': `token ${CURRENT_TOKEN}` } });
             if (!res.ok) throw new Error("API Error");
             const json = await res.json();
             const content = decodeURIComponent(escape(atob(json.content)));
@@ -265,7 +263,7 @@
             renderAll();
         }
 
-        // --- 渲染與操作邏輯 ---
+        // --- 渲染與操作邏輯 (完全相同) ---
         function switchTab(id) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -368,16 +366,19 @@
             DATA.settings.location_hand_name = document.getElementById('set_hand_name').value;
             DATA.settings.location_foot_name = document.getElementById('set_foot_name').value;
             DATA.settings.location_foot_surcharge = parseInt(document.getElementById('set_foot_price').value);
-            const { token, user, repo, path } = CURRENT_CONFIG;
+            
             const btn = document.querySelector('.btn-save');
             const originalText = btn.innerText;
             btn.innerText = "⏳ 儲存中...";
+            
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
             const body = { message: "Update via Admin Panel", content: content, sha: DATA.sha };
+            
             try {
-                const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`, {
+                // 使用內建的 GITHUB_CONFIG + 解密的 CURRENT_TOKEN
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.user}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
                     method: 'PUT',
-                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    headers: { 'Authorization': `token ${CURRENT_TOKEN}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
                 if (res.ok) { const json = await res.json(); DATA.sha = json.content.sha; alert("✅ 儲存成功！"); } else throw new Error("Save Failed");
