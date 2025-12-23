@@ -139,17 +139,7 @@
         },
         {
             "title": "我是新增分類",
-            "items": [
-                {
-                    "id": "item_1766474271818",
-                    "name": "項目1",
-                    "prices": {
-                        "manager": 10,
-                        "artist": 5,
-                        "assistant": 5
-                    }
-                }
-            ]
+            "items": []
         }
     ],
     "removals": [
