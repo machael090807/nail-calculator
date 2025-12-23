@@ -5,65 +5,225 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fairy. L 後台管理</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --accent: #8D6E63; --danger: #d32f2f; --success: #388E3C; }
-        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px; padding-bottom: 80px; }
-        h1 { text-align: center; margin-bottom: 5px; }
-        .subtitle { text-align: center; font-size: 0.9rem; color: var(--accent); margin-bottom: 30px; }
+        /* 全域設定：防止跑版的神奇語法 */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        :root { 
+            --bg: #F6F1ED; 
+            --card: #FFFFFF; 
+            --text: #4E342E; 
+            --accent: #8D6E63; 
+            --danger: #d32f2f; 
+            --gray: #f5f5f5;
+            --border: #e0e0e0;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Noto Sans TC', sans-serif; 
+            padding: 15px; 
+            padding-bottom: 100px; /* 留給下方懸浮按鈕空間 */
+            margin: 0;
+        }
+
+        h1 { text-align: center; margin: 10px 0 5px 0; font-size: 1.5rem; }
+        .subtitle { text-align: center; font-size: 0.9rem; color: var(--accent); margin-bottom: 20px; }
         
         /* 登入區 */
-        #login-panel { max-width: 400px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
-        input[type="password"] { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .btn-main { background: var(--text); color: white; border: none; padding: 12px 24px; border-radius: 50px; font-size: 1rem; margin-top: 20px; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+        #login-panel { 
+            max-width: 400px; 
+            margin: 20px auto; 
+            background: var(--card); 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            text-align: center; 
+        }
+        input[type="password"], input[type="text"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 10px; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            font-size: 1rem; 
+            background: var(--gray);
+        }
+        .btn-main { 
+            background: var(--text); 
+            color: white; 
+            border: none; 
+            padding: 12px 0; 
+            border-radius: 50px; 
+            font-size: 1rem; 
+            margin-top: 20px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: bold;
+        }
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* 編輯區 */
-        #editor-panel { display: none; max-width: 800px; margin: 0 auto; }
+        /* 編輯區容器 */
+        #editor-panel { display: none; width: 100%; max-width: 600px; margin: 0 auto; }
         
-        /* 分類卡片 */
-        .section-card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid transparent; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 15px; }
-        .cat-title-input { font-size: 1.2rem; font-weight: bold; border: none; background: transparent; color: var(--text); width: 70%; }
+        /* 卡片樣式 */
+        .section-card { 
+            background: var(--card); 
+            border-radius: 16px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+        }
+
+        /* 分類標題區 */
+        .section-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--bg); 
+            padding-bottom: 10px; 
+            margin-bottom: 10px; 
+            flex-wrap: wrap; /* 讓內容在小螢幕自動換行 */
+            gap: 10px;
+        }
+        .cat-title-input { 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            border: none; 
+            background: transparent; 
+            color: var(--text); 
+            flex: 1; /* 佔滿剩餘空間 */
+            min-width: 150px;
+        }
         
+        /* 按鈕群組 */
+        .btn-group { display: flex; gap: 5px; }
+        .btn-icon { 
+            width: 32px; height: 32px; 
+            border-radius: 8px; 
+            border: none; 
+            background: var(--gray); 
+            color: #666; 
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; 
+        }
+        .btn-del { color: var(--danger); background: #ffebee; }
+        .btn-icon:active { transform: scale(0.9); }
+
         /* 項目列表 */
-        .item-row { display: flex; flex-direction: column; gap: 8px; border-bottom: 1px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; position: relative; }
-        .item-row:last-child { border-bottom: none; margin-bottom: 0; }
+        .item-row { 
+            background: #fff;
+            padding: 10px 0; 
+            border-bottom: 1px dashed var(--border); 
+        }
+        .item-row:last-child { border-bottom: none; }
         
-        .row-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .name-input { flex: 2; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-weight: bold; }
+        /* 項目第一行：名稱 + 操作按鈕 */
+        .row-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 8px; 
+            margin-bottom: 8px; 
+        }
+        .name-input { 
+            flex: 1; 
+            padding: 8px 10px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            font-weight: bold; 
+            background: #fff;
+            font-size: 0.95rem;
+        }
         
-        .price-grid { display: flex; gap: 5px; }
-        .price-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-        .price-label { font-size: 0.7rem; color: #888; margin-bottom: 2px; }
-        .price-input { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 6px; text-align: center; background: #FAFAFA; font-size: 0.9rem; }
+        /* 價格輸入區 (Grid 排版) */
+        .price-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; /* 三等分 */
+            gap: 8px; 
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .price-col { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .price-label { 
+            font-size: 0.75rem; 
+            color: #888; 
+            margin-bottom: 4px; 
+        }
+        .price-input { 
+            width: 100%; 
+            padding: 8px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            text-align: center; 
+            background: #fff; 
+            font-size: 1rem; 
+            font-weight: bold;
+            color: var(--text);
+        }
 
-        /* 按鈕群 */
-        .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 5px; opacity: 0.6; transition: 0.2s; }
-        .btn-icon:hover { opacity: 1; transform: scale(1.1); }
-        .btn-del { color: var(--danger); }
-        .btn-move { color: var(--text); }
+        /* 底部操作按鈕 */
+        .btn-add-item { 
+            width: 100%; 
+            padding: 12px; 
+            background: #fcfcfc; 
+            border: 2px dashed #ddd; 
+            border-radius: 10px; 
+            color: #888; 
+            font-size: 0.9rem;
+            margin-top: 5px; 
+        }
+        .btn-add-cat { 
+            width: 100%; 
+            padding: 15px; 
+            background: transparent; 
+            border: 2px dashed var(--accent); 
+            border-radius: 16px; 
+            color: var(--accent); 
+            font-weight: bold; 
+            margin-bottom: 30px; 
+        }
         
-        .btn-add-item { width: 100%; padding: 10px; background: #f0f0f0; border: 1px dashed #aaa; border-radius: 8px; color: #666; cursor: pointer; margin-top: 10px; }
-        .btn-add-item:hover { background: #e0e0e0; color: #333; }
-
-        .btn-add-cat { width: 100%; padding: 15px; background: var(--bg); border: 2px dashed var(--accent); border-radius: 12px; color: var(--accent); font-weight: bold; cursor: pointer; margin-bottom: 40px; }
-        
-        /* 懸浮儲存 */
-        #save-btn { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: white; padding: 15px 30px; border-radius: 50px; border: none; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 999; display: flex; align-items: center; gap: 8px; }
+        /* 懸浮儲存按鈕 (優化版) */
+        #save-btn { 
+            position: fixed; 
+            bottom: 25px; 
+            right: 20px; 
+            background: var(--text); 
+            color: white; 
+            padding: 12px 25px; 
+            border-radius: 50px; 
+            border: none; 
+            font-size: 1rem; 
+            box-shadow: 0 4px 20px rgba(78, 52, 46, 0.4); 
+            z-index: 100; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-weight: bold;
+        }
         #save-btn:active { transform: scale(0.95); }
 
-        details summary { cursor: pointer; list-style: none; }
-        details[open] summary { margin-bottom: 10px; }
+        details summary { cursor: pointer; list-style: none; outline: none; }
+        details summary::-webkit-details-marker { display: none; } /* 隱藏預設箭頭 */
     </style>
 </head>
 <body>
 
-    <h1>Fairy. L後台管理系統</h1>
-    <div class="subtitle">Fairy. L CMS</div>
+    <h1>Fairy. L 後台管理系統</h1>
+    <div class="subtitle">Fairy. L Pricing Editor</div>
 
     <div id="login-panel">
         <h3>管理者登入</h3>
-        <input type="password" id="token-input" placeholder="輸入密碼(ghp_...)">
+        <input type="password" id="token-input" placeholder="輸入密碼 (ghp_...)">
         <button class="btn-main" onclick="login()">登入</button>
     </div>
 
@@ -74,11 +234,12 @@
         <div class="subtitle">———— 其他設定 ————</div>
         <div id="addons-area"></div>
 
-        <button id="save-btn" onclick="saveToGithub()">💾 儲存並發布</button>
+        <button id="save-btn" onclick="saveToGithub()">
+            <i class="fas fa-save"></i> 儲存並發布
+        </button>
     </div>
 
     <script>
-        // 設定
         const REPO_CONFIG = {
             owner: 'machael090807',     
             repo: 'nail-calculator',    
@@ -89,19 +250,17 @@
         let fileSha = null;
         let ghToken = null;
 
-        // 記住 Token
         window.onload = function() {
             const savedToken = localStorage.getItem('gh_token');
             if(savedToken) document.getElementById('token-input').value = savedToken;
         }
 
-        // 1. 登入
         async function login() {
             const inputToken = document.getElementById('token-input').value.trim();
             const btn = document.querySelector('#login-panel button');
 
             if(!inputToken) return alert("請輸入 Token");
-            btn.innerText = '讀取資料中...';
+            btn.innerText = '讀取中...';
             btn.disabled = true;
 
             try {
@@ -116,7 +275,6 @@
                 const content = decodeURIComponent(escape(window.atob(data.content)));
                 currentData = JSON.parse(content);
                 
-                // 修正舊資料結構 (如果有的話)
                 if(!currentData.categories) currentData.categories = [];
                 if(!currentData.add_ons) currentData.add_ons = [];
 
@@ -129,18 +287,16 @@
 
             } catch (e) {
                 alert('錯誤：' + e.message);
-                btn.innerText = '驗證並登入';
+                btn.innerText = '登入';
                 btn.disabled = false;
             }
         }
 
-        // 2. 渲染編輯器 (核心邏輯)
         function renderEditor() {
             renderCategories();
             renderAddons();
         }
 
-        // 渲染分類區塊
         function renderCategories() {
             const container = document.getElementById('categories-area');
             container.innerHTML = '';
@@ -149,20 +305,18 @@
                 const card = document.createElement('div');
                 card.className = 'section-card';
                 
-                // 分類標題區
                 let html = `
                     <div class="section-header">
                         <input type="text" class="cat-title-input" value="${cat.title}" onchange="updateCatTitle(${catIdx}, this.value)">
-                        <div>
-                            <button class="btn-icon btn-move" onclick="moveCategory(${catIdx}, -1)" title="上移">⬆</button>
-                            <button class="btn-icon btn-move" onclick="moveCategory(${catIdx}, 1)" title="下移">⬇</button>
-                            <button class="btn-icon btn-del" onclick="deleteCategory(${catIdx})" title="刪除分類">🗑</button>
+                        <div class="btn-group">
+                            <button class="btn-icon" onclick="moveCategory(${catIdx}, -1)"><i class="fas fa-arrow-up"></i></button>
+                            <button class="btn-icon" onclick="moveCategory(${catIdx}, 1)"><i class="fas fa-arrow-down"></i></button>
+                            <button class="btn-icon btn-del" onclick="deleteCategory(${catIdx})"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                     <div class="item-list">
                 `;
 
-                // 項目列表
                 cat.items.forEach((item, itemIdx) => {
                     const p = item.prices;
                     html += `
@@ -170,10 +324,10 @@
                             <div class="row-top">
                                 <input type="text" class="name-input" value="${item.name}" placeholder="項目名稱" 
                                     onchange="updateItemName(${catIdx}, ${itemIdx}, this.value)">
-                                <div>
-                                    <button class="btn-icon btn-move" onclick="moveItem(${catIdx}, ${itemIdx}, -1)">⬆</button>
-                                    <button class="btn-icon btn-move" onclick="moveItem(${catIdx}, ${itemIdx}, 1)">⬇</button>
-                                    <button class="btn-icon btn-del" onclick="deleteItem(${catIdx}, ${itemIdx})">✖</button>
+                                <div class="btn-group">
+                                    <button class="btn-icon" onclick="moveItem(${catIdx}, ${itemIdx}, -1)"><i class="fas fa-arrow-up"></i></button>
+                                    <button class="btn-icon" onclick="moveItem(${catIdx}, ${itemIdx}, 1)"><i class="fas fa-arrow-down"></i></button>
+                                    <button class="btn-icon btn-del" onclick="deleteItem(${catIdx}, ${itemIdx})"><i class="fas fa-times"></i></button>
                                 </div>
                             </div>
                             <div class="price-grid">
@@ -200,7 +354,6 @@
             });
         }
 
-        // 渲染加購區塊 (唯讀或簡單編輯，這裡做簡單版)
         function renderAddons() {
             const container = document.getElementById('addons-area');
             container.innerHTML = '';
@@ -214,89 +367,62 @@
                  html += `
                     <div class="item-row" style="flex-direction:row; align-items:center;">
                         <input type="text" class="name-input" value="${item.name}" disabled style="background:#eee; color:#888;">
-                        <input type="number" class="price-input" style="width:80px;" value="${priceVal}" 
+                        <input type="number" class="price-input" style="width:100px; margin-left:10px;" value="${priceVal}" 
                             onchange="updateAddonPrice(${idx}, this.value)">
                     </div>
                  `;
             });
-            html += `<p style="font-size:0.8rem; color:#888; text-align:center;">* 加購項目結構較複雜，建議僅在此修改金額，若需新增請聯繫工程師。</p>`;
+            html += `<p style="font-size:0.8rem; color:#888; text-align:center;">* 加購項目僅供修改金額</p>`;
             card.innerHTML = html;
             container.appendChild(card);
         }
 
-        // --- 資料操作邏輯 (CRUD) ---
-
-        // 新增分類
+        // --- CRUD 邏輯 (保持不變) ---
         function addCategory() {
-            currentData.categories.push({
-                title: "新分類名稱",
-                items: []
-            });
+            currentData.categories.push({ title: "新分類名稱", items: [] });
             renderCategories();
         }
 
-        // 刪除分類
         function deleteCategory(idx) {
-            if(!confirm(`確定要刪除「${currentData.categories[idx].title}」分類及其所有項目嗎？`)) return;
+            if(!confirm(`刪除「${currentData.categories[idx].title}」？`)) return;
             currentData.categories.splice(idx, 1);
             renderCategories();
         }
 
-        // 移動分類
         function moveCategory(idx, dir) {
             if (idx + dir < 0 || idx + dir >= currentData.categories.length) return;
-            const temp = currentData.categories[idx];
-            currentData.categories[idx] = currentData.categories[idx + dir];
-            currentData.categories[idx + dir] = temp;
+            [currentData.categories[idx], currentData.categories[idx + dir]] = [currentData.categories[idx + dir], currentData.categories[idx]];
             renderCategories();
         }
 
-        // 更新分類標題
-        function updateCatTitle(idx, val) {
-            currentData.categories[idx].title = val;
-        }
+        function updateCatTitle(idx, val) { currentData.categories[idx].title = val; }
 
-        // 新增項目
         function addItem(catIdx) {
-            const newId = 'item_' + new Date().getTime(); // 產生唯一ID
+            const newId = 'item_' + new Date().getTime();
             currentData.categories[catIdx].items.push({
-                id: newId,
-                name: "新項目",
-                prices: { manager: 0, artist: 0, assistant: 0 }
+                id: newId, name: "新項目", prices: { manager: 0, artist: 0, assistant: 0 }
             });
             renderCategories();
         }
 
-        // 刪除項目
         function deleteItem(catIdx, itemIdx) {
-            if(!confirm("確定刪除此項目？")) return;
+            if(!confirm("刪除此項目？")) return;
             currentData.categories[catIdx].items.splice(itemIdx, 1);
             renderCategories();
         }
 
-        // 移動項目
         function moveItem(catIdx, itemIdx, dir) {
             const items = currentData.categories[catIdx].items;
             if (itemIdx + dir < 0 || itemIdx + dir >= items.length) return;
-            const temp = items[itemIdx];
-            items[itemIdx] = items[itemIdx + dir];
-            items[itemIdx + dir] = temp;
+            [items[itemIdx], items[itemIdx + dir]] = [items[itemIdx + dir], items[itemIdx]];
             renderCategories();
         }
 
-        // 更新項目名稱
-        function updateItemName(catIdx, itemIdx, val) {
-            currentData.categories[catIdx].items[itemIdx].name = val;
-        }
+        function updateItemName(catIdx, itemIdx, val) { currentData.categories[catIdx].items[itemIdx].name = val; }
 
-        // 更新價格
         function updatePrice(catIdx, itemIdx, role, val) {
             const num = val === '' ? null : parseInt(val);
             const prices = currentData.categories[catIdx].items[itemIdx].prices;
-            
-            // 邏輯：如果後台輸入單一數字，存成數字；如果前台需要手足分開，這裡預設都存一樣
-            // 為了保持相容性：這裡簡單處理為直接更新。
-            // 若原本是陣列 [手, 足]，則更新 [新值, 新值 + 差價] (保留價差)
             if (Array.isArray(prices[role])) {
                 const diff = prices[role][1] - prices[role][0];
                 prices[role] = [num, num + diff];
@@ -305,31 +431,19 @@
             }
         }
         
-        // 輔助：讀取價格 (只顯示第一個數字)
-        function getPrice(p) {
-            if(Array.isArray(p)) return p[0];
-            return p;
-        }
+        function getPrice(p) { return Array.isArray(p) ? p[0] : p; }
 
-        // 更新加購價
         function updateAddonPrice(idx, val) {
             const num = parseInt(val);
             const item = currentData.add_ons[idx];
-            if(typeof item.price === 'number') {
-                item.price = num;
-            } else {
-                // 如果是分職位的，這裡簡化為全部更新一樣
-                item.prices.manager = num;
-                if(item.prices.artist) item.prices.artist = num;
-                if(item.prices.assistant) item.prices.assistant = num;
-            }
+            if(typeof item.price === 'number') { item.price = num; } 
+            else { item.prices.manager = num; if(item.prices.artist) item.prices.artist = num; if(item.prices.assistant) item.prices.assistant = num; }
         }
 
-        // 3. 儲存回 GitHub
         async function saveToGithub() {
-            if(!confirm("確定要儲存所有變更並發布嗎？")) return;
+            if(!confirm("確定儲存並發布？")) return;
             const btn = document.getElementById('save-btn');
-            btn.innerText = '上傳中...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上傳中...';
             btn.disabled = true;
 
             const jsonString = JSON.stringify(currentData, null, 4);
@@ -355,12 +469,12 @@
                 const resData = await response.json();
                 fileSha = resData.content.sha;
 
-                alert('✅ 發布成功！前台約 1 分鐘後更新。');
-                btn.innerText = '💾 儲存並發布';
+                alert('✅ 發布成功！');
+                btn.innerHTML = '<i class="fas fa-save"></i> 儲存並發布';
                 btn.disabled = false;
             } catch (e) {
                 alert('錯誤：' + e.message);
-                btn.innerText = '💾 儲存並發布';
+                btn.innerHTML = '<i class="fas fa-save"></i> 儲存並發布';
                 btn.disabled = false;
             }
         }
