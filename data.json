@@ -4,24 +4,6 @@
             "title": "✨ 基礎凝膠服務",
             "items": [
                 {
-                    "id": "cateye",
-                    "name": "貓眼凝膠",
-                    "prices": {
-                        "manager": [
-                            1300,
-                            1400
-                        ],
-                        "artist": [
-                            1100,
-                            1300
-                        ],
-                        "assistant": [
-                            1000,
-                            1100
-                        ]
-                    }
-                },
-                {
                     "id": "single",
                     "name": "單色凝膠",
                     "prices": {
@@ -36,6 +18,24 @@
                         "assistant": [
                             900,
                             1000
+                        ]
+                    }
+                },
+                {
+                    "id": "cateye",
+                    "name": "貓眼凝膠",
+                    "prices": {
+                        "manager": [
+                            1300,
+                            1400
+                        ],
+                        "artist": [
+                            1100,
+                            1300
+                        ],
+                        "assistant": [
+                            1000,
+                            1100
                         ]
                     }
                 }
