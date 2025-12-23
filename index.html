@@ -6,11 +6,26 @@
     <title>Fairy. L 美甲計算機</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="logo.jpg">
+
     <style>
         /* --- 核心樣式 --- */
         :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --sub-text: #8D6E63; --brown: #8D7B6F; --radius: 16px; }
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px 20px 50px; margin: 0; -webkit-tap-highlight-color: transparent; }
         
+        /* [新增] Logo 樣式：圓形、置中、陰影 */
+        .app-logo {
+            display: block;
+            width: 80px;            /* 圖片寬度，可自行調整 */
+            height: 80px;           /* 圖片高度 */
+            border-radius: 50%;     /* 變成圓形 */
+            object-fit: cover;      /* 確保圖片比例不變形 */
+            margin: 0 auto 10px;    /* 置中並與下方文字保持距離 */
+            box-shadow: 0 5px 15px rgba(141, 123, 111, 0.2); /* 淡淡的陰影增加質感 */
+            border: 3px solid white; /* 加上白邊框更像 app icon */
+        }
+
         h1 { text-align: center; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
         .subtitle { text-align: center; font-size: 0.9rem; color: var(--sub-text); margin-bottom: 25px; }
         .section-title { font-size: 1.1rem; font-weight: bold; margin: 30px 0 15px; }
@@ -50,6 +65,7 @@
     <div id="loading">讀取設定檔...</div>
 
     <header>
+        <img src="logo.jpg" class="app-logo" alt="Fairy. L Logo">
         <h1>Fairy. L</h1>
         <div class="subtitle">美甲計算機</div>
     </header>
