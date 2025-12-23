@@ -9,438 +9,309 @@
 
     <style>
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        :root { 
-            --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --accent: #8D6E63; 
-            --danger: #d32f2f; --gray: #f5f5f5; --border: #e0e0e0; 
-            --success: #2e7d32;
-        }
-
-        body { 
-            background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; 
-            padding: 15px; padding-bottom: 120px; /* 留給底部 Action Bar 空間 */
-            margin: 0;
-        }
-
+        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --accent: #8D6E63; --danger: #d32f2f; --gray: #f5f5f5; }
+        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 15px; margin: 0; padding-bottom: 100px; }
         h1 { text-align: center; margin: 10px 0 5px 0; font-size: 1.5rem; }
         .subtitle { text-align: center; font-size: 0.9rem; color: var(--accent); margin-bottom: 20px; }
         
-        /* 登入區 */
-        #login-panel { 
-            max-width: 400px; margin: 20px auto; background: var(--card); padding: 25px; 
-            border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; 
-        }
-        input[type="password"], input[type="text"] { 
-            width: 100%; padding: 12px; margin-top: 10px; border: 1px solid var(--border); 
-            border-radius: 12px; font-size: 1rem; background: var(--gray);
-        }
-        .btn-main { 
-            background: var(--text); color: white; border: none; padding: 12px 0; 
-            border-radius: 50px; font-size: 1rem; margin-top: 20px; cursor: pointer; 
-            width: 100%; font-weight: bold; transition: 0.2s;
-        }
+        /* 卡片共用樣式 */
+        .card-panel { max-width: 400px; margin: 20px auto; background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
+        
+        /* 輸入框 */
+        select, input { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; background: var(--gray); }
+        
+        /* 按鈕 */
+        .btn-main { background: var(--text); color: white; border: none; padding: 12px 0; border-radius: 50px; font-size: 1rem; margin-top: 20px; cursor: pointer; width: 100%; font-weight: bold; }
         .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-link { background: none; border: none; color: var(--accent); cursor: pointer; margin-top: 15px; text-decoration: underline; font-size: 0.9rem; }
 
-        /* 編輯區 */
+        /* 產生器區域 (預設隱藏) */
+        #generator-panel { display: none; border: 2px dashed var(--accent); }
+        .result-box { margin-top: 15px; padding: 10px; background: #eee; word-break: break-all; font-family: monospace; font-size: 0.8rem; border-radius: 8px; user-select: all; }
+
+        /* 編輯區 (預設隱藏) */
         #editor-panel { display: none; width: 100%; max-width: 600px; margin: 0 auto; }
         
-        .section-card { 
-            background: var(--card); border-radius: 16px; padding: 15px; 
-            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
-        }
-
-        .section-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 10px; 
-            flex-wrap: wrap; gap: 10px;
-        }
-        .cat-title-input { 
-            font-size: 1.1rem; font-weight: bold; border: none; background: transparent; 
-            color: var(--text); flex: 1; min-width: 150px; border-bottom: 1px dashed transparent;
-        }
-        .cat-title-input:focus { border-bottom: 1px dashed var(--accent); }
-        
-        .btn-group { display: flex; gap: 5px; }
-        .btn-icon { 
-            width: 32px; height: 32px; border-radius: 8px; border: none; 
-            background: var(--gray); color: #666; display: flex; align-items: center; 
-            justify-content: center; cursor: pointer; 
-        }
-        .btn-del { color: var(--danger); background: #ffebee; }
-        .btn-icon:active { transform: scale(0.9); }
-
-        .item-row { background: #fff; padding: 10px 0; border-bottom: 1px dashed var(--border); }
-        .item-row:last-child { border-bottom: none; }
-        
+        /* 其他編輯器樣式 */
+        .section-card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .cat-title-input { font-size: 1.1rem; font-weight: bold; border: none; background: transparent; color: var(--text); flex: 1; min-width: 150px; }
+        .item-row { background: #fff; padding: 10px 0; border-bottom: 1px dashed #e0e0e0; }
         .row-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .name-input { 
-            flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; 
-            font-weight: bold; background: #fff; font-size: 0.95rem;
-        }
-        
+        .name-input { flex: 1; padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-weight: bold; background: #fff; }
         .price-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: var(--bg); padding: 10px; border-radius: 10px; }
         .price-col { display: flex; flex-direction: column; align-items: center; }
         .price-label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
-        .price-input { 
-            width: 100%; padding: 8px 0; border: 1px solid #ddd; border-radius: 8px; 
-            text-align: center; background: #fff; font-size: 1rem; font-weight: bold; color: var(--text);
-        }
-
-        .btn-add-item { 
-            width: 100%; padding: 12px; background: #fcfcfc; border: 2px dashed #ddd; 
-            border-radius: 10px; color: #888; font-size: 0.9rem; margin-top: 5px; cursor: pointer;
-        }
-        .btn-add-cat { 
-            width: 100%; padding: 15px; background: transparent; border: 2px dashed var(--accent); 
-            border-radius: 16px; color: var(--accent); font-weight: bold; margin-bottom: 30px; cursor: pointer;
-        }
+        .price-input { width: 100%; padding: 8px 0; border: 1px solid #ddd; border-radius: 8px; text-align: center; background: #fff; font-weight: bold; }
         
-        /* 🔥 Action Bar (浮動操作列) - 預設隱藏 */
-        #action-bar {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%);
-            background: var(--text); color: white; padding: 10px 20px; border-radius: 50px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 999;
-            display: flex; align-items: center; gap: 15px;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 90%; max-width: 400px; justify-content: space-between;
-        }
+        .btn-group { display: flex; gap: 5px; }
+        .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--gray); color: #666; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-del { color: var(--danger); background: #ffebee; }
+        
+        .btn-add-item { width: 100%; padding: 12px; background: #fcfcfc; border: 2px dashed #ddd; border-radius: 10px; color: #888; font-size: 0.9rem; margin-top: 5px; cursor: pointer; }
+        .btn-add-cat { width: 100%; padding: 15px; background: transparent; border: 2px dashed var(--accent); border-radius: 16px; color: var(--accent); font-weight: bold; margin-bottom: 30px; cursor: pointer; }
+        
+        /* Action Bar */
+        #action-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: var(--text); color: white; padding: 10px 20px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 999; display: flex; align-items: center; gap: 15px; transition: transform 0.3s; width: 90%; max-width: 400px; justify-content: space-between; }
         #action-bar.show { transform: translateX(-50%) translateY(0); }
-
-        .bar-info { font-size: 0.9rem; font-weight: bold; }
+        .btn-save { background: white; color: var(--text); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-cancel { background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 15px; border-radius: 30px; cursor: pointer; }
         
-        .bar-btns { display: flex; gap: 10px; }
-        
-        .btn-save { 
-            background: white; color: var(--text); border: none; padding: 10px 20px; 
-            border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;
-        }
-        .btn-cancel {
-            background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 15px;
-            border-radius: 30px; font-weight: normal; cursor: pointer;
-        }
-        .btn-save:active, .btn-cancel:active { transform: scale(0.95); }
-
         details summary { cursor: pointer; list-style: none; outline: none; }
-        details summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body>
 
-    <h1>Fairy. L 後台管理系統</h1>
+    <h1>Fairy. L 後台管理</h1>
     <div class="subtitle">Fairy. L CMS</div>
 
-    <div id="login-panel">
+    <div id="login-panel" class="card-panel">
         <h3>管理者登入</h3>
-        <input type="password" id="token-input" placeholder="輸入密碼 (ghp_...)">
+        
+        <select id="user-select">
+            <option value="" disabled selected>載入使用者中...</option>
+        </select>
+
+        <input type="password" id="password-input" placeholder="請輸入短密碼 (例如 8888)">
         <button class="btn-main" onclick="login()">登入</button>
+        
+        <button class="btn-link" onclick="toggleGenerator()">🛠️ 我是第一次設定，我要產生代碼</button>
+    </div>
+
+    <div id="generator-panel" class="card-panel">
+        <h3>🔐 產生加密代碼</h3>
+        <p style="font-size:0.8rem; color:#666;">將原本的 Token 加上密碼鎖，產生安全的代碼貼到 admin_user.json</p>
+        
+        <input type="text" id="gen-token" placeholder="貼上 GitHub Token (ghp_...)">
+        <input type="text" id="gen-pass" placeholder="設定您的短密碼 (例如 8888)">
+        <button class="btn-main" onclick="generateCode()">產生加密碼</button>
+        
+        <div id="gen-result" class="result-box" style="display:none;"></div>
+        <button class="btn-link" onclick="toggleGenerator()">返回登入</button>
     </div>
 
     <div id="editor-panel">
         <div id="categories-area"></div>
         <button class="btn-add-cat" onclick="addCategory()">＋ 新增服務分類</button>
-        
         <div class="subtitle">———— 其他設定 ————</div>
         <div id="addons-area"></div>
     </div>
 
     <div id="action-bar">
-        <div class="bar-info">已修改內容</div>
-        <div class="bar-btns">
+        <div style="font-size:0.9rem; font-weight:bold;">已修改內容</div>
+        <div style="display:flex; gap:10px;">
             <button class="btn-cancel" onclick="cancelChanges()">取消</button>
-            <button class="btn-save" id="save-btn" onclick="saveToGithub()">
-                <i class="fas fa-save"></i> 儲存並發布
-            </button>
+            <button class="btn-save" id="save-btn" onclick="saveToGithub()"><i class="fas fa-save"></i> 儲存</button>
         </div>
     </div>
 
     <script>
-        const REPO_CONFIG = {
-            owner: 'machael090807',     
-            repo: 'nail-calculator',    
-            path: 'data.json'           
-        };
-
-        let originalData = null; // 備份原始資料
-        let currentData = null;  // 當前編輯資料
+        const REPO_CONFIG = { owner: 'machael090807', repo: 'nail-calculator', path: 'data.json' };
+        
+        let usersList = [];
+        let currentData = null;
+        let originalData = null;
         let fileSha = null;
         let ghToken = null;
 
-        window.onload = function() {
-            const savedToken = localStorage.getItem('gh_token');
-            if(savedToken) document.getElementById('token-input').value = savedToken;
+        // 頁面載入：抓取 admin_user.json 填入選單
+        window.onload = async function() {
+            try {
+                // ✅ 這裡改成了 admin_user.json
+                const res = await fetch('admin_user.json?v=' + new Date().getTime());
+                if(res.ok) {
+                    usersList = await res.json();
+                    const select = document.getElementById('user-select');
+                    select.innerHTML = '<option value="" disabled selected>請選擇使用者</option>';
+                    usersList.forEach((u, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = idx;
+                        opt.innerText = u.name;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    document.getElementById('user-select').innerHTML = '<option>找不到 admin_user.json</option>';
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        // --- 加密核心 (XOR + Base64) ---
+        function cipher(text, pass) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                result += String.fromCharCode(text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+            }
+            return btoa(result);
         }
 
-        async function login() {
-            const inputToken = document.getElementById('token-input').value.trim();
-            const btn = document.querySelector('#login-panel button');
+        function decipher(encoded, pass) {
+            try {
+                let text = atob(encoded);
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += String.fromCharCode(text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+                }
+                return result;
+            } catch(e) { return ''; }
+        }
 
-            if(!inputToken) return alert("請輸入 Token");
-            btn.innerText = '讀取中...';
-            btn.disabled = true;
+        // --- 產生代碼功能 ---
+        function toggleGenerator() {
+            const login = document.getElementById('login-panel');
+            const gen = document.getElementById('generator-panel');
+            if(gen.style.display === 'block') {
+                gen.style.display = 'none'; login.style.display = 'block';
+            } else {
+                gen.style.display = 'block'; login.style.display = 'none';
+            }
+        }
+
+        function generateCode() {
+            const token = document.getElementById('gen-token').value.trim();
+            const pass = document.getElementById('gen-pass').value.trim();
+            if(!token || !pass) return alert("請輸入 Token 和密碼");
+            
+            const encrypted = cipher(token, pass);
+            const resultBox = document.getElementById('gen-result');
+            
+            resultBox.style.display = 'block';
+            resultBox.innerText = encrypted;
+            alert("✅ 代碼已產生！\n請複製下方灰色區塊的亂碼，貼到 admin_user.json 的 cipher 欄位。");
+        }
+
+        // --- 登入功能 ---
+        async function login() {
+            const select = document.getElementById('user-select');
+            const pass = document.getElementById('password-input').value.trim();
+            
+            if(select.value === "") return alert("請選擇使用者");
+            if(!pass) return alert("請輸入密碼");
+
+            const userIdx = select.value;
+            const user = usersList[userIdx];
+            
+            // 嘗試解鎖
+            const unlockedToken = decipher(user.cipher, pass);
+            
+            if(!unlockedToken.startsWith('ghp_')) {
+                return alert("❌ 密碼錯誤，無法解鎖 Token");
+            }
+
+            const btn = document.querySelector('#login-panel .btn-main');
+            btn.innerText = '驗證中...'; btn.disabled = true;
 
             try {
                 const response = await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
-                    headers: { 'Authorization': `token ${inputToken}` }
+                    headers: { 'Authorization': `token ${unlockedToken}` }
                 });
 
-                if(!response.ok) throw new Error('Token 無效或連線失敗');
+                if(!response.ok) throw new Error('Token 無效 (GitHub 拒絕連線)');
 
                 const data = await response.json();
                 fileSha = data.sha; 
                 const content = decodeURIComponent(escape(window.atob(data.content)));
-                
-                // 1. 解析資料
                 currentData = JSON.parse(content);
-                // 2. 建立深層備份 (用於比對和還原)
-                originalData = JSON.parse(JSON.stringify(currentData));
+                originalData = JSON.parse(JSON.stringify(currentData)); 
                 
-                // 確保結構完整
                 if(!currentData.categories) currentData.categories = [];
                 if(!currentData.add_ons) currentData.add_ons = [];
 
-                ghToken = inputToken;
-                localStorage.setItem('gh_token', inputToken);
-
+                ghToken = unlockedToken; 
+                
                 renderEditor();
                 document.getElementById('login-panel').style.display = 'none';
                 document.getElementById('editor-panel').style.display = 'block';
 
             } catch (e) {
-                alert('錯誤：' + e.message);
-                btn.innerText = '登入';
-                btn.disabled = false;
+                alert('登入失敗：' + e.message);
+                btn.innerText = '登入'; btn.disabled = false;
             }
         }
 
-        // --- 核心邏輯：比對變更 ---
+        // --- 編輯與渲染 ---
+        function renderEditor() { renderCategories(); renderAddons(); }
+        
         function checkChanges() {
-            const currentStr = JSON.stringify(currentData);
-            const originalStr = JSON.stringify(originalData);
             const bar = document.getElementById('action-bar');
-
-            if (currentStr !== originalStr) {
-                bar.classList.add('show'); // 有差異，顯示按鈕
-            } else {
-                bar.classList.remove('show'); // 沒差異，隱藏按鈕
-            }
+            if (JSON.stringify(currentData) !== JSON.stringify(originalData)) bar.classList.add('show');
+            else bar.classList.remove('show');
         }
 
-        // --- 核心邏輯：取消變更 ---
         function cancelChanges() {
-            if(!confirm("確定要放棄所有修改，還原成未儲存狀態嗎？")) return;
-            
-            // 還原資料
+            if(!confirm("確定還原所有修改？")) return;
             currentData = JSON.parse(JSON.stringify(originalData));
-            renderEditor();
-            checkChanges(); // 這會隱藏 Action Bar
-        }
-
-        // 渲染介面
-        function renderEditor() {
-            renderCategories();
-            renderAddons();
+            renderEditor(); checkChanges();
         }
 
         function renderCategories() {
             const container = document.getElementById('categories-area');
             container.innerHTML = '';
-
             currentData.categories.forEach((cat, catIdx) => {
-                const card = document.createElement('div');
-                card.className = 'section-card';
+                let html = `<div class="section-card"><div class="section-header"><input type="text" class="cat-title-input" value="${cat.title}" onchange="updateCatTitle(${catIdx}, this.value)">
+                    <div class="btn-group"><button class="btn-icon" onclick="moveCategory(${catIdx}, -1)"><i class="fas fa-arrow-up"></i></button><button class="btn-icon" onclick="moveCategory(${catIdx}, 1)"><i class="fas fa-arrow-down"></i></button><button class="btn-icon btn-del" onclick="deleteCategory(${catIdx})"><i class="fas fa-trash"></i></button></div></div>`;
                 
-                let html = `
-                    <div class="section-header">
-                        <input type="text" class="cat-title-input" value="${cat.title}" onchange="updateCatTitle(${catIdx}, this.value)">
-                        <div class="btn-group">
-                            <button class="btn-icon" onclick="moveCategory(${catIdx}, -1)"><i class="fas fa-arrow-up"></i></button>
-                            <button class="btn-icon" onclick="moveCategory(${catIdx}, 1)"><i class="fas fa-arrow-down"></i></button>
-                            <button class="btn-icon btn-del" onclick="deleteCategory(${catIdx})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="item-list">
-                `;
-
                 cat.items.forEach((item, itemIdx) => {
-                    const p = item.prices;
-                    html += `
-                        <div class="item-row">
-                            <div class="row-top">
-                                <input type="text" class="name-input" value="${item.name}" placeholder="項目名稱" 
-                                    onchange="updateItemName(${catIdx}, ${itemIdx}, this.value)">
-                                <div class="btn-group">
-                                    <button class="btn-icon" onclick="moveItem(${catIdx}, ${itemIdx}, -1)"><i class="fas fa-arrow-up"></i></button>
-                                    <button class="btn-icon" onclick="moveItem(${catIdx}, ${itemIdx}, 1)"><i class="fas fa-arrow-down"></i></button>
-                                    <button class="btn-icon btn-del" onclick="deleteItem(${catIdx}, ${itemIdx})"><i class="fas fa-times"></i></button>
-                                </div>
-                            </div>
-                            <div class="price-grid">
-                                <div class="price-col">
-                                    <span class="price-label">店長</span>
-                                    <input type="number" class="price-input" value="${getPrice(p.manager)}" onchange="updatePrice(${catIdx}, ${itemIdx}, 'manager', this.value)">
-                                </div>
-                                <div class="price-col">
-                                    <span class="price-label">美甲師</span>
-                                    <input type="number" class="price-input" value="${getPrice(p.artist)}" onchange="updatePrice(${catIdx}, ${itemIdx}, 'artist', this.value)">
-                                </div>
-                                <div class="price-col">
-                                    <span class="price-label">助理</span>
-                                    <input type="number" class="price-input" value="${getPrice(p.assistant)}" onchange="updatePrice(${catIdx}, ${itemIdx}, 'assistant', this.value)">
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    html += `<div class="item-row"><div class="row-top"><input type="text" class="name-input" value="${item.name}" onchange="updateItemName(${catIdx}, ${itemIdx}, this.value)">
+                        <div class="btn-group"><button class="btn-icon" onclick="moveItem(${catIdx}, ${itemIdx}, -1)"><i class="fas fa-arrow-up"></i></button><button class="btn-icon" onclick="moveItem(${catIdx}, ${itemIdx}, 1)"><i class="fas fa-arrow-down"></i></button><button class="btn-icon btn-del" onclick="deleteItem(${catIdx}, ${itemIdx})"><i class="fas fa-times"></i></button></div></div>
+                        <div class="price-grid">
+                            <div class="price-col"><span class="price-label">店長</span><input type="number" class="price-input" value="${getPrice(item.prices.manager)}" onchange="updatePrice(${catIdx}, ${itemIdx}, 'manager', this.value)"></div>
+                            <div class="price-col"><span class="price-label">美甲師</span><input type="number" class="price-input" value="${getPrice(item.prices.artist)}" onchange="updatePrice(${catIdx}, ${itemIdx}, 'artist', this.value)"></div>
+                            <div class="price-col"><span class="price-label">助理</span><input type="number" class="price-input" value="${getPrice(item.prices.assistant)}" onchange="updatePrice(${catIdx}, ${itemIdx}, 'assistant', this.value)"></div>
+                        </div></div>`;
                 });
-
-                html += `</div><button class="btn-add-item" onclick="addItem(${catIdx})">＋ 新增項目</button>`;
-                card.innerHTML = html;
-                container.appendChild(card);
+                html += `<button class="btn-add-item" onclick="addItem(${catIdx})">＋ 新增項目</button></div>`;
+                container.innerHTML += html;
             });
         }
 
         function renderAddons() {
             const container = document.getElementById('addons-area');
             container.innerHTML = '';
-            
-            const card = document.createElement('div');
-            card.className = 'section-card';
-            let html = `<div class="section-header"><b>加購與延甲設定</b></div>`;
-            
+            let html = `<div class="section-card"><div class="section-header"><b>加購設定</b></div>`;
             currentData.add_ons.forEach((item, idx) => {
-                 let priceVal = typeof item.price === 'number' ? item.price : item.prices.manager;
-                 html += `
-                    <div class="item-row" style="flex-direction:row; align-items:center;">
-                        <input type="text" class="name-input" value="${item.name}" disabled style="background:#eee; color:#888;">
-                        <input type="number" class="price-input" style="width:100px; margin-left:10px;" value="${priceVal}" 
-                            onchange="updateAddonPrice(${idx}, this.value)">
-                    </div>
-                 `;
+                 let val = typeof item.price === 'number' ? item.price : item.prices.manager;
+                 html += `<div class="item-row" style="display:flex;align-items:center;"><input type="text" class="name-input" value="${item.name}" disabled style="background:#eee; color:#888;"><input type="number" class="price-input" style="width:80px; margin-left:10px;" value="${val}" onchange="updateAddonPrice(${idx}, this.value)"></div>`;
             });
-            html += `<p style="font-size:0.8rem; color:#888; text-align:center;">* 加購項目僅供修改金額</p>`;
-            card.innerHTML = html;
-            container.appendChild(card);
+            container.innerHTML = html + `</div>`;
         }
 
-        // --- CRUD 操作 (修改後都會觸發 checkChanges) ---
-        function addCategory() {
-            currentData.categories.push({ title: "新分類", items: [] });
-            renderCategories();
-            checkChanges();
-        }
-
-        function deleteCategory(idx) {
-            if(!confirm(`刪除「${currentData.categories[idx].title}」？`)) return;
-            currentData.categories.splice(idx, 1);
-            renderCategories();
-            checkChanges();
-        }
-
-        function moveCategory(idx, dir) {
-            if (idx + dir < 0 || idx + dir >= currentData.categories.length) return;
-            [currentData.categories[idx], currentData.categories[idx + dir]] = [currentData.categories[idx + dir], currentData.categories[idx]];
-            renderCategories();
-            checkChanges();
-        }
-
-        function updateCatTitle(idx, val) { 
-            currentData.categories[idx].title = val; 
-            checkChanges();
-        }
-
-        function addItem(catIdx) {
-            const newId = 'item_' + new Date().getTime();
-            currentData.categories[catIdx].items.push({
-                id: newId, name: "新項目", prices: { manager: 0, artist: 0, assistant: 0 }
-            });
-            renderCategories();
-            checkChanges();
-        }
-
-        function deleteItem(catIdx, itemIdx) {
-            if(!confirm("刪除此項目？")) return;
-            currentData.categories[catIdx].items.splice(itemIdx, 1);
-            renderCategories();
-            checkChanges();
-        }
-
-        function moveItem(catIdx, itemIdx, dir) {
-            const items = currentData.categories[catIdx].items;
-            if (itemIdx + dir < 0 || itemIdx + dir >= items.length) return;
-            [items[itemIdx], items[itemIdx + dir]] = [items[itemIdx + dir], items[itemIdx]];
-            renderCategories();
-            checkChanges();
-        }
-
-        function updateItemName(catIdx, itemIdx, val) { 
-            currentData.categories[catIdx].items[itemIdx].name = val; 
-            checkChanges();
-        }
-
-        function updatePrice(catIdx, itemIdx, role, val) {
-            const num = val === '' ? null : parseInt(val);
-            const prices = currentData.categories[catIdx].items[itemIdx].prices;
-            if (Array.isArray(prices[role])) {
-                const diff = prices[role][1] - prices[role][0];
-                prices[role] = [num, num + diff];
-            } else {
-                prices[role] = num;
-            }
-            checkChanges();
-        }
-        
+        // CRUD Helpers
         function getPrice(p) { return Array.isArray(p) ? p[0] : p; }
-
-        function updateAddonPrice(idx, val) {
-            const num = parseInt(val);
-            const item = currentData.add_ons[idx];
-            if(typeof item.price === 'number') { item.price = num; } 
+        function updateCatTitle(i, v) { currentData.categories[i].title = v; checkChanges(); }
+        function updateItemName(ci, ii, v) { currentData.categories[ci].items[ii].name = v; checkChanges(); }
+        function updatePrice(ci, ii, r, v) { 
+            let num = v===''?null:parseInt(v); let p = currentData.categories[ci].items[ii].prices;
+            if(Array.isArray(p[r])) { let diff = p[r][1]-p[r][0]; p[r] = [num, num+diff]; } else { p[r] = num; }
+            checkChanges(); 
+        }
+        function updateAddonPrice(i, v) {
+            let num = parseInt(v); let item = currentData.add_ons[i];
+            if(typeof item.price === 'number') item.price = num;
             else { item.prices.manager = num; if(item.prices.artist) item.prices.artist = num; if(item.prices.assistant) item.prices.assistant = num; }
             checkChanges();
         }
+        function addCategory() { currentData.categories.push({ title: "新分類", items: [] }); renderCategories(); checkChanges(); }
+        function deleteCategory(i) { if(!confirm("刪除此分類？")) return; currentData.categories.splice(i,1); renderCategories(); checkChanges(); }
+        function moveCategory(i, d) { if(i+d<0 || i+d>=currentData.categories.length) return; [currentData.categories[i], currentData.categories[i+d]] = [currentData.categories[i+d], currentData.categories[i]]; renderCategories(); checkChanges(); }
+        function addItem(ci) { currentData.categories[ci].items.push({ id:'i'+Date.now(), name:"新項目", prices:{manager:0,artist:0,assistant:0}}); renderCategories(); checkChanges(); }
+        function deleteItem(ci, ii) { if(!confirm("刪除此項目？")) return; currentData.categories[ci].items.splice(ii,1); renderCategories(); checkChanges(); }
+        function moveItem(ci, ii, d) { let it = currentData.categories[ci].items; if(ii+d<0 || ii+d>=it.length) return; [it[ii], it[ii+d]] = [it[ii+d], it[ii]]; renderCategories(); checkChanges(); }
 
-        // --- 儲存回 GitHub ---
         async function saveToGithub() {
-            if(!confirm("確定儲存並發布？")) return;
+            if(!confirm("確定儲存？")) return;
             const btn = document.getElementById('save-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上傳中...';
-            btn.disabled = true;
-
-            const jsonString = JSON.stringify(currentData, null, 4);
-            const contentEncoded = window.btoa(unescape(encodeURIComponent(jsonString)));
-
-            const body = {
-                message: "Update via CMS Admin",
-                content: contentEncoded,
-                sha: fileSha
-            };
-
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上傳中...'; btn.disabled = true;
             try {
-                const response = await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
+                await fetch(`https://api.github.com/repos/${REPO_CONFIG.owner}/${REPO_CONFIG.repo}/contents/${REPO_CONFIG.path}`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${ghToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                });
-
-                if(!response.ok) throw new Error('上傳失敗');
-                const resData = await response.json();
-                fileSha = resData.content.sha;
-
-                // 儲存成功後，把「現在的狀態」設為「新的原始狀態」
-                originalData = JSON.parse(JSON.stringify(currentData));
-                checkChanges(); // 隱藏按鈕
-
-                alert('✅ 發布成功！');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            } catch (e) {
-                alert('錯誤：' + e.message);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+                    headers: { 'Authorization': `token ${ghToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Update", content: btoa(unescape(encodeURIComponent(JSON.stringify(currentData,null,4)))), sha: fileSha })
+                }).then(r=>{if(!r.ok) throw new Error(); return r.json()}).then(d=>{fileSha=d.content.sha});
+                
+                originalData = JSON.parse(JSON.stringify(currentData)); checkChanges();
+                alert('✅ 成功！');
+            } catch(e) { alert('失敗'); }
+            btn.innerHTML = '<i class="fas fa-save"></i> 儲存'; btn.disabled = false;
         }
     </script>
 </body>
