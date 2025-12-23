@@ -6,63 +6,87 @@
     <title>Fairy. L 後台管理</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --btn: #8D7B6F; --danger: #E57373; --input-bg: #F5F5F5; }
+        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --btn: #8D7B6F; --btn-hover: #6D5B53; --danger: #E57373; --input-bg: #F5F5F5; }
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px; margin: 0; padding-bottom: 80px; }
         
-        h1 { text-align: center; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #8D6E63; margin-bottom: 20px; font-size: 0.9rem; }
+        /* 頂部導航 */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 1.5rem; }
+        .btn-config { background: white; border: 1px solid #D7CCC8; color: var(--text); padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
 
         /* 分頁按鈕 */
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab { flex: 1; min-width: 80px; text-align: center; padding: 10px; background: #E0D8D4; border-radius: 10px; cursor: pointer; color: #795548; font-weight: bold; white-space: nowrap; }
-        .tab.active { background: var(--btn); color: white; }
-        .page { display: none; }
+        .tab { flex: 1; min-width: 80px; text-align: center; padding: 10px; background: #E0D8D4; border-radius: 10px; cursor: pointer; color: #795548; font-weight: bold; white-space: nowrap; transition: 0.2s; }
+        .tab.active { background: var(--btn); color: white; transform: scale(1.02); }
+        
+        .page { display: none; animation: fadeIn 0.3s; }
         .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 卡片與輸入框 */
-        .card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
         .section-header { font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; display: flex; justify-content: space-between; align-items: center; }
         
-        label { display: block; margin-top: 10px; font-size: 0.9rem; color: #8D6E63; font-weight: bold; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: none; background: var(--input-bg); border-radius: 8px; font-size: 1rem; box-sizing: border-box; color: var(--text); }
+        label { display: block; margin-top: 12px; font-size: 0.9rem; color: #8D6E63; font-weight: bold; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 12px; border: none; background: var(--input-bg); border-radius: 10px; font-size: 1rem; box-sizing: border-box; color: var(--text); outline: none; font-weight: 500; }
+        input:focus { background: #FFF; box-shadow: 0 0 0 2px var(--btn); }
+        
         .row { display: flex; gap: 10px; }
         .row input { flex: 1; }
 
         /* 按鈕樣式 */
         button { border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
-        .btn-add { background: #81C784; color: white; width: 100%; margin-top: 10px; }
-        .btn-del { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 0.8rem; position: absolute; top: 15px; right: 15px; }
-        .btn-save { background: var(--btn); color: white; width: 100%; padding: 15px; font-size: 1.1rem; position: fixed; bottom: 0; left: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 99; }
-        .btn-load { background: #8D6E63; color: white; margin-bottom: 20px; width: 100%; }
+        .btn-add { background: #81C784; color: white; width: 100%; margin-top: 10px; padding: 12px; }
+        .btn-del { background: transparent; color: var(--danger); border: 1px solid var(--danger); font-size: 0.8rem; position: absolute; top: 20px; right: 20px; padding: 5px 10px; }
+        
+        /* 底部浮動儲存按鈕 */
+        .btn-save { background: var(--btn); color: white; width: 100%; padding: 16px; font-size: 1.1rem; position: fixed; bottom: 0; left: 0; border-radius: 20px 20px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 50; }
+        .btn-save:active { background: var(--btn-hover); }
 
         /* 價格輸入區塊 */
-        .price-group { background: #FAFAFA; padding: 10px; border-radius: 8px; margin-top: 5px; }
-        .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .price-group { background: #FAFAFA; padding: 12px; border-radius: 10px; margin-top: 8px; border: 1px dashed #E0E0E0; }
+        .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .price-row:last-child { margin-bottom: 0; }
         .price-label { width: 50px; font-size: 0.85rem; color: #999; }
 
-        /* 系統設定區 */
-        .config-box { background: #3E2723; color: #D7CCC8; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        .config-box input { background: #5D4037; color: white; }
-        .config-box label { color: #A1887F; }
+        /* --- 登入視窗 (Modal) --- */
+        #login_modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center; }
+        .login-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; color: var(--text); }
+        .login-desc { font-size: 0.9rem; color: #8D6E63; margin-bottom: 25px; }
+        .btn-connect { background: var(--btn); color: white; width: 100%; padding: 12px; font-size: 1rem; border-radius: 50px; margin-top: 20px; box-shadow: 0 4px 10px rgba(141, 123, 111, 0.4); }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <h1>Fairy. L 後台</h1>
-    <div class="subtitle">設定與價格管理系統</div>
+    <div id="login_modal">
+        <div class="login-box">
+            <div class="login-title">Fairy. L 後台</div>
+            <div class="login-desc">請連接您的 GitHub 資料庫</div>
+            
+            <div style="text-align:left">
+                <label>GitHub Token (Personal Access Token)</label>
+                <input type="password" id="gh_token" placeholder="ghp_xxxx...">
+                
+                <label>使用者名稱 (Username)</label>
+                <input type="text" id="gh_user" placeholder="machael090807">
+                
+                <label>儲存庫名稱 (Repo)</label>
+                <input type="text" id="gh_repo" placeholder="nail-calculator">
+                
+                <input type="hidden" id="gh_path" value="data.json">
+            </div>
 
-    <details class="config-box">
-        <summary style="cursor:pointer; font-weight:bold;">⚙️ GitHub 連線設定 (點擊展開)</summary>
-        <label>GitHub Token (Personal Access Token)</label>
-        <input type="password" id="gh_token" placeholder="ghp_xxxx..." onchange="saveConfig()">
-        <label>使用者名稱 (Username)</label>
-        <input type="text" id="gh_user" placeholder="machael090807" onchange="saveConfig()">
-        <label>儲存庫名稱 (Repo)</label>
-        <input type="text" id="gh_repo" placeholder="nail-calculator" onchange="saveConfig()">
-        <label>檔案路徑 (Path)</label>
-        <input type="text" id="gh_path" value="data.json" readonly>
-        <button class="btn-load" onclick="loadData()" style="margin-top:15px; background:#8D7B6F;">📥 讀取現有資料</button>
-    </details>
+            <button class="btn-connect" onclick="attemptLogin()">🚀 連接資料庫</button>
+            <div id="login_msg" style="margin-top:10px; font-size:0.9rem; color:#E57373;"></div>
+        </div>
+    </div>
+
+    <header>
+        <h1>後台管理</h1>
+        <button class="btn-config" onclick="openLoginModal()">⚙️ 設定連線</button>
+    </header>
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab('tab_settings')">全域設定</div>
@@ -72,12 +96,12 @@
 
     <div id="tab_settings" class="page active">
         <div class="card">
-            <div class="section-header">🎂 優惠設定</div>
+            <div class="section-header">🎂 優惠與其他</div>
             <label>當月壽星折扣 (0.9 = 9折)</label>
             <input type="number" id="set_birthday" step="0.01" placeholder="0.9">
         </div>
         <div class="card">
-            <div class="section-header">📍 位置設定</div>
+            <div class="section-header">📍 位置加價</div>
             <label>手部顯示名稱</label>
             <input type="text" id="set_hand_name" placeholder="🖐️ 手部">
             <label>足部顯示名稱</label>
@@ -95,13 +119,13 @@
     <div id="tab_others" class="page">
         <div class="section-header">
             <span>💅 卸甲項目</span>
-            <button class="btn-add" style="width:auto; padding:5px 15px; margin:0;" onclick="addRemoval()">+ 新增</button>
+            <button class="btn-add" style="width:auto; padding:8px 15px; margin:0; font-size:0.9rem" onclick="addRemoval()">+ 新增</button>
         </div>
         <div id="removals_container"></div>
 
         <div class="section-header" style="margin-top:30px">
             <span>➕ 加購項目</span>
-            <button class="btn-add" style="width:auto; padding:5px 15px; margin:0;" onclick="addAddon()">+ 新增</button>
+            <button class="btn-add" style="width:auto; padding:8px 15px; margin:0; font-size:0.9rem" onclick="addAddon()">+ 新增</button>
         </div>
         <div id="addons_container"></div>
     </div>
@@ -109,23 +133,49 @@
     <button class="btn-save" onclick="saveData()">💾 儲存並發布更新</button>
 
     <script>
-        // --- 資料結構初始化 ---
-        let DATA = {
-            settings: { birthday_discount: 0.9, location_hand_name: "🖐️ 手部", location_foot_name: "🦶 足部", location_foot_surcharge: 200 },
-            categories: [], removals: [], add_ons: [], sha: ""
-        };
+        let DATA = { settings: {}, categories: [], removals: [], add_ons: [], sha: "" };
 
-        // --- 初始化讀取設定 ---
+        // --- 初始化 ---
         window.onload = function() {
+            // 自動填入記憶的設定
             if(localStorage.getItem('gh_token')) document.getElementById('gh_token').value = localStorage.getItem('gh_token');
             if(localStorage.getItem('gh_user')) document.getElementById('gh_user').value = localStorage.getItem('gh_user');
             if(localStorage.getItem('gh_repo')) document.getElementById('gh_repo').value = localStorage.getItem('gh_repo');
+            
+            // 如果有設定，嘗試自動連線
+            if(document.getElementById('gh_token').value) {
+                attemptLogin(true); // true = 靜默模式，不跳 alert
+            }
         };
 
-        function saveConfig() {
+        function openLoginModal() {
+            document.getElementById('login_modal').classList.remove('hidden');
+        }
+
+        async function attemptLogin(silent = false) {
+            const btn = document.querySelector('.btn-connect');
+            const msg = document.getElementById('login_msg');
+            
+            // 儲存設定到本地
             localStorage.setItem('gh_token', document.getElementById('gh_token').value);
             localStorage.setItem('gh_user', document.getElementById('gh_user').value);
             localStorage.setItem('gh_repo', document.getElementById('gh_repo').value);
+
+            btn.innerText = "連線中...";
+            msg.innerText = "";
+
+            try {
+                await loadData();
+                // 成功：隱藏視窗
+                document.getElementById('login_modal').classList.add('hidden');
+                if(!silent) alert("✅ 連線成功！");
+            } catch (e) {
+                msg.innerText = "❌ 連線失敗，請檢查 Token 或設定";
+                // 失敗則保持視窗開啟
+                document.getElementById('login_modal').classList.remove('hidden');
+            } finally {
+                btn.innerText = "🚀 連接資料庫";
+            }
         }
 
         function switchTab(id) {
@@ -135,103 +185,85 @@
             event.target.classList.add('active');
         }
 
-        // --- 核心功能：讀取資料 ---
+        // --- GitHub API 讀取 ---
         async function loadData() {
             const token = document.getElementById('gh_token').value;
             const user = document.getElementById('gh_user').value;
             const repo = document.getElementById('gh_repo').value;
             const path = document.getElementById('gh_path').value;
 
-            if (!token || !user || !repo) return alert("請先填寫 GitHub 連線設定！");
+            if (!token) throw new Error("No Token");
 
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-            try {
-                const res = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
-                if (!res.ok) throw new Error("連線失敗");
-                const json = await res.json();
-                
-                // 解碼 Base64
-                const content = decodeURIComponent(escape(atob(json.content)));
-                DATA = JSON.parse(content);
-                DATA.sha = json.sha; // 紀錄 SHA 以便更新
+            const res = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
+            
+            if (!res.ok) throw new Error("Network Error");
+            
+            const json = await res.json();
+            const content = decodeURIComponent(escape(atob(json.content)));
+            DATA = JSON.parse(content);
+            DATA.sha = json.sha;
 
-                // 確保 settings 存在
-                if (!DATA.settings) DATA.settings = {};
-
-                renderAll();
-                alert("✅ 資料讀取成功！");
-            } catch (e) {
-                alert("❌ 讀取失敗，請檢查 Token 或 Repo 設定");
-                console.error(e);
-            }
+            // 確保資料結構完整
+            if (!DATA.settings) DATA.settings = {};
+            renderAll();
         }
 
-        // --- 渲染畫面 (Render) ---
+        // --- 渲染畫面 ---
         function renderAll() {
-            // 1. 填入 Settings
+            // 1. Settings
             document.getElementById('set_birthday').value = DATA.settings.birthday_discount || 0.9;
             document.getElementById('set_hand_name').value = DATA.settings.location_hand_name || "🖐️ 手部";
             document.getElementById('set_foot_name').value = DATA.settings.location_foot_name || "🦶 足部";
             document.getElementById('set_foot_price').value = DATA.settings.location_foot_surcharge || 200;
 
-            // 2. 渲染 Categories
+            // 2. Categories
             const catContainer = document.getElementById('categories_container');
             catContainer.innerHTML = '';
             (DATA.categories || []).forEach((cat, cIdx) => {
                 let itemsHtml = '';
-                cat.items.forEach((item, iIdx) => {
-                    itemsHtml += createItemHTML('cat', cIdx, iIdx, item);
-                });
+                cat.items.forEach((item, iIdx) => { itemsHtml += createItemHTML('cat', cIdx, iIdx, item); });
 
                 const div = document.createElement('div');
                 div.className = 'card';
-                div.style.border = '2px solid #D7CCC8';
                 div.innerHTML = `
                     <button class="btn-del" onclick="delCategory(${cIdx})">刪除分類</button>
                     <label>分類標題</label>
-                    <input type="text" value="${cat.title}" onchange="updateCatTitle(${cIdx}, this.value)" style="font-weight:bold; color:#4E342E;">
+                    <input type="text" value="${cat.title}" onchange="updateCatTitle(${cIdx}, this.value)" style="font-weight:bold; color:#4E342E; font-size:1.1rem">
                     <div style="margin-top:15px; padding-left:10px; border-left: 3px solid #EFEBE9;">
                         ${itemsHtml}
-                        <button class="btn-add" style="background:#BCAAA4" onclick="addItem(${cIdx})">+ 新增服務項目</button>
+                        <button class="btn-add" style="background:#BCAAA4; margin-top:15px" onclick="addItem(${cIdx})">+ 新增項目</button>
                     </div>
                 `;
                 catContainer.appendChild(div);
             });
 
-            // 3. 渲染 Removals
+            // 3. Removals
             const rmContainer = document.getElementById('removals_container');
             rmContainer.innerHTML = '';
             (DATA.removals || []).forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'card';
-                div.innerHTML = createItemHTML('rm', null, idx, item, true); // true 代表是卸甲(有價格結構)
+                div.innerHTML = createItemHTML('rm', null, idx, item);
                 rmContainer.appendChild(div);
             });
 
-            // 4. 渲染 Add-ons
+            // 4. Add-ons
             const addContainer = document.getElementById('addons_container');
             addContainer.innerHTML = '';
             (DATA.add_ons || []).forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'card';
-                
-                // 加購的價格可能是單一數字，也可能是物件，需判斷
-                let priceHtml = '';
-                if (item.prices && typeof item.prices === 'object') {
-                   // 複雜定價
-                   priceHtml = getPriceInputsHTML('addon', null, idx, item.prices);
-                } else {
-                   // 簡單定價
-                   const p = item.price || 0;
-                   priceHtml = `<label>單價</label><input type="number" value="${p}" onchange="updateAddonSimplePrice(${idx}, this.value)">`;
-                }
+                let priceHtml = item.prices && typeof item.prices === 'object' 
+                    ? getPriceInputsHTML('addon', null, idx, item.prices)
+                    : `<label>單價</label><input type="number" value="${item.price||0}" onchange="updateAddonSimplePrice(${idx}, this.value)">`;
 
                 div.innerHTML = `
                     <button class="btn-del" onclick="delAddon(${idx})">刪除</button>
                     <label>項目名稱</label>
                     <input type="text" value="${item.name}" onchange="DATA.add_ons[${idx}].name = this.value">
                     <div class="row">
-                        <div><label>單位 (如: /指)</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div>
+                        <div><label>單位</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div>
                     </div>
                     ${priceHtml}
                 `;
@@ -239,47 +271,35 @@
             });
         }
 
-        // --- HTML 產生器 helper ---
-        function createItemHTML(type, cIdx, iIdx, item, isRemoval = false) {
-            // 產生價格輸入框
-            let priceInputs = getPriceInputsHTML(type, cIdx, iIdx, item.prices);
-            
-            // 刪除按鈕的 onclick
+        // --- Helper: 產生項目 HTML ---
+        function createItemHTML(type, cIdx, iIdx, item) {
+            let prices = item.prices;
             let delFunc = type === 'cat' ? `delItem(${cIdx}, ${iIdx})` : `delRemoval(${iIdx})`;
+            let nameChange = type === 'cat' ? `DATA.categories[${cIdx}].items[${iIdx}].name = this.value` : `DATA.removals[${iIdx}].name = this.value`;
             
-            // 更新名稱的 onchange
-            let nameChange = type === 'cat' 
-                ? `DATA.categories[${cIdx}].items[${iIdx}].name = this.value`
-                : `DATA.removals[${iIdx}].name = this.value`;
-
             return `
-                <div style="background:#fff; padding:10px; border-radius:8px; margin-bottom:10px; position:relative; border:1px solid #EEE;">
-                    <button class="btn-del" style="top:5px; right:5px" onclick="${delFunc}">x</button>
-                    <label>項目名稱</label>
-                    <input type="text" value="${item.name}" onchange="${nameChange}">
-                    ${priceInputs}
+                <div style="background:#fff; padding:15px; border-radius:12px; margin-bottom:12px; position:relative; border:1px solid #EEE;">
+                    <button class="btn-del" style="top:10px; right:10px; padding:2px 8px" onclick="${delFunc}">x</button>
+                    <label style="margin-top:0">名稱</label>
+                    <input type="text" value="${item.name}" onchange="${nameChange}" style="background:#FAFAFA">
+                    ${getPriceInputsHTML(type, cIdx, iIdx, prices)}
                 </div>
             `;
         }
 
         function getPriceInputsHTML(type, cIdx, iIdx, prices) {
-            // 如果 prices 是 null 或數字，先轉成預設物件結構方便編輯
             let p = prices;
             if (typeof p !== 'object' || p === null) {
-                // 如果原本是數字，就全填一樣，如果是 null 就填空
                 let val = (typeof p === 'number') ? p : '';
                 p = { manager: val, artist: val, assistant: val };
             }
             
-            // 產生更新資料的 JS 字串
             const update = (role) => {
                 if (type === 'cat') return `updatePrice('cat', ${cIdx}, ${iIdx}, '${role}', this.value)`;
                 if (type === 'rm') return `updatePrice('rm', null, ${iIdx}, '${role}', this.value)`;
                 if (type === 'addon') return `updatePrice('addon', null, ${iIdx}, '${role}', this.value)`;
             };
-
-            // 判斷是否為陣列 (手/足分開價) -> 這裡簡化，後台統一顯示單一輸入框，若需進階可再擴充
-            // 為了讓非技術人員好懂，這裡假設輸入單一價格。若原資料是陣列(手足不同)，顯示第一個值。
+            
             const val = (v) => Array.isArray(v) ? v[0] : (v === null ? '' : v);
 
             return `
@@ -291,62 +311,34 @@
             `;
         }
 
-        // --- 資料更新邏輯 ---
+        // --- 資料更新 ---
         function updateCatTitle(cIdx, val) { DATA.categories[cIdx].title = val; }
-        
         function updatePrice(type, cIdx, iIdx, role, val) {
             let target;
             if (type === 'cat') target = DATA.categories[cIdx].items[iIdx];
             else if (type === 'rm') target = DATA.removals[iIdx];
             else if (type === 'addon') target = DATA.add_ons[iIdx];
 
-            if (!target.prices || typeof target.prices !== 'object') {
-                target.prices = { manager: null, artist: null, assistant: null };
-            }
-            
-            // 轉換數字，若空白則為 null
-            let num = val === '' ? null : parseInt(val);
-            target.prices[role] = num;
+            if (!target.prices || typeof target.prices !== 'object') target.prices = { manager:null, artist:null, assistant:null };
+            target.prices[role] = val === '' ? null : parseInt(val);
         }
-
         function updateAddonSimplePrice(idx, val) {
             DATA.add_ons[idx].price = parseInt(val) || 0;
-            delete DATA.add_ons[idx].prices; // 移除複雜定價結構
+            delete DATA.add_ons[idx].prices;
         }
 
         // --- 新增 / 刪除 ---
-        function addCategory() {
-            DATA.categories.push({ title: "新分類", items: [] });
-            renderAll();
-        }
-        function delCategory(idx) {
-            if(confirm("確定刪除此分類？")) { DATA.categories.splice(idx, 1); renderAll(); }
-        }
-        function addItem(cIdx) {
-            const id = 'item_' + Date.now();
-            DATA.categories[cIdx].items.push({ id: id, name: "新項目", prices: { manager:0, artist:0, assistant:0 } });
-            renderAll();
-        }
-        function delItem(cIdx, iIdx) {
-            DATA.categories[cIdx].items.splice(iIdx, 1);
-            renderAll();
-        }
-        function addRemoval() {
-            const id = 'rm_' + Date.now();
-            DATA.removals.push({ id: id, name: "新卸甲", prices: { manager:0, artist:0, assistant:0 } });
-            renderAll();
-        }
+        function addCategory() { DATA.categories.push({ title: "新分類", items: [] }); renderAll(); }
+        function delCategory(idx) { if(confirm("刪除此分類？")) { DATA.categories.splice(idx, 1); renderAll(); } }
+        function addItem(cIdx) { DATA.categories[cIdx].items.push({ id: 'i'+Date.now(), name: "新項目", prices: { manager:0, artist:0, assistant:0 } }); renderAll(); }
+        function delItem(cIdx, iIdx) { DATA.categories[cIdx].items.splice(iIdx, 1); renderAll(); }
+        function addRemoval() { DATA.removals.push({ id: 'r'+Date.now(), name: "新卸甲", prices: { manager:0, artist:0, assistant:0 } }); renderAll(); }
         function delRemoval(idx) { DATA.removals.splice(idx, 1); renderAll(); }
-        function addAddon() {
-            const id = 'add_' + Date.now();
-            DATA.add_ons.push({ id: id, name: "新加購", price: 100, unit_desc: "" });
-            renderAll();
-        }
+        function addAddon() { DATA.add_ons.push({ id: 'a'+Date.now(), name: "新加購", price: 100 }); renderAll(); }
         function delAddon(idx) { DATA.add_ons.splice(idx, 1); renderAll(); }
 
-        // --- 核心功能：存檔 ---
+        // --- 存檔 ---
         async function saveData() {
-            // 1. 收集 Settings 資料
             DATA.settings.birthday_discount = parseFloat(document.getElementById('set_birthday').value);
             DATA.settings.location_hand_name = document.getElementById('set_hand_name').value;
             DATA.settings.location_foot_name = document.getElementById('set_foot_name').value;
@@ -356,38 +348,29 @@
             const user = document.getElementById('gh_user').value;
             const repo = document.getElementById('gh_repo').value;
             const path = document.getElementById('gh_path').value;
-            
-            if (!token || !user || !repo) return alert("GitHub 設定不完整");
 
-            // 轉成 JSON 字串，並編碼成 Base64 (解決中文亂碼問題)
+            const btn = document.querySelector('.btn-save');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ 儲存中...";
+
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
-
-            const body = {
-                message: "Update via Admin Panel",
-                content: content,
-                sha: DATA.sha // 必須帶上 SHA 才能覆蓋檔案
-            };
+            const body = { message: "Update via Admin", content: content, sha: DATA.sha };
 
             try {
                 const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`, {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
-
                 if (res.ok) {
                     const json = await res.json();
-                    DATA.sha = json.content.sha; // 更新 SHA
-                    alert("✅ 儲存成功！前台更新可能需要幾分鐘。");
-                } else {
-                    throw new Error("儲存失敗");
-                }
+                    DATA.sha = json.content.sha;
+                    alert("✅ 儲存成功！");
+                } else throw new Error("Save Failed");
             } catch (e) {
-                alert("❌ 儲存失敗，請檢查權限或網路");
-                console.error(e);
+                alert("❌ 儲存失敗");
+            } finally {
+                btn.innerText = originalText;
             }
         }
     </script>
