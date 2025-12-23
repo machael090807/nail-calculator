@@ -63,7 +63,7 @@
         let fileSha = null;
         let realToken = null; 
 
-        // 登入邏輯：讀取 users.json -> 比對帳密 -> 取得 Token
+        // 登入邏輯：讀取 admin_user.json -> 比對帳密 -> 取得 Token
         async function login() {
             const inputUser = document.getElementById('username').value.trim();
             const inputPass = document.getElementById('password').value.trim();
@@ -75,9 +75,9 @@
             btn.disabled = true;
 
             try {
-                // 1. 讀取 users.json (加上時間戳記防止快取)
-                const userRes = await fetch('users.json?v=' + new Date().getTime());
-                if(!userRes.ok) throw new Error("找不到使用者檔案 (users.json)");
+                // 1. 讀取 admin_user.json (加上時間戳記防止快取)
+                const userRes = await fetch('admin_user.json?v=' + new Date().getTime());
+                if(!userRes.ok) throw new Error("找不到使用者檔案 (admin_user.json)");
                 
                 const users = await userRes.json();
                 
