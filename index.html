@@ -7,39 +7,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 核心樣式設定 (CSS) --- */
+        /* --- 核心樣式 --- */
         :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --sub-text: #8D6E63; --brown: #8D7B6F; --radius: 16px; }
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px 20px 50px; margin: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* 通用元件 */
         h1 { text-align: center; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
         .subtitle { text-align: center; font-size: 0.9rem; color: var(--sub-text); margin-bottom: 25px; }
         .section-title { font-size: 1.1rem; font-weight: bold; margin: 30px 0 15px; }
         .btn-reset { display:block; margin: 20px auto; background: transparent; border: 1px solid var(--sub-text); color: var(--sub-text); padding: 10px 20px; border-radius: 20px; cursor: pointer; }
         
-        /* 卡片與格線系統 */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .card { background: var(--card); border-radius: var(--radius); padding: 15px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: 0.2s; }
         .card.active { border-color: var(--sub-text); background: #FFFBF8; }
         .card-row { display: flex; justify-content: space-between; align-items: center; }
         
-        /* 角色切換 */
         .tabs { display: flex; background: #EBE5DF; border-radius: 50px; padding: 4px; margin-bottom: 30px; }
         .tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 50px; font-weight: bold; color: #9E9E9E; cursor: pointer; transition: 0.3s; }
         .tab.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        /* 加購計數器樣式 */
         .stepper { display: flex; gap: 10px; background: #F5F5F5; padding: 4px; border-radius: 20px; align-items: center; }
         .btn-step { width: 32px; height: 32px; border-radius: 50%; border: none; background: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        /* 總計區塊 */
         .total-box { background: var(--brown); color: white; border-radius: 20px; padding: 25px; margin-top: 40px; text-align: center; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3); }
         .price-big { font-size: 3rem; font-weight: 800; margin: 5px 0 20px; line-height: 1; }
         .detail-list { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; text-align: left; min-height: 100px; font-size: 0.9rem; }
         .detail-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px; }
         .btn-copy { width: 100%; background: white; color: var(--brown); border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px; }
 
-        /* 開關 Switch */
         .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-top: 20px; }
         .switch { position: relative; width: 50px; height: 28px; }
         .switch input { display:none; }
@@ -48,13 +42,12 @@
         input:checked + .slider { background: var(--sub-text); }
         input:checked + .slider:before { transform: translateX(22px); }
         
-        /* 讀取畫面 */
         #loading { position: fixed; inset: 0; background: var(--bg); z-index: 99; display: flex; justify-content: center; align-items: center; color: var(--sub-text); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="loading">讀取資料中...</div>
+    <div id="loading">讀取設定檔...</div>
 
     <header>
         <h1>Fairy. L</h1>
@@ -72,12 +65,12 @@
     <div class="section-title">位置</div>
     <div class="grid">
         <div class="card card-row" id="card_hand" onclick="togglePos('hand')">
-            <span>🖐️ 手部</span>
-            <span id="icon_hand" style="display:none">✔</span>
+            <span id="txt_hand">🖐️ 手部</span>
+            <span id="icon_hand" style="display:none; font-weight:bold">✔</span>
         </div>
         <div class="card card-row" id="card_foot" onclick="togglePos('foot')">
-            <span>🦶 足部 (+$200)</span>
-            <span id="icon_foot" style="display:none">✔</span>
+            <span id="txt_foot">🦶 足部</span>
+            <span id="icon_foot" style="display:none; font-weight:bold">✔</span>
         </div>
     </div>
 
@@ -94,7 +87,7 @@
     </div>
 
     <div class="switch-row">
-        <span style="font-weight:bold;">🎂 當月壽星優惠 (9折)</span>
+        <span style="font-weight:bold;" id="txt_birthday">🎂 當月壽星優惠</span>
         <label class="switch">
             <input type="checkbox" id="birthday" onchange="calculate()">
             <span class="slider"></span>
@@ -111,85 +104,99 @@
     <button class="btn-reset" onclick="resetAll()">清除計算</button>
 
     <script>
-        // --- 變數與設定 ---
-        let DATA = { categories: [], removals: [], add_ons: [] };
-        let ITEMS = {}; // 方便用 ID 找資料
-        let STATE = {
-            role: 'artist',
-            serviceId: null,
-            removeId: null,
-            addons: {}, // 紀錄加購數量 { id: count }
-            hand: true,
-            foot: false
+        // 預設值，萬一讀不到檔案時使用
+        let DATA = { 
+            settings: { 
+                birthday_discount: 0.9, 
+                location_hand_name: "🖐️ 手部", 
+                location_foot_name: "🦶 足部", 
+                location_foot_surcharge: 200 
+            },
+            categories: [], removals: [], add_ons: [] 
         };
+        let ITEMS = {}; 
+        let STATE = { role: 'artist', serviceId: null, removeId: null, addons: {}, hand: true, foot: false };
 
-        // --- 初始化 ---
         window.onload = async () => {
             try {
-                // 抓取資料，加時間戳記避免快取
                 const res = await fetch('data.json?v=' + Date.now());
-                DATA = await res.json();
+                if (res.ok) {
+                    DATA = await res.json();
+                    // 確保 settings 存在 (防呆)
+                    if (!DATA.settings) DATA.settings = {};
+                    if (!DATA.settings.birthday_discount) DATA.settings.birthday_discount = 0.9;
+                    if (!DATA.settings.location_foot_surcharge) DATA.settings.location_foot_surcharge = 200;
+                }
                 
-                // 建立快速查詢表 (Mapping)
-                DATA.categories.forEach(c => c.items.forEach(i => ITEMS[i.id] = i));
-                DATA.removals.forEach(i => ITEMS[i.id] = i);
-                DATA.add_ons.forEach(i => { ITEMS[i.id] = i; STATE.addons[i.id] = 0; });
+                // 建立索引
+                if (DATA.categories) DATA.categories.forEach(c => c.items.forEach(i => ITEMS[i.id] = i));
+                if (DATA.removals) DATA.removals.forEach(i => ITEMS[i.id] = i);
+                if (DATA.add_ons) DATA.add_ons.forEach(i => { ITEMS[i.id] = i; STATE.addons[i.id] = 0; });
 
-                // 預設選取第一個
-                if(DATA.categories.length) STATE.serviceId = DATA.categories[0].items[0].id;
-                if(DATA.removals.length) STATE.removeId = DATA.removals[0].id;
+                // 預設選取
+                if (DATA.categories && DATA.categories.length > 0) STATE.serviceId = DATA.categories[0].items[0].id;
+                if (DATA.removals && DATA.removals.length > 0) STATE.removeId = DATA.removals[0].id;
 
                 renderAll();
                 document.getElementById('loading').style.display = 'none';
             } catch(e) {
-                alert("讀取 data.json 失敗，請檢查檔案");
+                alert("讀取失敗，請確認 data.json 格式");
+                console.error(e);
+                document.getElementById('loading').style.display = 'none';
             }
         };
 
-        // --- 畫面渲染 (Render) ---
         function renderAll() {
             renderServices();
             renderRemoves();
             renderAddons();
+            updateGlobalUI(); // 更新位置名稱與優惠折數顯示
             updateUI(); // 更新勾選狀態
             calculate();
         }
 
-        // 1. 產生服務列表 (含過濾空分類功能)
+        // 更新介面上的文字 (從設定檔讀取)
+        function updateGlobalUI() {
+            const s = DATA.settings;
+            // 位置名稱 + 價格
+            document.getElementById('txt_hand').innerText = s.location_hand_name || "🖐️ 手部";
+            document.getElementById('txt_foot').innerText = `${s.location_foot_name || "🦶 足部"} (+$${s.location_foot_surcharge})`;
+            
+            // 壽星優惠折數顯示
+            const discountRate = s.birthday_discount || 0.9;
+            let discountText = (discountRate * 10).toString().replace('.5', '.5') + "折"; 
+            if (discountRate === 1) discountText = "無折扣";
+            document.getElementById('txt_birthday').innerText = `🎂 當月壽星優惠 (${discountText})`;
+        }
+
         function renderServices() {
             const container = document.getElementById('area-services');
             let html = '';
+            if (!DATA.categories) return;
 
             DATA.categories.forEach(cat => {
-                // 篩選：只有「有價格」的項目才顯示
                 const validItems = cat.items.filter(item => getPrice(item) !== null);
-                
-                // 如果這分類沒東西，就跳過
                 if (validItems.length === 0) return;
 
-                // 樣板語法：先加標題
                 html += `<div class="section-title">${cat.title}</div><div class="grid">`;
-                
-                // 再加格子
                 validItems.forEach(item => {
                     const price = getPrice(item);
                     const isActive = STATE.serviceId === item.id ? 'active' : '';
                     const priceTxt = Array.isArray(price) ? `$${price[0]}` : `$${price}`;
-                    
                     html += `
                         <div class="card ${isActive}" onclick="selectService('${item.id}')">
                             <div style="font-weight:bold">${item.name}</div>
                             <div style="font-size:0.85rem; color:#8D6E63">${priceTxt}</div>
                         </div>`;
                 });
-                html += `</div>`; // 關閉 grid
+                html += `</div>`;
             });
             container.innerHTML = html;
         }
 
-        // 2. 產生卸甲列表
         function renderRemoves() {
             const container = document.getElementById('area-removes');
+            if (!DATA.removals) return;
             container.innerHTML = DATA.removals.map(item => {
                 const price = getPrice(item);
                 const isActive = STATE.removeId === item.id ? 'active' : '';
@@ -202,13 +209,12 @@
             }).join('');
         }
 
-        // 3. 產生加購列表
         function renderAddons() {
             const container = document.getElementById('area-addons');
+            if (!DATA.add_ons) return;
             container.innerHTML = DATA.add_ons.map(item => {
                 const price = getPrice(item);
-                if (price === null) return ''; // 沒價格就不顯示
-                
+                if (price === null) return '';
                 return `
                     <div class="card card-row" style="margin-bottom:10px">
                         <div>
@@ -224,40 +230,31 @@
             }).join('');
         }
 
-        // --- 互動邏輯 ---
         function getPrice(item) {
-            // 如果價格是數字直接回傳，如果是物件則根據角色回傳
             if (typeof item.prices === 'number') return item.prices;
             return item.prices ? item.prices[STATE.role] : null;
         }
 
         function setRole(role) {
             STATE.role = role;
-            // 更新上方分頁樣式
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             document.getElementById(`role_${role}`).classList.add('active');
-            renderAll(); // 價格變了，全部重畫
+            renderAll();
         }
 
         function selectService(id) { STATE.serviceId = id; renderServices(); calculate(); }
         function selectRemove(id) { STATE.removeId = id; renderRemoves(); calculate(); }
-        
         function updateAddon(id, delta) {
             const newVal = STATE.addons[id] + delta;
             if (newVal >= 0) STATE.addons[id] = newVal;
-            renderAddons(); // 只需要重畫加購區
-            calculate();
+            renderAddons(); calculate();
         }
-
         function togglePos(type) {
             if (type === 'hand') STATE.hand = !STATE.hand;
             if (type === 'foot') STATE.foot = !STATE.foot;
-            updateUI();
-            calculate();
+            updateUI(); calculate();
         }
-
         function updateUI() {
-            // 控制手足的勾勾顯示 (原本是 Checkbox，現在改用純樣式比較好控制)
             document.getElementById('card_hand').classList.toggle('active', STATE.hand);
             document.getElementById('icon_hand').style.display = STATE.hand ? 'block' : 'none';
             document.getElementById('card_foot').classList.toggle('active', STATE.foot);
@@ -265,9 +262,8 @@
         }
 
         function resetAll() {
-            // 重置所有狀態
-            if(DATA.categories.length) STATE.serviceId = DATA.categories[0].items[0].id;
-            if(DATA.removals.length) STATE.removeId = DATA.removals[0].id;
+            if (DATA.categories && DATA.categories.length) STATE.serviceId = DATA.categories[0].items[0].id;
+            if (DATA.removals && DATA.removals.length) STATE.removeId = DATA.removals[0].id;
             for(let k in STATE.addons) STATE.addons[k] = 0;
             STATE.hand = true; STATE.foot = false;
             document.getElementById('custom_price').value = '';
@@ -275,33 +271,31 @@
             renderAll();
         }
 
-        // --- 計算核心 ---
         function calculate() {
             if (!STATE.serviceId) return;
-            
             let total = 0;
             let details = '';
             
-            // 1. 主項目計算
+            // 1. 主項目
             const item = ITEMS[STATE.serviceId];
-            const price = getPrice(item);
-            
-            if (Array.isArray(price)) {
-                // 分開定價 (價格是陣列 [手, 足])
-                if (STATE.hand) { total += price[0]; details += row(item.name+' (手)', price[0]); }
-                if (STATE.foot) { total += price[1]; details += row(item.name+' (足)', price[1]); }
-            } else {
-                // 單一定價 (手部原價，足部+200)
-                if (STATE.hand) { total += price; details += row(item.name+' (手)', price); }
-                if (STATE.foot) { total += (price + 200); details += row(item.name+' (足)', price + 200); }
+            if (item) {
+                const price = getPrice(item);
+                const surcharge = DATA.settings.location_foot_surcharge || 200;
+                
+                if (Array.isArray(price)) {
+                    if (STATE.hand) { total += price[0]; details += row(item.name+' (手)', price[0]); }
+                    if (STATE.foot) { total += price[1]; details += row(item.name+' (足)', price[1]); }
+                } else {
+                    if (STATE.hand) { total += price; details += row(item.name+' (手)', price); }
+                    if (STATE.foot) { total += (price + surcharge); details += row(item.name+' (足)', price + surcharge); }
+                }
             }
 
             // 2. 卸甲
             const remove = ITEMS[STATE.removeId];
-            const removePrice = getPrice(remove);
-            if (removePrice > 0) {
-                total += removePrice;
-                details += row('卸甲: ' + remove.name, removePrice);
+            if (remove) {
+                const removePrice = getPrice(remove);
+                if (removePrice > 0) { total += removePrice; details += row('卸甲: ' + remove.name, removePrice); }
             }
 
             // 3. 加購
@@ -309,42 +303,39 @@
                 if (STATE.addons[id] > 0) {
                     const add = ITEMS[id];
                     const p = getPrice(add);
-                    const sum = p * STATE.addons[id];
-                    total += sum;
-                    details += row(`${add.name} x${STATE.addons[id]}`, sum);
+                    total += p * STATE.addons[id];
+                    details += row(`${add.name} x${STATE.addons[id]}`, p * STATE.addons[id]);
                 }
             }
 
-            // 4. 自訂金額
+            // 4. 自訂
             const custom = parseInt(document.getElementById('custom_price').value) || 0;
             if (custom > 0) { total += custom; details += row('其他加購', custom); }
 
             // 5. 壽星優惠
             if (document.getElementById('birthday').checked) {
-                let discount = Math.round(total * 0.1); // 10% off
-                total -= discount;
-                details += `<div class="detail-item" style="color:#FFCC80"><span>🎂 壽星優惠</span><span>-$${discount}</span></div>`;
+                const rate = DATA.settings.birthday_discount || 0.9;
+                let originalTotal = total;
+                // 無條件捨去小數點
+                total = Math.floor(total * rate);
+                let saved = originalTotal - total;
+                details += `<div class="detail-item" style="color:#FFCC80"><span>🎂 壽星優惠</span><span>-$${saved}</span></div>`;
             }
 
             document.getElementById('display_total').innerText = `$${total}`;
             document.getElementById('detail_box').innerHTML = details || '<div style="text-align:center; opacity:0.5">尚未選擇項目</div>';
         }
 
-        function row(name, money) {
-            return `<div class="detail-item"><span>${name}</span><span>$${money}</span></div>`;
-        }
+        function row(name, money) { return `<div class="detail-item"><span>${name}</span><span>$${money}</span></div>`; }
 
         function copyQuote() {
             const roleName = {'manager':'店長', 'artist':'美甲師', 'assistant':'助理'}[STATE.role];
             const time = new Date().toLocaleDateString();
             let text = `【Fairy. L 美甲報價單】\n📅 日期：${time}\n👤 服務人員：${roleName}\n----------------------\n`;
-            
-            // 抓取明細文字
             document.querySelectorAll('.detail-item').forEach(el => {
                 const spans = el.querySelectorAll('span');
                 text += `${spans[0].innerText} ... ${spans[1].innerText}\n`;
             });
-            
             text += `----------------------\n💰 總計：${document.getElementById('display_total').innerText}\n\n＊提醒：本店作品享有一週保固`;
             navigator.clipboard.writeText(text).then(() => alert("✅ 已複製報價單！"));
         }
