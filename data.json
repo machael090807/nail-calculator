@@ -118,21 +118,21 @@
                     }
                 },
                 {
-                    "id": "ext_long",
-                    "name": "淺貼加長延甲",
-                    "prices": {
-                        "manager": 1500,
-                        "artist": null,
-                        "assistant": null
-                    }
-                },
-                {
                     "id": "ext_styled",
                     "name": "十指半貼含造型",
                     "prices": {
                         "manager": 2500,
                         "artist": 2000,
                         "assistant": 2000
+                    }
+                },
+                {
+                    "id": "ext_long",
+                    "name": "淺貼加長延甲",
+                    "prices": {
+                        "manager": 1500,
+                        "artist": null,
+                        "assistant": null
                     }
                 }
             ]
