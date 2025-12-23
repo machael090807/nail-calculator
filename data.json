@@ -1,31 +1,55 @@
 {
-    "PRICES": {
-        "single": { "manager": [1255, 1300], "artist": [1000, 1200], "assistant": [900, 1000], "name": "單色凝膠" },
-        "cateye": { "manager": [1300, 1400], "artist": [1100, 1300], "assistant": [1000, 1100], "name": "貓眼凝膠" },
-        "mirror": { "manager": 1500, "artist": 1300, "assistant": 1100, "name": "十指鏡面" },
-        "french": { "manager": 1600, "artist": 1500, "assistant": 1200, "name": "十指法式" },
-        "gradient": { "manager": 1300, "artist": 1300, "assistant": 1100, "name": "十指漸層" },
-        "custom": { "manager": 1300, "artist": 1000, "assistant": 800, "name": "自帶圖" },
-        "blind_value": { "manager": 1500, "artist": 1200, "assistant": null, "name": "超值不挑款" },
-        "blind_diamond": { "manager": 1700, "artist": 1500, "assistant": null, "name": "含鑽不挑款" },
-        "ext_half": { "manager": 1200, "artist": 1000, "assistant": 1000, "name": "十指半貼延甲" },
-        "ext_long": { "manager": 1500, "artist": null, "assistant": null, "name": "淺貼加長延甲" },
-        "ext_styled": { "manager": 2500, "artist": 2000, "assistant": 2000, "name": "十指半貼含造型" }
-    },
-    "REMOVE_PRICES": {
-        "none": [0, 0, 0],
-        "our_shop": [300, 200, 200],
-        "other_shop": [300, 300, 300],
-        "pure": [0, 500, 500]
-    },
-    "REMOVE_NAMES": {
-        "none": "無",
-        "our_shop": "本店卸甲",
-        "other_shop": "他店卸甲",
-        "pure": "純卸甲"
-    },
-    "EXTRA_PRICES": {
-        "jump_color": 100,
-        "toe_ext": 120
-    }
+    "categories": [
+        {
+            "title": "✨ 基礎凝膠服務",
+            "items": [
+                { "id": "single", "name": "單色凝膠", "prices": { "manager": [1200, 1300], "artist": [1000, 1200], "assistant": [900, 1000] } },
+                { "id": "cateye", "name": "貓眼凝膠", "prices": { "manager": [1300, 1400], "artist": [1100, 1300], "assistant": [1000, 1100] } }
+            ]
+        },
+        {
+            "title": "🎨 設計與造型",
+            "items": [
+                { "id": "mirror", "name": "十指鏡面", "prices": { "manager": 1500, "artist": 1300, "assistant": 1100 } },
+                { "id": "french", "name": "十指法式", "prices": { "manager": 1600, "artist": 1500, "assistant": 1200 } },
+                { "id": "gradient", "name": "十指漸層", "prices": { "manager": 1300, "artist": 1300, "assistant": 1100 } },
+                { "id": "custom", "name": "自帶圖", "prices": { "manager": 1300, "artist": 1000, "assistant": 800 } }
+            ]
+        },
+        {
+            "title": "🎁 盲盒系列",
+            "items": [
+                { "id": "blind_value", "name": "超值不挑款", "prices": { "manager": 1500, "artist": 1200, "assistant": null } },
+                { "id": "blind_diamond", "name": "含鑽不挑款", "prices": { "manager": 1700, "artist": 1500, "assistant": null } }
+            ]
+        },
+        {
+            "title": "💅 延甲服務",
+            "items": [
+                { "id": "ext_half", "name": "十指半貼延甲", "prices": { "manager": 1200, "artist": 1000, "assistant": 1000 } },
+                { "id": "ext_long", "name": "淺貼加長延甲", "prices": { "manager": 1500, "artist": null, "assistant": null } },
+                { "id": "ext_styled", "name": "十指半貼含造型", "prices": { "manager": 2500, "artist": 2000, "assistant": 2000 } }
+            ]
+        }
+    ],
+    "removals": [
+        { "id": "none", "name": "無", "prices": { "manager": 0, "artist": 0, "assistant": 0 } },
+        { "id": "our_shop", "name": "本店卸甲", "prices": { "manager": 300, "artist": 200, "assistant": 200 } },
+        { "id": "other_shop", "name": "他店卸甲", "prices": { "manager": 300, "artist": 300, "assistant": 300 } },
+        { "id": "pure", "name": "純卸甲", "prices": { "manager": 0, "artist": 500, "assistant": 500 } }
+    ],
+    "add_ons": [
+        { 
+            "id": "jump_color", 
+            "name": "跳色", 
+            "unit_desc": "/ 指",
+            "price": 100 
+        },
+        { 
+            "id": "toe_ext", 
+            "name": "足部單指延甲", 
+            "unit_desc": "/ 指",
+            "prices": { "manager": 120, "artist": 120, "assistant": null } 
+        }
+    ]
 }
