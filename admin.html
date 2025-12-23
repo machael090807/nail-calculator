@@ -203,7 +203,7 @@
             const unlockedToken = decipher(user.cipher, pass);
             
             if(!unlockedToken.startsWith('ghp_')) {
-                return alert("❌ 密碼錯誤，無法解鎖 Token");
+                return alert("❌ 密碼錯誤");
             }
 
             const btn = document.querySelector('#login-panel .btn-main');
