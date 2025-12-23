@@ -107,7 +107,7 @@
     <button class="btn-reset" onclick="resetAll()">清除計算</button>
 
     <script>
-        // 預設值，萬一讀不到檔案時使用
+        // 預設值
         let DATA = { 
             settings: { 
                 birthday_discount: 0.9, 
@@ -125,7 +125,6 @@
                 const res = await fetch('data.json?v=' + Date.now());
                 if (res.ok) {
                     DATA = await res.json();
-                    // 確保 settings 存在 (防呆)
                     if (!DATA.settings) DATA.settings = {};
                     if (!DATA.settings.birthday_discount) DATA.settings.birthday_discount = 0.9;
                     if (!DATA.settings.location_foot_surcharge) DATA.settings.location_foot_surcharge = 200;
@@ -138,7 +137,6 @@
 
                 // 預設選取
                 if (DATA.categories && DATA.categories.length > 0) {
-                     // 需確保預設選取的項目不是 null
                      const firstValid = DATA.categories[0].items.find(i => getPrice(i) !== null);
                      if(firstValid) STATE.serviceId = firstValid.id;
                 }
@@ -182,7 +180,6 @@
             if (!DATA.categories) return;
 
             DATA.categories.forEach(cat => {
-                // 邏輯修改：過濾掉價格為 null 的項目
                 const validItems = cat.items.filter(item => getPrice(item) !== null);
                 if (validItems.length === 0) return;
 
@@ -191,7 +188,6 @@
                     const price = getPrice(item);
                     const isActive = STATE.serviceId === item.id ? 'active' : '';
                     
-                    // 邏輯修改：若非陣列且為0，顯示免費
                     let priceTxt = '';
                     if (Array.isArray(price)) {
                         priceTxt = `$${price[0]}`;
@@ -215,12 +211,9 @@
             if (!DATA.removals) return;
             container.innerHTML = DATA.removals.map(item => {
                 const price = getPrice(item);
-                
-                // 邏輯修改：價格為 null 直接回傳空字串 (不顯示)
                 if (price === null) return '';
 
                 const isActive = STATE.removeId === item.id ? 'active' : '';
-                // 邏輯修改：0元顯示免費
                 const priceTxt = price === 0 ? '免費' : `$${price}`;
                 
                 return `
@@ -236,11 +229,8 @@
             if (!DATA.add_ons) return;
             container.innerHTML = DATA.add_ons.map(item => {
                 const price = getPrice(item);
-                
-                // 邏輯修改：價格為 null 不顯示
                 if (price === null) return '';
 
-                // 邏輯修改：0元顯示免費
                 const priceTxt = (price === 0) ? '免費' : `$${price}`;
 
                 return `
@@ -258,9 +248,21 @@
             }).join('');
         }
 
+        // --- 修正後的 getPrice 函式 ---
         function getPrice(item) {
-            if (typeof item.prices === 'number') return item.prices;
-            return item.prices ? item.prices[STATE.role] : null;
+            // 情況 1: JSON 只有 "price" (單數)，表示統一價格
+            if (item.price !== undefined && item.price !== null) {
+                return item.price;
+            }
+            
+            // 情況 2: JSON 是 "prices" (複數)
+            if (item.prices !== undefined) {
+                if (typeof item.prices === 'number') return item.prices;
+                // 根據角色回傳價格
+                return item.prices[STATE.role];
+            }
+            
+            return null;
         }
 
         function setRole(role) {
@@ -290,7 +292,6 @@
         }
 
         function resetAll() {
-            // 重置時也要考慮過濾掉 null 的項目
             if (DATA.categories && DATA.categories.length) {
                  const firstValid = DATA.categories[0].items.find(i => getPrice(i) !== null);
                  if(firstValid) STATE.serviceId = firstValid.id;
@@ -316,7 +317,6 @@
             const item = ITEMS[STATE.serviceId];
             if (item) {
                 const price = getPrice(item);
-                // 防呆：如果當前選到的項目變成了 null (切換角色時可能發生)，則跳過
                 if (price !== null) {
                     const surcharge = DATA.settings.location_foot_surcharge || 200;
                     
@@ -334,11 +334,7 @@
             const remove = ITEMS[STATE.removeId];
             if (remove) {
                 const removePrice = getPrice(remove);
-                // 0 元或以上才計算，但 null 不算
                 if (removePrice !== null) {
-                     // 顯示邏輯：就算是 0 元 (免費)，明細要不要顯示？通常免費卸甲也會列出來
-                     // 但如果不想要列出 0 元項目，可以在這裡加 if (removePrice > 0)
-                     // 目前保留顯示「卸甲: xxx $0」或「免費」
                      total += removePrice; 
                      details += row('卸甲: ' + remove.name, removePrice); 
                 }
@@ -373,9 +369,6 @@
             document.getElementById('detail_box').innerHTML = details || '<div style="text-align:center; opacity:0.5">尚未選擇項目</div>';
         }
 
-        // 修改 row 顯示邏輯，如果是 0 元也顯示「免費」字樣嗎？
-        // 報價單明細通常建議保留金額格式 $0 比較好計算，或者維持原樣
-        // 這裡維持原樣 $money，若 money 是 0 會顯示 $0
         function row(name, money) { 
             return `<div class="detail-item"><span>${name}</span><span>$${money}</span></div>`; 
         }
