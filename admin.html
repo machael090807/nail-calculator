@@ -8,25 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* 全域設定：防止跑版的神奇語法 */
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         :root { 
-            --bg: #F6F1ED; 
-            --card: #FFFFFF; 
-            --text: #4E342E; 
-            --accent: #8D6E63; 
-            --danger: #d32f2f; 
-            --gray: #f5f5f5;
-            --border: #e0e0e0;
+            --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --accent: #8D6E63; 
+            --danger: #d32f2f; --gray: #f5f5f5; --border: #e0e0e0; 
+            --success: #2e7d32;
         }
 
         body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Noto Sans TC', sans-serif; 
-            padding: 15px; 
-            padding-bottom: 100px; /* 留給下方懸浮按鈕空間 */
+            background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; 
+            padding: 15px; padding-bottom: 120px; /* 留給底部 Action Bar 空間 */
             margin: 0;
         }
 
@@ -35,191 +27,107 @@
         
         /* 登入區 */
         #login-panel { 
-            max-width: 400px; 
-            margin: 20px auto; 
-            background: var(--card); 
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-            text-align: center; 
+            max-width: 400px; margin: 20px auto; background: var(--card); padding: 25px; 
+            border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; 
         }
         input[type="password"], input[type="text"] { 
-            width: 100%; 
-            padding: 12px; 
-            margin-top: 10px; 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            font-size: 1rem; 
-            background: var(--gray);
+            width: 100%; padding: 12px; margin-top: 10px; border: 1px solid var(--border); 
+            border-radius: 12px; font-size: 1rem; background: var(--gray);
         }
         .btn-main { 
-            background: var(--text); 
-            color: white; 
-            border: none; 
-            padding: 12px 0; 
-            border-radius: 50px; 
-            font-size: 1rem; 
-            margin-top: 20px; 
-            cursor: pointer; 
-            width: 100%; 
-            font-weight: bold;
+            background: var(--text); color: white; border: none; padding: 12px 0; 
+            border-radius: 50px; font-size: 1rem; margin-top: 20px; cursor: pointer; 
+            width: 100%; font-weight: bold; transition: 0.2s;
         }
         .btn-main:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* 編輯區容器 */
+        /* 編輯區 */
         #editor-panel { display: none; width: 100%; max-width: 600px; margin: 0 auto; }
         
-        /* 卡片樣式 */
         .section-card { 
-            background: var(--card); 
-            border-radius: 16px; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+            background: var(--card); border-radius: 16px; padding: 15px; 
+            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
         }
 
-        /* 分類標題區 */
         .section-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid var(--bg); 
-            padding-bottom: 10px; 
-            margin-bottom: 10px; 
-            flex-wrap: wrap; /* 讓內容在小螢幕自動換行 */
-            gap: 10px;
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 10px; 
+            flex-wrap: wrap; gap: 10px;
         }
         .cat-title-input { 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            border: none; 
-            background: transparent; 
-            color: var(--text); 
-            flex: 1; /* 佔滿剩餘空間 */
-            min-width: 150px;
+            font-size: 1.1rem; font-weight: bold; border: none; background: transparent; 
+            color: var(--text); flex: 1; min-width: 150px; border-bottom: 1px dashed transparent;
         }
+        .cat-title-input:focus { border-bottom: 1px dashed var(--accent); }
         
-        /* 按鈕群組 */
         .btn-group { display: flex; gap: 5px; }
         .btn-icon { 
-            width: 32px; height: 32px; 
-            border-radius: 8px; 
-            border: none; 
-            background: var(--gray); 
-            color: #666; 
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; 
+            width: 32px; height: 32px; border-radius: 8px; border: none; 
+            background: var(--gray); color: #666; display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; 
         }
         .btn-del { color: var(--danger); background: #ffebee; }
         .btn-icon:active { transform: scale(0.9); }
 
-        /* 項目列表 */
-        .item-row { 
-            background: #fff;
-            padding: 10px 0; 
-            border-bottom: 1px dashed var(--border); 
-        }
+        .item-row { background: #fff; padding: 10px 0; border-bottom: 1px dashed var(--border); }
         .item-row:last-child { border-bottom: none; }
         
-        /* 項目第一行：名稱 + 操作按鈕 */
-        .row-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 8px; 
-            margin-bottom: 8px; 
-        }
+        .row-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
         .name-input { 
-            flex: 1; 
-            padding: 8px 10px; 
-            border: 1px solid var(--border); 
-            border-radius: 8px; 
-            font-weight: bold; 
-            background: #fff;
-            font-size: 0.95rem;
+            flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; 
+            font-weight: bold; background: #fff; font-size: 0.95rem;
         }
         
-        /* 價格輸入區 (Grid 排版) */
-        .price-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; /* 三等分 */
-            gap: 8px; 
-            background: var(--bg);
-            padding: 10px;
-            border-radius: 10px;
-        }
-        .price-col { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-        }
-        .price-label { 
-            font-size: 0.75rem; 
-            color: #888; 
-            margin-bottom: 4px; 
-        }
+        .price-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: var(--bg); padding: 10px; border-radius: 10px; }
+        .price-col { display: flex; flex-direction: column; align-items: center; }
+        .price-label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
         .price-input { 
-            width: 100%; 
-            padding: 8px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            text-align: center; 
-            background: #fff; 
-            font-size: 1rem; 
-            font-weight: bold;
-            color: var(--text);
+            width: 100%; padding: 8px 0; border: 1px solid #ddd; border-radius: 8px; 
+            text-align: center; background: #fff; font-size: 1rem; font-weight: bold; color: var(--text);
         }
 
-        /* 底部操作按鈕 */
         .btn-add-item { 
-            width: 100%; 
-            padding: 12px; 
-            background: #fcfcfc; 
-            border: 2px dashed #ddd; 
-            border-radius: 10px; 
-            color: #888; 
-            font-size: 0.9rem;
-            margin-top: 5px; 
+            width: 100%; padding: 12px; background: #fcfcfc; border: 2px dashed #ddd; 
+            border-radius: 10px; color: #888; font-size: 0.9rem; margin-top: 5px; cursor: pointer;
         }
         .btn-add-cat { 
-            width: 100%; 
-            padding: 15px; 
-            background: transparent; 
-            border: 2px dashed var(--accent); 
-            border-radius: 16px; 
-            color: var(--accent); 
-            font-weight: bold; 
-            margin-bottom: 30px; 
+            width: 100%; padding: 15px; background: transparent; border: 2px dashed var(--accent); 
+            border-radius: 16px; color: var(--accent); font-weight: bold; margin-bottom: 30px; cursor: pointer;
         }
         
-        /* 懸浮儲存按鈕 (優化版) */
-        #save-btn { 
-            position: fixed; 
-            bottom: 25px; 
-            right: 20px; 
-            background: var(--text); 
-            color: white; 
-            padding: 12px 25px; 
-            border-radius: 50px; 
-            border: none; 
-            font-size: 1rem; 
-            box-shadow: 0 4px 20px rgba(78, 52, 46, 0.4); 
-            z-index: 100; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            font-weight: bold;
+        /* 🔥 Action Bar (浮動操作列) - 預設隱藏 */
+        #action-bar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%);
+            background: var(--text); color: white; padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 999;
+            display: flex; align-items: center; gap: 15px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 90%; max-width: 400px; justify-content: space-between;
         }
-        #save-btn:active { transform: scale(0.95); }
+        #action-bar.show { transform: translateX(-50%) translateY(0); }
+
+        .bar-info { font-size: 0.9rem; font-weight: bold; }
+        
+        .bar-btns { display: flex; gap: 10px; }
+        
+        .btn-save { 
+            background: white; color: var(--text); border: none; padding: 10px 20px; 
+            border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-cancel {
+            background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 15px;
+            border-radius: 30px; font-weight: normal; cursor: pointer;
+        }
+        .btn-save:active, .btn-cancel:active { transform: scale(0.95); }
 
         details summary { cursor: pointer; list-style: none; outline: none; }
-        details summary::-webkit-details-marker { display: none; } /* 隱藏預設箭頭 */
+        details summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body>
 
     <h1>Fairy. L 後台管理系統</h1>
-    <div class="subtitle">Fairy. L Pricing Editor</div>
+    <div class="subtitle">Fairy. L CMS</div>
 
     <div id="login-panel">
         <h3>管理者登入</h3>
@@ -233,10 +141,16 @@
         
         <div class="subtitle">———— 其他設定 ————</div>
         <div id="addons-area"></div>
+    </div>
 
-        <button id="save-btn" onclick="saveToGithub()">
-            <i class="fas fa-save"></i> 儲存並發布
-        </button>
+    <div id="action-bar">
+        <div class="bar-info">已修改內容</div>
+        <div class="bar-btns">
+            <button class="btn-cancel" onclick="cancelChanges()">取消</button>
+            <button class="btn-save" id="save-btn" onclick="saveToGithub()">
+                <i class="fas fa-save"></i> 儲存並發布
+            </button>
+        </div>
     </div>
 
     <script>
@@ -246,7 +160,8 @@
             path: 'data.json'           
         };
 
-        let currentData = null;
+        let originalData = null; // 備份原始資料
+        let currentData = null;  // 當前編輯資料
         let fileSha = null;
         let ghToken = null;
 
@@ -273,8 +188,13 @@
                 const data = await response.json();
                 fileSha = data.sha; 
                 const content = decodeURIComponent(escape(window.atob(data.content)));
-                currentData = JSON.parse(content);
                 
+                // 1. 解析資料
+                currentData = JSON.parse(content);
+                // 2. 建立深層備份 (用於比對和還原)
+                originalData = JSON.parse(JSON.stringify(currentData));
+                
+                // 確保結構完整
                 if(!currentData.categories) currentData.categories = [];
                 if(!currentData.add_ons) currentData.add_ons = [];
 
@@ -292,6 +212,30 @@
             }
         }
 
+        // --- 核心邏輯：比對變更 ---
+        function checkChanges() {
+            const currentStr = JSON.stringify(currentData);
+            const originalStr = JSON.stringify(originalData);
+            const bar = document.getElementById('action-bar');
+
+            if (currentStr !== originalStr) {
+                bar.classList.add('show'); // 有差異，顯示按鈕
+            } else {
+                bar.classList.remove('show'); // 沒差異，隱藏按鈕
+            }
+        }
+
+        // --- 核心邏輯：取消變更 ---
+        function cancelChanges() {
+            if(!confirm("確定要放棄所有修改，還原成未儲存狀態嗎？")) return;
+            
+            // 還原資料
+            currentData = JSON.parse(JSON.stringify(originalData));
+            renderEditor();
+            checkChanges(); // 這會隱藏 Action Bar
+        }
+
+        // 渲染介面
         function renderEditor() {
             renderCategories();
             renderAddons();
@@ -377,25 +321,31 @@
             container.appendChild(card);
         }
 
-        // --- CRUD 邏輯 (保持不變) ---
+        // --- CRUD 操作 (修改後都會觸發 checkChanges) ---
         function addCategory() {
-            currentData.categories.push({ title: "新分類名稱", items: [] });
+            currentData.categories.push({ title: "新分類", items: [] });
             renderCategories();
+            checkChanges();
         }
 
         function deleteCategory(idx) {
             if(!confirm(`刪除「${currentData.categories[idx].title}」？`)) return;
             currentData.categories.splice(idx, 1);
             renderCategories();
+            checkChanges();
         }
 
         function moveCategory(idx, dir) {
             if (idx + dir < 0 || idx + dir >= currentData.categories.length) return;
             [currentData.categories[idx], currentData.categories[idx + dir]] = [currentData.categories[idx + dir], currentData.categories[idx]];
             renderCategories();
+            checkChanges();
         }
 
-        function updateCatTitle(idx, val) { currentData.categories[idx].title = val; }
+        function updateCatTitle(idx, val) { 
+            currentData.categories[idx].title = val; 
+            checkChanges();
+        }
 
         function addItem(catIdx) {
             const newId = 'item_' + new Date().getTime();
@@ -403,12 +353,14 @@
                 id: newId, name: "新項目", prices: { manager: 0, artist: 0, assistant: 0 }
             });
             renderCategories();
+            checkChanges();
         }
 
         function deleteItem(catIdx, itemIdx) {
             if(!confirm("刪除此項目？")) return;
             currentData.categories[catIdx].items.splice(itemIdx, 1);
             renderCategories();
+            checkChanges();
         }
 
         function moveItem(catIdx, itemIdx, dir) {
@@ -416,9 +368,13 @@
             if (itemIdx + dir < 0 || itemIdx + dir >= items.length) return;
             [items[itemIdx], items[itemIdx + dir]] = [items[itemIdx + dir], items[itemIdx]];
             renderCategories();
+            checkChanges();
         }
 
-        function updateItemName(catIdx, itemIdx, val) { currentData.categories[catIdx].items[itemIdx].name = val; }
+        function updateItemName(catIdx, itemIdx, val) { 
+            currentData.categories[catIdx].items[itemIdx].name = val; 
+            checkChanges();
+        }
 
         function updatePrice(catIdx, itemIdx, role, val) {
             const num = val === '' ? null : parseInt(val);
@@ -429,6 +385,7 @@
             } else {
                 prices[role] = num;
             }
+            checkChanges();
         }
         
         function getPrice(p) { return Array.isArray(p) ? p[0] : p; }
@@ -438,11 +395,14 @@
             const item = currentData.add_ons[idx];
             if(typeof item.price === 'number') { item.price = num; } 
             else { item.prices.manager = num; if(item.prices.artist) item.prices.artist = num; if(item.prices.assistant) item.prices.assistant = num; }
+            checkChanges();
         }
 
+        // --- 儲存回 GitHub ---
         async function saveToGithub() {
             if(!confirm("確定儲存並發布？")) return;
             const btn = document.getElementById('save-btn');
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上傳中...';
             btn.disabled = true;
 
@@ -469,12 +429,16 @@
                 const resData = await response.json();
                 fileSha = resData.content.sha;
 
-                alert('✅ 發布成功！需等待1-2分鐘刷新頁面');
-                btn.innerHTML = '<i class="fas fa-save"></i> 儲存並發布';
+                // 儲存成功後，把「現在的狀態」設為「新的原始狀態」
+                originalData = JSON.parse(JSON.stringify(currentData));
+                checkChanges(); // 隱藏按鈕
+
+                alert('✅ 發布成功！');
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             } catch (e) {
                 alert('錯誤：' + e.message);
-                btn.innerHTML = '<i class="fas fa-save"></i> 儲存並發布';
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         }
