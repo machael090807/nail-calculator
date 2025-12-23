@@ -61,22 +61,22 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 👇👇👇 修改重點：改成兩欄網格排列 👇👇👇 */
+        /* 兩欄網格排列 */
         .options-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 切成兩等分 */
-            gap: 10px; /* 按鈕之間的間距 */
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
         
         /* 選項按鈕樣式 */
         .option-label {
             display: flex; align-items: center; justify-content: space-between;
             background: rgba(255,255,255,0.4);
-            padding: 10px; /* 稍微縮小內距以適應兩欄 */
+            padding: 10px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
             cursor: pointer; transition: 0.2s;
-            font-size: 0.95rem; /* 字體稍微縮小一點點避免折行 */
+            font-size: 0.95rem;
         }
         .option-label:has(input:checked) {
             background: rgba(255,255,255,0.9);
@@ -84,10 +84,9 @@
             box-shadow: 0 0 0 1px var(--text-color);
         }
 
-        /* 標籤內的文字容器，避免文字跟圓點擠在一起 */
         .label-text {
             display: flex;
-            flex-direction: column; /* 讓標籤跟文字上下排或自動調整 */
+            flex-direction: column;
             gap: 2px;
         }
 
@@ -95,7 +94,7 @@
             accent-color: var(--text-color);
             transform: scale(1.2);
             margin-left: 5px;
-            flex-shrink: 0; /* 防止按鈕被擠壓 */
+            flex-shrink: 0;
         }
 
         /* 輸入框 */
@@ -148,7 +147,6 @@
         }
         button.copy-btn:active { transform: scale(0.98); }
         
-        /* 分類標籤 (小字) */
         .cat-tag {
             font-size: 0.75rem;
             color: var(--white);
@@ -218,8 +216,13 @@
                 <div class="label-text"><span class="cat-tag">延甲</span>淺貼加長</div>
                 <input type="radio" name="service" value="ext_long">
             </label>
-            <label class="option-label" style="grid-column: span 2;"> <div class="label-text"><span class="cat-tag">延甲</span>十指半貼含造型</div>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">延甲</span>半貼含造型</div>
                 <input type="radio" name="service" value="ext_styled">
+            </label>
+            <label class="option-label">
+                <div class="label-text"><span class="cat-tag">延甲</span>足部單指</div>
+                <input type="radio" name="service" value="ext_toe_single">
             </label>
         </div>
     </div>
@@ -270,7 +273,7 @@
     </div>
 
     <script>
-        // 資料與邏輯部分 (保持不變)
+        // 資料與邏輯部分
         const PRICES = {
             'single': { 'manager': [1200, 1300], 'artist': [1000, 1200], 'assistant': [900, 1000], name: "單色凝膠" },
             'cateye': { 'manager': [1300, 1400], 'artist': [1100, 1300], 'assistant': [1000, 1100], name: "貓眼凝膠" },
@@ -280,9 +283,12 @@
             'custom': { 'manager': 1300, 'artist': 1000, 'assistant': 800, name: "自帶圖" },
             'blind_value': { 'manager': 1500, 'artist': 1200, 'assistant': null, name: "超值不挑款" },
             'blind_diamond': { 'manager': 1700, 'artist': 1500, 'assistant': null, name: "含鑽不挑款" },
+            
+            // 👇 新增/更新的延甲服務 👇
             'ext_half': { 'manager': 1200, 'artist': 1000, 'assistant': 1000, name: "十指半貼延甲" },
             'ext_long': { 'manager': 1500, 'artist': null, 'assistant': null, name: "淺貼加長延甲" },
-            'ext_styled': { 'manager': 2500, 'artist': 2000, 'assistant': 2000, name: "十指半貼含造型" }
+            'ext_styled': { 'manager': 2500, 'artist': 2000, 'assistant': 2000, name: "十指半貼含造型(up)" },
+            'ext_toe_single': { 'manager': 120, 'artist': 120, 'assistant': null, name: "足部單指延甲" }
         };
 
         const REMOVE_PRICES = {
@@ -331,13 +337,24 @@
                     if (isHand) { serviceTotal += basePriceData[0]; posTextArr.push(`手部$${basePriceData[0]}`); }
                     if (isFoot) { serviceTotal += basePriceData[1]; posTextArr.push(`足部$${basePriceData[1]}`); }
                 } else {
+                    // 一般項目、延甲類
                     let itemPrice = basePriceData;
-                    if (isHand) { serviceTotal += itemPrice; posTextArr.push("手部"); }
-                    if (isFoot) {
-                        let surcharge = 0;
-                        if (['mirror', 'french', 'gradient', 'custom'].includes(serviceVal)) { surcharge = 200; }
-                        serviceTotal += (itemPrice + surcharge);
-                        posTextArr.push(`足部(+$${surcharge})`);
+                    // 足部單指是個例外，它名稱已經包含足部，不需額外加價邏輯，直接累加
+                    if (serviceVal === 'ext_toe_single') {
+                        // 如果是足部單指，價格就是 itemPrice，不管勾選什麼位置 (因為名稱已定)
+                        // 但為了符合操作邏輯，至少要選一個位置才算有選，或者直接算價格
+                        // 這裡簡單處理：只要選了這個項目，就顯示價格
+                         serviceTotal += itemPrice;
+                         posTextArr.push("足部單指");
+                    } else {
+                        // 其他延甲或造型
+                        if (isHand) { serviceTotal += itemPrice; posTextArr.push("手部"); }
+                        if (isFoot) {
+                            let surcharge = 0;
+                            if (['mirror', 'french', 'gradient', 'custom'].includes(serviceVal)) { surcharge = 200; }
+                            serviceTotal += (itemPrice + surcharge);
+                            posTextArr.push(`足部(+$${surcharge})`);
+                        }
                     }
                 }
             } else {
@@ -345,6 +362,8 @@
             }
 
             const posText = posTextArr.length > 0 ? posTextArr.join("+") : "未選擇";
+            
+            // 卸甲
             const removeVal = document.querySelector('input[name="remove"]:checked').value;
             let roleIdx = 0;
             if (currentRole === 'artist') roleIdx = 1;
@@ -355,6 +374,7 @@
             const removeName = removeEl.closest('.option-label').querySelector('span').innerText;
             const removeText = removePrice === 0 ? removeName : `${removeName} ($${removePrice})`;
 
+            // 加購
             const jumpCount = parseInt(document.getElementById('jump_color').value) || 0;
             const jumpPrice = jumpCount * 100;
             const addonPrice = parseInt(document.getElementById('addon_price').value) || 0;
@@ -363,7 +383,8 @@
             const isBirthday = document.getElementById('birthday').checked;
 
             let baseTotal = serviceTotal + removePrice + extraTotal;
-            if (!isHand && !isFoot) baseTotal = 0;
+            // 如果沒選位置且不是足部單指，則歸零
+            if (!isHand && !isFoot && serviceVal !== 'ext_toe_single') baseTotal = 0;
 
             let finalTotal = isBirthday ? Math.round(baseTotal * 0.9) : baseTotal;
             let discountText = isBirthday ? " (已折壽星9折)" : "";
