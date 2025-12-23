@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+        /* CSS 樣式保持不變 */
         :root {
             --bg-color: #F6F1ED;
             --card-bg: #FFFFFF;
@@ -37,7 +38,6 @@
         h1 { font-size: 1.8rem; margin: 0; color: var(--text-primary); letter-spacing: 1px; text-transform: uppercase; }
         .subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
 
-        /* 職級切換 */
         .role-tabs {
             display: flex; background: #EBE5DF; border-radius: 50px; padding: 4px;
             margin-bottom: 30px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
@@ -53,7 +53,6 @@
 
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-primary); margin-bottom: 15px; margin-top: 30px; }
 
-        /* 卡片網格 */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .service-card {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
@@ -67,7 +66,6 @@
 
         input[type="radio"], input[type="checkbox"] { display: none; }
 
-        /* 位置選擇 */
         .pos-card {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
@@ -80,7 +78,6 @@
         }
         .pos-card.active .check-icon { background: var(--text-secondary); border-color: var(--text-secondary); }
 
-        /* Stepper & Input Row */
         .stepper-row {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
             display: flex; align-items: center; justify-content: space-between;
@@ -102,7 +99,6 @@
         .btn-step:active { transform: scale(0.9); }
         .step-val { font-weight: bold; width: 20px; text-align: center; }
 
-        /* 膠囊輸入框 */
         .input-pill {
             background: #F5F5F5; border-radius: 20px; padding: 0 15px; height: 40px; width: 130px;
             display: flex; align-items: center;
@@ -116,7 +112,6 @@
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        /* 總計與明細 */
         .total-card {
             background-color: var(--total-bg); color: white; border-radius: 20px;
             padding: 25px; margin-top: 40px; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3); text-align: center;
@@ -154,12 +149,21 @@
         input:checked + .slider { background-color: var(--text-secondary); }
         input:checked + .slider:before { transform: translateX(22px); }
 
+        /* Loading 遮罩 */
+        #loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 999;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
 
+    <div id="loading">載入價格表中...</div>
+
     <header>
-        <h1>Fairy. L</h1>
+        <h1>COKICLAWS</h1>
         <div class="subtitle">美甲計算機</div>
     </header>
 
@@ -192,7 +196,7 @@
     <div class="stepper-row">
         <div class="stepper-info">
             <span class="stepper-name">跳色</span>
-            <span class="stepper-price">$100 / 指</span>
+            <span class="stepper-price" id="label_jump_price">$100 / 指</span>
         </div>
         <div class="stepper-ctrl">
             <button class="btn-step" onclick="updateStepper('jump_color', -1)">-</button>
@@ -234,46 +238,53 @@
     <div class="total-card">
         <div class="total-label">總計</div>
         <div class="total-price" id="total_display">$0</div>
-        
         <div class="detail-box" id="detail_box"></div>
-
-        <button class="btn-copy" onclick="copyQuote()">
-            📄 複製價格明細
-        </button>
+        <button class="btn-copy" onclick="copyQuote()">📄 複製價格明細</button>
     </div>
 
     <div style="text-align:center;">
-        <button class="btn-reset" onclick="resetAll()">清除計算</button>
+        <button class="btn-reset" onclick="resetAll()">清除重算 (保留職位)</button>
     </div>
 
-
     <script>
-        const PRICES = {
-            'single': { 'manager': [1200, 1300], 'artist': [1000, 1200], 'assistant': [900, 1000], name: "單色凝膠" },
-            'cateye': { 'manager': [1300, 1400], 'artist': [1100, 1300], 'assistant': [1000, 1100], name: "貓眼凝膠" },
-            'mirror': { 'manager': 1500, 'artist': 1300, 'assistant': 1100, name: "十指鏡面" },
-            'french': { 'manager': 1600, 'artist': 1500, 'assistant': 1200, name: "十指法式" },
-            'gradient': { 'manager': 1300, 'artist': 1300, 'assistant': 1100, name: "十指漸層" },
-            'custom': { 'manager': 1300, 'artist': 1000, 'assistant': 800, name: "自帶圖" },
-            'blind_value': { 'manager': 1500, 'artist': 1200, 'assistant': null, name: "超值不挑款" },
-            'blind_diamond': { 'manager': 1700, 'artist': 1500, 'assistant': null, name: "含鑽不挑款" },
-            'ext_half': { 'manager': 1200, 'artist': 1000, 'assistant': 1000, name: "十指半貼延甲" },
-            'ext_long': { 'manager': 1500, 'artist': null, 'assistant': null, name: "淺貼加長延甲" },
-            'ext_styled': { 'manager': 2500, 'artist': 2000, 'assistant': 2000, name: "十指半貼含造型" }
-        };
+        // 定義全域變數，等待 JSON 載入
+        let PRICES = {};
+        let REMOVE_PRICES = {};
+        let REMOVE_NAMES = {};
+        let EXTRA_PRICES = {};
 
-        const REMOVE_PRICES = {
-            'none': [0, 0, 0],
-            'our_shop': [300, 200, 200],
-            'other_shop': [300, 300, 300],
-            'pure': [0, 500, 500]
-        };
-        const REMOVE_NAMES = {'none':'無', 'our_shop':'本店卸甲', 'other_shop':'他店卸甲', 'pure':'純卸甲'};
-
-        let currentRole = 'artist'; // ✅ 預設為美甲師，與 HTML class="active" 保持一致
+        let currentRole = 'artist'; 
         let selectedService = 'single';
         let selectedRemove = 'none';
         let counts = { 'jump_color': 0, 'toe_ext': 0 };
+
+        // 頁面載入後，先去抓 data.json
+        window.onload = async function() {
+            try {
+                // 加個時間戳記 ?v=... 避免手機瀏覽器快取舊資料
+                const response = await fetch('data.json?v=' + new Date().getTime());
+                if (!response.ok) throw new Error("讀取失敗");
+                
+                const data = await response.json();
+                PRICES = data.PRICES;
+                REMOVE_PRICES = data.REMOVE_PRICES;
+                REMOVE_NAMES = data.REMOVE_NAMES;
+                EXTRA_PRICES = data.EXTRA_PRICES;
+
+                // 更新畫面上的價格文字
+                document.getElementById('label_jump_price').innerText = `$${EXTRA_PRICES.jump_color} / 指`;
+                document.getElementById('price_toe_ext').innerText = `$${EXTRA_PRICES.toe_ext} / 指`;
+
+                // 隱藏 Loading，顯示內容
+                document.getElementById('loading').style.display = 'none';
+                
+                // 初始化
+                init();
+            } catch (error) {
+                alert("無法讀取價格表 (data.json)，請確認檔案是否存在於 GitHub。");
+                console.error(error);
+            }
+        };
 
         function init() {
             renderServices();
@@ -283,14 +294,11 @@
             calculate();
         }
 
-        // ✅ 新增：清除重算功能 (不重整網頁，保留職位)
         function resetAll() {
-            // 重置變數
             selectedService = 'single';
             selectedRemove = 'none';
             counts = { 'jump_color': 0, 'toe_ext': 0 };
 
-            // 重置介面數值
             document.getElementById('pos_hand').checked = true;
             document.getElementById('pos_foot').checked = false;
             document.getElementById('addon_price').value = '';
@@ -298,15 +306,11 @@
             document.getElementById('val_jump_color').innerText = '0';
             document.getElementById('val_toe_ext').innerText = '0';
 
-            // 重新渲染與計算
             togglePos('hand');
             togglePos('foot');
             renderServices();
             renderRemoves();
             calculate();
-            
-            // 提示一下
-            // alert('已清除選項，職位保留'); 
         }
 
         function setRole(role) {
@@ -434,13 +438,13 @@
                 detailHtml += `<div class="detail-row"><span>卸甲: ${REMOVE_NAMES[selectedRemove]}</span><span>$${removePrice}</span></div>`;
             }
 
-            const jumpPrice = counts['jump_color'] * 100;
+            const jumpPrice = counts['jump_color'] * EXTRA_PRICES.jump_color;
             if (jumpPrice > 0) {
                 total += jumpPrice;
                 detailHtml += `<div class="detail-row"><span>跳色 x${counts['jump_color']}</span><span>$${jumpPrice}</span></div>`;
             }
 
-            let toePriceUnit = 120; 
+            let toePriceUnit = EXTRA_PRICES.toe_ext; 
             if (currentRole === 'assistant') toePriceUnit = 0; 
             const toeTotal = counts['toe_ext'] * toePriceUnit;
             if (toeTotal > 0 && currentRole !== 'assistant') {
@@ -490,8 +494,6 @@
                 alert('✅ 價格明細已複製！');
             });
         }
-
-        init();
     </script>
 </body>
 </html>
