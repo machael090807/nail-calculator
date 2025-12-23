@@ -163,23 +163,42 @@
         function renderServices() {
             const container = document.getElementById('dynamic-services');
             container.innerHTML = ''; 
+            
             DATA.categories.forEach(cat => {
+                // 步驟 1: 先檢查這個分類下，有沒有「目前身份」能做的項目
+                // 我們先把有效的項目挑出來存成 validItems
+                const validItems = cat.items.filter(item => {
+                    const price = getPrice(item.prices);
+                    return price !== null; // 只有價格不是 null 的才算有效
+                });
+
+                // 步驟 2: 如果有效項目是 0 個，就直接跳過這個分類 (不顯示標題)
+                if (validItems.length === 0) return;
+
+                // 步驟 3: 確定有東西後，才開始建立標題
                 const title = document.createElement('div');
                 title.className = 'section-title';
                 title.innerText = cat.title;
                 container.appendChild(title);
+
+                // 步驟 4: 建立格子容器
                 const grid = document.createElement('div');
                 grid.className = 'grid-container';
-                cat.items.forEach(item => {
+
+                // 步驟 5: 只把剛剛篩選出來的 validItems 顯示出來
+                validItems.forEach(item => {
                     const price = getPrice(item.prices);
-                    if (price === null) return; 
+                    
                     const card = document.createElement('div');
                     card.className = `service-card ${selectedServiceId === item.id ? 'active' : ''}`;
                     card.onclick = () => { selectedServiceId = item.id; renderServices(); calculate(); };
+                    
                     let priceText = Array.isArray(price) ? `$${price[0]}` : `$${price}`;
                     card.innerHTML = `<div class="card-title">${item.name}</div><div class="card-price">${priceText}</div>`;
+                    
                     grid.appendChild(card);
                 });
+
                 container.appendChild(grid);
             });
         }
