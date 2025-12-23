@@ -226,6 +226,15 @@
                 "artist": 120,
                 "assistant": null
             }
+        },
+        {
+            "id": "a1766501499921",
+            "name": "新加購222",
+            "prices": {
+                "manager": 2100,
+                "artist": 1100,
+                "assistant": 100
+            }
         }
     ],
     "sha": "5cbed726d55c5f851779414e9f12a6ee3a881cbe"
