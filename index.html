@@ -4,328 +4,345 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fairy. L 美甲計算機</title>
-    
-    <link rel="apple-touch-icon" href="logo.jpg">
-    <link rel="icon" href="logo.jpg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-
+    
     <style>
-        :root { --bg-color: #F6F1ED; --card-bg: #FFFFFF; --text-primary: #4E342E; --text-secondary: #8D6E63; --accent-color: #A1887F; --total-bg: #8D7B6F; --border-radius: 16px; }
-        body { background-color: var(--bg-color); color: var(--text-primary); font-family: 'Noto Sans TC', sans-serif; margin: 0; padding: 20px; padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
-        header { text-align: center; margin-bottom: 25px; }
-        h1 { font-size: 1.8rem; margin: 0; color: var(--text-primary); letter-spacing: 1px; text-transform: uppercase; }
-        .subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 999; display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--text-secondary); }
-        .role-tabs { display: flex; background: #EBE5DF; border-radius: 50px; padding: 4px; margin-bottom: 30px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-        .role-tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 50px; font-size: 0.95rem; font-weight: bold; color: #9E9E9E; cursor: pointer; transition: 0.3s; }
-        .role-tab.active { background-color: var(--card-bg); color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-primary); margin-bottom: 15px; margin-top: 30px; }
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .service-card { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; cursor: pointer; transition: 0.2s; border: 2px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center; height: 80px; }
-        .service-card.active { border-color: var(--text-secondary); background-color: #FFFBF8; }
-        .card-title { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
-        .card-price { font-size: 0.85rem; color: var(--text-secondary); }
-        .pos-card { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; border: 2px solid transparent; }
-        .pos-card.active { border-color: var(--text-secondary); color: var(--text-primary); }
-        .check-icon { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #DDD; display: flex; align-items: center; justify-content: center; color: white; transition: 0.2s; }
-        .pos-card.active .check-icon { background: var(--text-secondary); border-color: var(--text-secondary); }
-        .stepper-row { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .stepper-info { display: flex; flex-direction: column; }
-        .stepper-name { font-weight: bold; font-size: 1rem; }
-        .stepper-price { font-size: 0.8rem; color: var(--text-secondary); }
-        .stepper-ctrl { display: flex; align-items: center; gap: 10px; background: #F5F5F5; padding: 4px; border-radius: 20px; }
-        .btn-step { width: 32px; height: 32px; border-radius: 50%; border: none; background: white; color: var(--text-primary); font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-step:active { transform: scale(0.9); }
-        .step-val { font-weight: bold; width: 20px; text-align: center; }
-        .input-pill { background: #F5F5F5; border-radius: 20px; padding: 0 15px; height: 40px; width: 130px; display: flex; align-items: center; }
-        .input-pill input { border: none; background: transparent; width: 100%; text-align: right; font-size: 1rem; outline: none; color: var(--text-primary); padding: 0; margin: 0; font-weight: bold; }
-        .input-pill input::placeholder { color: #AAA; font-weight: normal; font-size: 0.9rem; }
-        .total-card { background-color: var(--total-bg); color: white; border-radius: 20px; padding: 25px; margin-top: 40px; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3); text-align: center; }
-        .total-label { font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px; }
-        .total-price { font-size: 3rem; font-weight: 800; margin-bottom: 20px; line-height: 1; }
-        .detail-box { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; text-align: left; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; min-height: 100px; }
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px; }
-        .detail-row:last-child { border-bottom: none; }
-        .btn-copy { width: 100%; background: white; color: var(--total-bg); border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-reset { margin-top: 15px; background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; }
-        .promo-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 0 10px; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        /* --- 核心樣式設定 (CSS) --- */
+        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --sub-text: #8D6E63; --brown: #8D7B6F; --radius: 16px; }
+        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px 20px 50px; margin: 0; -webkit-tap-highlight-color: transparent; }
+        
+        /* 通用元件 */
+        h1 { text-align: center; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
+        .subtitle { text-align: center; font-size: 0.9rem; color: var(--sub-text); margin-bottom: 25px; }
+        .section-title { font-size: 1.1rem; font-weight: bold; margin: 30px 0 15px; }
+        .btn-reset { display:block; margin: 20px auto; background: transparent; border: 1px solid var(--sub-text); color: var(--sub-text); padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        
+        /* 卡片與格線系統 */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background: var(--card); border-radius: var(--radius); padding: 15px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: 0.2s; }
+        .card.active { border-color: var(--sub-text); background: #FFFBF8; }
+        .card-row { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* 角色切換 */
+        .tabs { display: flex; background: #EBE5DF; border-radius: 50px; padding: 4px; margin-bottom: 30px; }
+        .tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 50px; font-weight: bold; color: #9E9E9E; cursor: pointer; transition: 0.3s; }
+        .tab.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        /* 加購計數器樣式 */
+        .stepper { display: flex; gap: 10px; background: #F5F5F5; padding: 4px; border-radius: 20px; align-items: center; }
+        .btn-step { width: 32px; height: 32px; border-radius: 50%; border: none; background: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* 總計區塊 */
+        .total-box { background: var(--brown); color: white; border-radius: 20px; padding: 25px; margin-top: 40px; text-align: center; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3); }
+        .price-big { font-size: 3rem; font-weight: 800; margin: 5px 0 20px; line-height: 1; }
+        .detail-list { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; text-align: left; min-height: 100px; font-size: 0.9rem; }
+        .detail-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px; }
+        .btn-copy { width: 100%; background: white; color: var(--brown); border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+
+        /* 開關 Switch */
+        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-top: 20px; }
+        .switch { position: relative; width: 50px; height: 28px; }
         .switch input { display:none; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--text-secondary); }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background: var(--sub-text); }
         input:checked + .slider:before { transform: translateX(22px); }
-        input[type="checkbox"] { display: none; }
+        
+        /* 讀取畫面 */
+        #loading { position: fixed; inset: 0; background: var(--bg); z-index: 99; display: flex; justify-content: center; align-items: center; color: var(--sub-text); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="loading">讀取價格表...</div>
+    <div id="loading">讀取資料中...</div>
 
     <header>
         <h1>Fairy. L</h1>
         <div class="subtitle">美甲計算機</div>
     </header>
 
-    <div class="role-tabs">
-        <div class="role-tab" id="tab_manager" onclick="setRole('manager')">店長</div>
-        <div class="role-tab active" id="tab_artist" onclick="setRole('artist')">美甲師</div>
-        <div class="role-tab" id="tab_assistant" onclick="setRole('assistant')">助理</div>
+    <div class="tabs">
+        <div class="tab" id="role_manager" onclick="setRole('manager')">店長</div>
+        <div class="tab active" id="role_artist" onclick="setRole('artist')">美甲師</div>
+        <div class="tab" id="role_assistant" onclick="setRole('assistant')">助理</div>
     </div>
 
-    <div id="dynamic-services"></div>
+    <div id="area-services"></div>
 
     <div class="section-title">位置</div>
-    <label class="pos-card" id="card_pos_hand">
+    <div class="card card-row" id="card_hand" onclick="togglePos('hand')">
         <span>🖐️ 手部</span>
-        <div class="check-icon">✓</div>
-        <input type="checkbox" id="pos_hand" checked onchange="togglePos('hand')">
-    </label>
-    <label class="pos-card" id="card_pos_foot">
+        <span id="icon_hand" style="display:none">✔</span> </div>
+    <div class="card card-row" id="card_foot" onclick="togglePos('foot')">
         <span>🦶 足部 (+$200)</span>
-        <div class="check-icon">✓</div>
-        <input type="checkbox" id="pos_foot" onchange="togglePos('foot')">
-    </label>
-
-    <div class="section-title">卸甲服務</div>
-    <div class="grid-container" id="removeGrid"></div>
-
-    <div class="section-title">加購及其他</div>
-    <div id="dynamic-addons"></div>
-
-    <div class="stepper-row">
-        <div class="stepper-info">
-            <span class="stepper-name">其他加購</span>
-            <span class="stepper-price">自訂金額</span>
-        </div>
-        <div class="input-pill">
-            <input type="number" id="addon_price" placeholder="輸入金額" oninput="calculate()">
-        </div>
+        <span id="icon_foot" style="display:none">✔</span>
     </div>
 
-    <div class="promo-row">
-        <span style="font-weight:bold; color:var(--text-primary);">🎂 當月壽星優惠 (9折)</span>
+    <div class="section-title">卸甲服務</div>
+    <div class="grid" id="area-removes"></div>
+
+    <div class="section-title">加購及其他</div>
+    <div id="area-addons"></div>
+
+    <div class="card card-row" style="margin-top:10px">
+        <span>其他加購</span>
+        <input type="number" id="custom_price" placeholder="輸入金額" oninput="calculate()" style="border:none; background:#F5F5F5; padding:5px; border-radius:5px; width:80px; text-align:right;">
+    </div>
+
+    <div class="switch-row">
+        <span style="font-weight:bold;">🎂 當月壽星優惠 (9折)</span>
         <label class="switch">
             <input type="checkbox" id="birthday" onchange="calculate()">
             <span class="slider"></span>
         </label>
     </div>
 
-    <div class="total-card">
-        <div class="total-label">總計</div>
-        <div class="total-price" id="total_display">$0</div>
-        <div class="detail-box" id="detail_box"></div>
+    <div class="total-box">
+        <div style="opacity:0.8">總計</div>
+        <div class="price-big" id="display_total">$0</div>
+        <div class="detail-list" id="detail_box"></div>
         <button class="btn-copy" onclick="copyQuote()">📄 複製價格明細</button>
     </div>
 
-    <div style="text-align:center;">
-        <button class="btn-reset" onclick="resetAll()">清除計算</button>
-    </div>
+    <button class="btn-reset" onclick="resetAll()">清除計算</button>
 
     <script>
+        // --- 變數與設定 ---
         let DATA = { categories: [], removals: [], add_ons: [] };
-        let ITEMS_MAP = {}; 
-        let currentRole = 'artist'; // 預設仍為美甲師，但畫面上店長排第一
-        let selectedServiceId = null;
-        let selectedRemoveId = null;
-        let counts = {}; 
+        let ITEMS = {}; // 方便用 ID 找資料
+        let STATE = {
+            role: 'artist',
+            serviceId: null,
+            removeId: null,
+            addons: {}, // 紀錄加購數量 { id: count }
+            hand: true,
+            foot: false
+        };
 
-        window.onload = async function() {
+        // --- 初始化 ---
+        window.onload = async () => {
             try {
-                const response = await fetch('data.json?v=' + new Date().getTime());
-                if (!response.ok) throw new Error("Load failed");
-                DATA = await response.json();
-                DATA.categories.forEach(cat => cat.items.forEach(item => ITEMS_MAP[item.id] = item));
-                DATA.removals.forEach(item => ITEMS_MAP[item.id] = item);
-                DATA.add_ons.forEach(item => { ITEMS_MAP[item.id] = item; counts[item.id] = 0; });
-                if (DATA.categories.length > 0) selectedServiceId = DATA.categories[0].items[0].id;
-                if (DATA.removals.length > 0) selectedRemoveId = DATA.removals[0].id;
+                // 抓取資料，加時間戳記避免快取
+                const res = await fetch('data.json?v=' + Date.now());
+                DATA = await res.json();
+                
+                // 建立快速查詢表 (Mapping)
+                DATA.categories.forEach(c => c.items.forEach(i => ITEMS[i.id] = i));
+                DATA.removals.forEach(i => ITEMS[i.id] = i);
+                DATA.add_ons.forEach(i => { ITEMS[i.id] = i; STATE.addons[i.id] = 0; });
+
+                // 預設選取第一個
+                if(DATA.categories.length) STATE.serviceId = DATA.categories[0].items[0].id;
+                if(DATA.removals.length) STATE.removeId = DATA.removals[0].id;
+
                 renderAll();
                 document.getElementById('loading').style.display = 'none';
-            } catch (e) {
-                alert("讀取設定檔失敗，請確認 data.json 格式正確");
-                console.error(e);
+            } catch(e) {
+                alert("讀取 data.json 失敗，請檢查檔案");
             }
         };
 
+        // --- 畫面渲染 (Render) ---
         function renderAll() {
             renderServices();
             renderRemoves();
-            renderAddOns();
-            togglePos('hand'); 
-            togglePos('foot');
+            renderAddons();
+            updateUI(); // 更新勾選狀態
             calculate();
         }
 
+        // 1. 產生服務列表 (含過濾空分類功能)
         function renderServices() {
-            const container = document.getElementById('dynamic-services');
-            container.innerHTML = ''; 
-            
-            DATA.categories.forEach(cat => {
-                // 步驟 1: 先檢查這個分類下，有沒有「目前身份」能做的項目
-                // 我們先把有效的項目挑出來存成 validItems
-                const validItems = cat.items.filter(item => {
-                    const price = getPrice(item.prices);
-                    return price !== null; // 只有價格不是 null 的才算有效
-                });
+            const container = document.getElementById('area-services');
+            let html = '';
 
-                // 步驟 2: 如果有效項目是 0 個，就直接跳過這個分類 (不顯示標題)
+            DATA.categories.forEach(cat => {
+                // 篩選：只有「有價格」的項目才顯示
+                const validItems = cat.items.filter(item => getPrice(item) !== null);
+                
+                // 如果這分類沒東西，就跳過
                 if (validItems.length === 0) return;
 
-                // 步驟 3: 確定有東西後，才開始建立標題
-                const title = document.createElement('div');
-                title.className = 'section-title';
-                title.innerText = cat.title;
-                container.appendChild(title);
-
-                // 步驟 4: 建立格子容器
-                const grid = document.createElement('div');
-                grid.className = 'grid-container';
-
-                // 步驟 5: 只把剛剛篩選出來的 validItems 顯示出來
+                // 樣板語法：先加標題
+                html += `<div class="section-title">${cat.title}</div><div class="grid">`;
+                
+                // 再加格子
                 validItems.forEach(item => {
-                    const price = getPrice(item.prices);
+                    const price = getPrice(item);
+                    const isActive = STATE.serviceId === item.id ? 'active' : '';
+                    const priceTxt = Array.isArray(price) ? `$${price[0]}` : `$${price}`;
                     
-                    const card = document.createElement('div');
-                    card.className = `service-card ${selectedServiceId === item.id ? 'active' : ''}`;
-                    card.onclick = () => { selectedServiceId = item.id; renderServices(); calculate(); };
-                    
-                    let priceText = Array.isArray(price) ? `$${price[0]}` : `$${price}`;
-                    card.innerHTML = `<div class="card-title">${item.name}</div><div class="card-price">${priceText}</div>`;
-                    
-                    grid.appendChild(card);
+                    html += `
+                        <div class="card ${isActive}" onclick="selectService('${item.id}')">
+                            <div style="font-weight:bold">${item.name}</div>
+                            <div style="font-size:0.85rem; color:#8D6E63">${priceTxt}</div>
+                        </div>`;
                 });
-
-                container.appendChild(grid);
+                html += `</div>`; // 關閉 grid
             });
+            container.innerHTML = html;
         }
 
+        // 2. 產生卸甲列表
         function renderRemoves() {
-            const grid = document.getElementById('removeGrid');
-            grid.innerHTML = '';
-            DATA.removals.forEach(item => {
-                const price = getPrice(item.prices);
-                const card = document.createElement('div');
-                card.className = `service-card ${selectedRemoveId === item.id ? 'active' : ''}`;
-                card.onclick = () => { selectedRemoveId = item.id; renderRemoves(); calculate(); };
-                card.innerHTML = `<div class="card-title">${item.name}</div><div class="card-price">${price === 0 ? '免費' : '$'+price}</div>`;
-                grid.appendChild(card);
-            });
+            const container = document.getElementById('area-removes');
+            container.innerHTML = DATA.removals.map(item => {
+                const price = getPrice(item);
+                const isActive = STATE.removeId === item.id ? 'active' : '';
+                const priceTxt = price === 0 ? '免費' : `$${price}`;
+                return `
+                    <div class="card ${isActive}" onclick="selectRemove('${item.id}')">
+                        <div style="font-weight:bold">${item.name}</div>
+                        <div style="font-size:0.85rem; color:#8D6E63">${priceTxt}</div>
+                    </div>`;
+            }).join('');
         }
 
-        function renderAddOns() {
-            const container = document.getElementById('dynamic-addons');
-            container.innerHTML = '';
-            DATA.add_ons.forEach(item => {
-                let priceVal = item.price;
-                if (item.prices) priceVal = getPrice(item.prices);
-                if (priceVal === null) return;
-                const row = document.createElement('div');
-                row.className = 'stepper-row';
-                row.innerHTML = `<div class="stepper-info"><span class="stepper-name">${item.name}</span><span class="stepper-price">$${priceVal} ${item.unit_desc || ''}</span></div>
-                    <div class="stepper-ctrl"><button class="btn-step" onclick="updateCount('${item.id}', -1)">-</button><span class="step-val">${counts[item.id]}</span><button class="btn-step" onclick="updateCount('${item.id}', 1)">+</button></div>`;
-                container.appendChild(row);
-            });
+        // 3. 產生加購列表
+        function renderAddons() {
+            const container = document.getElementById('area-addons');
+            container.innerHTML = DATA.add_ons.map(item => {
+                const price = getPrice(item);
+                if (price === null) return ''; // 沒價格就不顯示
+                
+                return `
+                    <div class="card card-row" style="margin-bottom:10px">
+                        <div>
+                            <div style="font-weight:bold">${item.name}</div>
+                            <div style="font-size:0.8rem; color:#8D6E63">$${price} ${item.unit_desc||''}</div>
+                        </div>
+                        <div class="stepper">
+                            <button class="btn-step" onclick="updateAddon('${item.id}', -1)">-</button>
+                            <span style="font-weight:bold; width:20px; text-align:center">${STATE.addons[item.id]}</span>
+                            <button class="btn-step" onclick="updateAddon('${item.id}', 1)">+</button>
+                        </div>
+                    </div>`;
+            }).join('');
         }
 
-        function getPrice(priceObj) {
-            if (typeof priceObj === 'number') return priceObj;
-            return priceObj[currentRole]; 
+        // --- 互動邏輯 ---
+        function getPrice(item) {
+            // 如果價格是數字直接回傳，如果是物件則根據角色回傳
+            if (typeof item.prices === 'number') return item.prices;
+            return item.prices ? item.prices[STATE.role] : null;
         }
 
         function setRole(role) {
-            currentRole = role;
-            document.querySelectorAll('.role-tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab_${role}`).classList.add('active');
-            renderAll(); 
+            STATE.role = role;
+            // 更新上方分頁樣式
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`role_${role}`).classList.add('active');
+            renderAll(); // 價格變了，全部重畫
         }
 
-        function updateCount(id, delta) {
-            counts[id] += delta;
-            if (counts[id] < 0) counts[id] = 0;
-            renderAddOns(); 
+        function selectService(id) { STATE.serviceId = id; renderServices(); calculate(); }
+        function selectRemove(id) { STATE.removeId = id; renderRemoves(); calculate(); }
+        
+        function updateAddon(id, delta) {
+            const newVal = STATE.addons[id] + delta;
+            if (newVal >= 0) STATE.addons[id] = newVal;
+            renderAddons(); // 只需要重畫加購區
             calculate();
         }
 
         function togglePos(type) {
-            const checkbox = document.getElementById(`pos_${type}`);
-            const card = document.getElementById(`card_pos_${type}`);
-            if (checkbox.checked) card.classList.add('active'); else card.classList.remove('active');
+            if (type === 'hand') STATE.hand = !STATE.hand;
+            if (type === 'foot') STATE.foot = !STATE.foot;
+            updateUI();
             calculate();
         }
 
+        function updateUI() {
+            // 控制手足的勾勾顯示 (原本是 Checkbox，現在改用純樣式比較好控制)
+            document.getElementById('card_hand').classList.toggle('active', STATE.hand);
+            document.getElementById('icon_hand').style.display = STATE.hand ? 'block' : 'none';
+            document.getElementById('card_foot').classList.toggle('active', STATE.foot);
+            document.getElementById('icon_foot').style.display = STATE.foot ? 'block' : 'none';
+        }
+
         function resetAll() {
-            if (DATA.categories.length > 0) selectedServiceId = DATA.categories[0].items[0].id;
-            if (DATA.removals.length > 0) selectedRemoveId = DATA.removals[0].id;
-            for (let k in counts) counts[k] = 0;
-            document.getElementById('pos_hand').checked = true;
-            document.getElementById('pos_foot').checked = false;
-            document.getElementById('addon_price').value = '';
+            // 重置所有狀態
+            if(DATA.categories.length) STATE.serviceId = DATA.categories[0].items[0].id;
+            if(DATA.removals.length) STATE.removeId = DATA.removals[0].id;
+            for(let k in STATE.addons) STATE.addons[k] = 0;
+            STATE.hand = true; STATE.foot = false;
+            document.getElementById('custom_price').value = '';
             document.getElementById('birthday').checked = false;
             renderAll();
         }
 
+        // --- 計算核心 ---
         function calculate() {
-            if (!selectedServiceId) return;
+            if (!STATE.serviceId) return;
+            
             let total = 0;
-            let html = '';
-            const serviceItem = ITEMS_MAP[selectedServiceId];
-            const priceData = getPrice(serviceItem.prices);
-            const isHand = document.getElementById('pos_hand').checked;
-            const isFoot = document.getElementById('pos_foot').checked;
+            let details = '';
+            
+            // 1. 主項目計算
+            const item = ITEMS[STATE.serviceId];
+            const price = getPrice(item);
+            
+            if (Array.isArray(price)) {
+                // 分開定價 (價格是陣列 [手, 足])
+                if (STATE.hand) { total += price[0]; details += row(item.name+' (手)', price[0]); }
+                if (STATE.foot) { total += price[1]; details += row(item.name+' (足)', price[1]); }
+            } else {
+                // 單一定價 (手部原價，足部+200)
+                if (STATE.hand) { total += price; details += row(item.name+' (手)', price); }
+                if (STATE.foot) { total += (price + 200); details += row(item.name+' (足)', price + 200); }
+            }
 
-            if (isHand || isFoot) {
-                if (Array.isArray(priceData)) {
-                    if (isHand) { total += priceData[0]; html += rowHTML(`${serviceItem.name} (手)`, priceData[0]); }
-                    if (isFoot) { total += priceData[1]; html += rowHTML(`${serviceItem.name} (足)`, priceData[1]); }
-                } else {
-                    let base = priceData;
-                    if (isHand) { total += base; html += rowHTML(`${serviceItem.name} (手)`, base); }
-                    if (isFoot) { let surcharge = 200; total += (base + surcharge); html += rowHTML(`${serviceItem.name} (足)`, base + surcharge); }
+            // 2. 卸甲
+            const remove = ITEMS[STATE.removeId];
+            const removePrice = getPrice(remove);
+            if (removePrice > 0) {
+                total += removePrice;
+                details += row('卸甲: ' + remove.name, removePrice);
+            }
+
+            // 3. 加購
+            for (let id in STATE.addons) {
+                if (STATE.addons[id] > 0) {
+                    const add = ITEMS[id];
+                    const p = getPrice(add);
+                    const sum = p * STATE.addons[id];
+                    total += sum;
+                    details += row(`${add.name} x${STATE.addons[id]}`, sum);
                 }
             }
 
-            const removeItem = ITEMS_MAP[selectedRemoveId];
-            const removePrice = getPrice(removeItem.prices);
-            if (removePrice > 0) { total += removePrice; html += rowHTML(`卸甲: ${removeItem.name}`, removePrice); }
+            // 4. 自訂金額
+            const custom = parseInt(document.getElementById('custom_price').value) || 0;
+            if (custom > 0) { total += custom; details += row('其他加購', custom); }
 
-            for (let id in counts) {
-                if (counts[id] > 0) {
-                    const item = ITEMS_MAP[id];
-                    let unitPrice = item.price || getPrice(item.prices);
-                    let subTotal = unitPrice * counts[id];
-                    total += subTotal;
-                    html += rowHTML(`${item.name} x${counts[id]}`, subTotal);
-                }
+            // 5. 壽星優惠
+            if (document.getElementById('birthday').checked) {
+                let discount = Math.round(total * 0.1); // 10% off
+                total -= discount;
+                details += `<div class="detail-item" style="color:#FFCC80"><span>🎂 壽星優惠</span><span>-$${discount}</span></div>`;
             }
 
-            const customAddon = parseInt(document.getElementById('addon_price').value) || 0;
-            if (customAddon > 0) { total += customAddon; html += rowHTML("其他加購", customAddon); }
-
-            const isBirthday = document.getElementById('birthday').checked;
-            if (isBirthday) {
-                let discount = Math.round(total * 0.1);
-                total = Math.round(total * 0.9);
-                html += `<div class="detail-row" style="color:#FFCC80;"><span>🎂 壽星優惠</span><span>-$${discount}</span></div>`;
-            }
-
-            document.getElementById('total_display').innerText = `$${total}`;
-            document.getElementById('detail_box').innerHTML = html || '<div style="text-align:center; opacity:0.5">尚未選擇項目</div>';
+            document.getElementById('display_total').innerText = `$${total}`;
+            document.getElementById('detail_box').innerHTML = details || '<div style="text-align:center; opacity:0.5">尚未選擇項目</div>';
         }
 
-        function rowHTML(name, price) { return `<div class="detail-row"><span>${name}</span><span>$${price}</span></div>`; }
+        function row(name, money) {
+            return `<div class="detail-item"><span>${name}</span><span>$${money}</span></div>`;
+        }
 
         function copyQuote() {
-            const roleName = {'manager':'店長', 'artist':'美甲師', 'assistant':'助理'}[currentRole];
-            const date = new Date().toLocaleDateString();
-            const total = document.getElementById('total_display').innerText;
-            let text = `【Fairy. L 美甲報價單】\n📅 日期：${date}\n👤 服務人員：${roleName}\n----------------------\n`;
-            document.querySelectorAll('.detail-row').forEach(row => { text += `${row.children[0].innerText} ... ${row.children[1].innerText}\n`; });
-            text += `----------------------\n💰 總計：${total}\n\n＊提醒：本店作品享有一週保固`;
-            navigator.clipboard.writeText(text).then(() => alert("✅ 已複製！"));
+            const roleName = {'manager':'店長', 'artist':'美甲師', 'assistant':'助理'}[STATE.role];
+            const time = new Date().toLocaleDateString();
+            let text = `【Fairy. L 美甲報價單】\n📅 日期：${time}\n👤 服務人員：${roleName}\n----------------------\n`;
+            
+            // 抓取明細文字
+            document.querySelectorAll('.detail-item').forEach(el => {
+                const spans = el.querySelectorAll('span');
+                text += `${spans[0].innerText} ... ${spans[1].innerText}\n`;
+            });
+            
+            text += `----------------------\n💰 總計：${document.getElementById('display_total').innerText}\n\n＊提醒：本店作品享有一週保固`;
+            navigator.clipboard.writeText(text).then(() => alert("✅ 已複製報價單！"));
         }
     </script>
 </body>
