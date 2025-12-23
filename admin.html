@@ -10,7 +10,7 @@
         :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --btn: #4E342E; --btn-hover: #3E2723; --danger: #E57373; --input-bg: #F5F5F5; }
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; margin: 0; padding: 0; height: 100vh; }
         
-        /* --- 登入畫面樣式 (依照你的截圖) --- */
+        /* --- 登入畫面 --- */
         #login_view { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999; background: var(--bg); transition: 0.3s; }
         .login-header { text-align: center; margin-bottom: 20px; }
         .login-header h1 { font-size: 1.5rem; margin: 0 0 5px 0; color: #4E342E; font-weight: bold; }
@@ -29,7 +29,26 @@
         .btn-login:active { transform: scale(0.98); }
         .error-msg { color: #E57373; font-size: 0.85rem; margin-top: 15px; min-height: 20px; }
 
-        /* --- 後台主介面 (登入後顯示) --- */
+        /* --- 隱藏按鈕 (忍者模式) --- */
+        .btn-ninja { 
+            margin-top: 50px; 
+            background: var(--bg); /* 與背景同色 */
+            color: var(--bg);      /* 文字與背景同色 */
+            border: none; 
+            cursor: default;       /* 滑鼠游標不變，讓人更難發現 */
+            font-size: 0.8rem;
+        }
+        .btn-ninja:hover {
+            cursor: pointer;       /* 只有滑鼠剛好移上去時才會變手手 */
+        }
+
+        /* --- 產生器視窗 (Modal) --- */
+        #gen_modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .gen-box { background: white; padding: 30px; border-radius: 16px; width: 350px; position: relative; }
+        .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.2rem; color: #999; }
+        .gen-result { background: #EEE; padding: 10px; border-radius: 8px; margin-top: 10px; word-break: break-all; font-family: monospace; display: none; color: #333; }
+
+        /* --- 後台主介面 --- */
         #admin_view { display: none; padding: 20px; padding-bottom: 80px; max-width: 800px; margin: 0 auto; }
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
@@ -81,12 +100,38 @@
             <button class="btn-login" onclick="attemptLogin()">登入</button>
             <div id="login_msg" class="error-msg"></div>
         </div>
+
+        <button class="btn-ninja" onclick="document.getElementById('gen_modal').style.display='flex'">• 產生金鑰 •</button>
+    </div>
+
+    <div id="gen_modal">
+        <div class="gen-box">
+            <div class="close-btn" onclick="document.getElementById('gen_modal').style.display='none'">✕</div>
+            <h3 style="margin-top:0; text-align:center;">🔐 產生 Cipher 亂碼</h3>
+            
+            <label>GitHub Token</label>
+            <input type="text" id="g_token" placeholder="ghp_xxx...">
+            
+            <label>User (帳號)</label>
+            <input type="text" id="g_user" placeholder="machael090807">
+            
+            <label>Repo (儲存庫)</label>
+            <input type="text" id="g_repo" placeholder="nail-calculator" value="nail-calculator">
+            
+            <label>設定密碼</label>
+            <input type="text" id="g_pass" placeholder="輸入你想設定的密碼">
+
+            <button class="btn-login" style="margin-top:20px" onclick="generateCipher()">產生並顯示</button>
+            
+            <div id="g_result" class="gen-result"></div>
+            <div id="g_msg" style="color:green; font-size:0.8rem; text-align:center; margin-top:5px; display:none;">✅ 已複製！請貼回 JSON</div>
+        </div>
     </div>
 
     <div id="admin_view">
         <div class="header-bar">
             <h2 style="margin:0">後台管理</h2>
-            <button onclick="logout()" style="background:#EEE; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">登出</button>
+            <button onclick="location.reload()" style="background:#EEE; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">登出</button>
         </div>
 
         <div class="tabs">
@@ -137,21 +182,17 @@
     <script>
         let DATA = { settings: {}, categories: [], removals: [], add_ons: [], sha: "" };
         let USER_LIST = [];
-        let CURRENT_CONFIG = { token: "", user: "", repo: "nail-calculator", path: "data.json" };
+        let CURRENT_CONFIG = { token: "", user: "", repo: "", path: "data.json" };
 
-        // --- 初始化：讀取 admin_user.json ---
         window.onload = async function() {
             try {
-                // 讀取同一目錄下的 admin_user.json
                 const res = await fetch('admin_user.json?v=' + Date.now());
                 if(res.ok) {
                     USER_LIST = await res.json();
                     renderUserSelect();
-                } else {
-                    throw new Error("找不到使用者設定檔");
-                }
+                } else { throw new Error(""); }
             } catch(e) {
-                document.getElementById('login_msg').innerText = "⚠️ 無法讀取使用者列表 (請確認 admin_user.json 存在)";
+                document.getElementById('login_msg').innerText = "⚠️ 找不到 admin_user.json";
             }
         };
 
@@ -166,116 +207,85 @@
             });
         }
 
-        // --- 登入與解密邏輯 ---
+        // --- 產生亂碼功能 (後門) ---
+        function generateCipher() {
+            const t = document.getElementById('g_token').value.trim();
+            const u = document.getElementById('g_user').value.trim();
+            const r = document.getElementById('g_repo').value.trim();
+            const p = document.getElementById('g_pass').value.trim();
+            
+            if(!t || !u || !r || !p) return alert("請填寫所有欄位");
+
+            const raw = `${t}|${u}|${r}`;
+            const cipher = btoa(xor_process(raw, p)); // 加密
+
+            const box = document.getElementById('g_result');
+            box.innerText = cipher;
+            box.style.display = 'block';
+            
+            navigator.clipboard.writeText(cipher).then(() => {
+                document.getElementById('g_msg').style.display = 'block';
+            });
+        }
+
+        // --- 登入功能 ---
         function attemptLogin() {
             const userIdx = document.getElementById('user_select').value;
             const pwd = document.getElementById('password_input').value;
             const msg = document.getElementById('login_msg');
             
             if(!pwd) return msg.innerText = "請輸入密碼";
-
             const targetUser = USER_LIST[userIdx];
             if(!targetUser) return;
 
             msg.innerText = "驗證中...";
             
-            // 1. 解密嘗試
-            const decrypted = xor_decrypt(targetUser.cipher, pwd);
-            
-            // 2. 驗證解密格式 (預期格式: token|username|repo)
+            // 解密
+            const decrypted = xor_process(atob(targetUser.cipher), pwd);
             const parts = decrypted.split('|');
+
             if(parts.length >= 3 && parts[0].startsWith('ghp_')) {
-                // 解密成功，設定當前 Config
                 CURRENT_CONFIG.token = parts[0];
                 CURRENT_CONFIG.user = parts[1];
                 CURRENT_CONFIG.repo = parts[2];
                 
-                // 3. 嘗試去 GitHub 撈資料，確認 Token 真的可用
                 loadDataFromGitHub().then(() => {
-                    // 登入成功：切換畫面
                     document.getElementById('login_view').style.opacity = '0';
                     setTimeout(() => {
                         document.getElementById('login_view').style.display = 'none';
                         document.getElementById('admin_view').style.display = 'block';
                     }, 300);
                 }).catch(() => {
-                    msg.innerText = "❌ 密碼正確但 Token 失效，請聯繫管理員";
+                    msg.innerText = "❌ Token 失效或網路錯誤";
                 });
-
             } else {
                 msg.innerText = "❌ 密碼錯誤";
             }
         }
 
-        // 簡單 XOR 解密 (配合 Python 生成端)
-        function xor_decrypt(cipher, key) {
-            try {
-                const str = atob(cipher); // Base64 Decode
-                let result = '';
-                for (let i = 0; i < str.length; i++) {
-                    result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-                }
-                return decodeURIComponent(escape(result)); // URL Decode
-            } catch(e) {
-                return "";
+        // 共用的 XOR 加解密函式 (因為 XOR 是對稱的，加密解密用同一段程式)
+        function xor_process(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
+            return result;
         }
 
-        function logout() {
-            location.reload();
-        }
-
-        // --- GitHub API 操作 ---
+        // --- GitHub API & 渲染 ---
         async function loadDataFromGitHub() {
             const { token, user, repo, path } = CURRENT_CONFIG;
             const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
-            
             const res = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
             if (!res.ok) throw new Error("API Error");
-            
             const json = await res.json();
             const content = decodeURIComponent(escape(atob(json.content)));
             DATA = JSON.parse(content);
             DATA.sha = json.sha;
-
             if (!DATA.settings) DATA.settings = {};
-            renderAll(); // 渲染後台介面
+            renderAll();
         }
 
-        async function saveData() {
-            // 收集 Settings 資料
-            DATA.settings.birthday_discount = parseFloat(document.getElementById('set_birthday').value);
-            DATA.settings.location_hand_name = document.getElementById('set_hand_name').value;
-            DATA.settings.location_foot_name = document.getElementById('set_foot_name').value;
-            DATA.settings.location_foot_surcharge = parseInt(document.getElementById('set_foot_price').value);
-
-            const { token, user, repo, path } = CURRENT_CONFIG;
-            const btn = document.querySelector('.btn-save');
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ 儲存中...";
-
-            const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
-            const body = { message: "Update via Admin Panel", content: content, sha: DATA.sha };
-
-            try {
-                const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                if (res.ok) {
-                    const json = await res.json();
-                    DATA.sha = json.content.sha;
-                    alert("✅ 儲存成功！");
-                } else throw new Error("Save Failed");
-            } catch (e) {
-                alert("❌ 儲存失敗");
-            } finally {
-                btn.innerText = originalText;
-            }
-        }
-
-        // --- 渲染與介面邏輯 (與之前相同) ---
         function switchTab(id) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -296,7 +306,6 @@
             (DATA.categories || []).forEach((cat, cIdx) => {
                 let itemsHtml = '';
                 cat.items.forEach((item, iIdx) => { itemsHtml += createItemHTML('cat', cIdx, iIdx, item); });
-
                 const div = document.createElement('div');
                 div.className = 'card';
                 div.innerHTML = `
@@ -306,8 +315,7 @@
                     <div style="margin-top:15px; padding-left:10px; border-left: 3px solid #EFEBE9;">
                         ${itemsHtml}
                         <button class="btn-act" style="background:#D7CCC8; color:#4E342E; margin-top:10px; width:100%" onclick="addItem(${cIdx})">+ 新增項目</button>
-                    </div>
-                `;
+                    </div>`;
                 catContainer.appendChild(div);
             });
 
@@ -330,16 +338,12 @@
                 let priceHtml = item.prices && typeof item.prices === 'object' 
                     ? getPriceInputsHTML('addon', null, idx, item.prices)
                     : `<label>單價</label><input type="number" value="${item.price||0}" onchange="updateAddonSimplePrice(${idx}, this.value)">`;
-
                 div.innerHTML = `
                     <button class="btn-del" onclick="delAddon(${idx})">刪除</button>
                     <label>項目名稱</label>
                     <input type="text" value="${item.name}" onchange="DATA.add_ons[${idx}].name = this.value">
-                    <div style="display:flex; gap:10px">
-                        <div style="flex:1"><label>單位</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div>
-                    </div>
-                    ${priceHtml}
-                `;
+                    <div style="display:flex; gap:10px"><div style="flex:1"><label>單位</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div></div>
+                    ${priceHtml}`;
                 addContainer.appendChild(div);
             });
         }
@@ -348,37 +352,25 @@
             let prices = item.prices;
             let delFunc = type === 'cat' ? `delItem(${cIdx}, ${iIdx})` : `delRemoval(${iIdx})`;
             let nameChange = type === 'cat' ? `DATA.categories[${cIdx}].items[${iIdx}].name = this.value` : `DATA.removals[${iIdx}].name = this.value`;
-            
-            return `
-                <div style="background:#FAFAFA; padding:15px; border-radius:10px; margin-bottom:10px; position:relative; border:1px solid #EEE;">
+            return `<div style="background:#FAFAFA; padding:15px; border-radius:10px; margin-bottom:10px; position:relative; border:1px solid #EEE;">
                     <button class="btn-del" style="top:5px; right:5px; padding:2px 8px" onclick="${delFunc}">x</button>
-                    <label style="margin-top:0">名稱</label>
-                    <input type="text" value="${item.name}" onchange="${nameChange}" style="background:white">
-                    ${getPriceInputsHTML(type, cIdx, iIdx, prices)}
-                </div>
-            `;
+                    <label style="margin-top:0">名稱</label><input type="text" value="${item.name}" onchange="${nameChange}" style="background:white">
+                    ${getPriceInputsHTML(type, cIdx, iIdx, prices)}</div>`;
         }
 
         function getPriceInputsHTML(type, cIdx, iIdx, prices) {
             let p = prices;
-            if (typeof p !== 'object' || p === null) {
-                let val = (typeof p === 'number') ? p : '';
-                p = { manager: val, artist: val, assistant: val };
-            }
+            if (typeof p !== 'object' || p === null) { let val = (typeof p === 'number') ? p : ''; p = { manager: val, artist: val, assistant: val }; }
             const update = (role) => {
                 if (type === 'cat') return `updatePrice('cat', ${cIdx}, ${iIdx}, '${role}', this.value)`;
                 if (type === 'rm') return `updatePrice('rm', null, ${iIdx}, '${role}', this.value)`;
                 if (type === 'addon') return `updatePrice('addon', null, ${iIdx}, '${role}', this.value)`;
             };
             const val = (v) => Array.isArray(v) ? v[0] : (v === null ? '' : v);
-
-            return `
-                <div class="price-group">
+            return `<div class="price-group">
                     <div class="price-row"><span class="price-label">店長</span><input type="number" placeholder="無" value="${val(p.manager)}" onchange="${update('manager')}"></div>
                     <div class="price-row"><span class="price-label">美甲師</span><input type="number" placeholder="無" value="${val(p.artist)}" onchange="${update('artist')}"></div>
-                    <div class="price-row"><span class="price-label">助理</span><input type="number" placeholder="無" value="${val(p.assistant)}" onchange="${update('assistant')}"></div>
-                </div>
-            `;
+                    <div class="price-row"><span class="price-label">助理</span><input type="number" placeholder="無" value="${val(p.assistant)}" onchange="${update('assistant')}"></div></div>`;
         }
 
         function updatePrice(type, cIdx, iIdx, role, val) {
@@ -386,14 +378,10 @@
             if (type === 'cat') target = DATA.categories[cIdx].items[iIdx];
             else if (type === 'rm') target = DATA.removals[iIdx];
             else if (type === 'addon') target = DATA.add_ons[iIdx];
-            
             if (!target.prices || typeof target.prices !== 'object') target.prices = { manager:null, artist:null, assistant:null };
             target.prices[role] = val === '' ? null : parseInt(val);
         }
-        function updateAddonSimplePrice(idx, val) {
-            DATA.add_ons[idx].price = parseInt(val) || 0;
-            delete DATA.add_ons[idx].prices;
-        }
+        function updateAddonSimplePrice(idx, val) { DATA.add_ons[idx].price = parseInt(val) || 0; delete DATA.add_ons[idx].prices; }
 
         function addCategory() { DATA.categories.push({ title: "新分類", items: [] }); renderAll(); }
         function delCategory(idx) { if(confirm("確定刪除此分類？")) { DATA.categories.splice(idx, 1); renderAll(); } }
@@ -403,6 +391,27 @@
         function delRemoval(idx) { DATA.removals.splice(idx, 1); renderAll(); }
         function addAddon() { DATA.add_ons.push({ id: 'a'+Date.now(), name: "新加購", price: 100 }); renderAll(); }
         function delAddon(idx) { DATA.add_ons.splice(idx, 1); renderAll(); }
+
+        async function saveData() {
+            DATA.settings.birthday_discount = parseFloat(document.getElementById('set_birthday').value);
+            DATA.settings.location_hand_name = document.getElementById('set_hand_name').value;
+            DATA.settings.location_foot_name = document.getElementById('set_foot_name').value;
+            DATA.settings.location_foot_surcharge = parseInt(document.getElementById('set_foot_price').value);
+            const { token, user, repo, path } = CURRENT_CONFIG;
+            const btn = document.querySelector('.btn-save');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ 儲存中...";
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
+            const body = { message: "Update via Admin Panel", content: content, sha: DATA.sha };
+            try {
+                const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) { const json = await res.json(); DATA.sha = json.content.sha; alert("✅ 儲存成功！"); } else throw new Error("Save Failed");
+            } catch (e) { alert("❌ 儲存失敗"); } finally { btn.innerText = originalText; }
+        }
     </script>
 </body>
 </html>
