@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS 樣式維持不變 */
         :root {
             --bg-color: #F6F1ED;
             --card-bg: #FFFFFF;
@@ -38,6 +37,15 @@
         h1 { font-size: 1.8rem; margin: 0; color: var(--text-primary); letter-spacing: 1px; text-transform: uppercase; }
         .subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
 
+        /* Loading */
+        #loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 999;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; color: var(--text-secondary);
+        }
+
+        /* Tabs */
         .role-tabs {
             display: flex; background: #EBE5DF; border-radius: 50px; padding: 4px;
             margin-bottom: 30px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
@@ -53,6 +61,7 @@
 
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-primary); margin-bottom: 15px; margin-top: 30px; }
 
+        /* Grid System */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .service-card {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
@@ -64,8 +73,7 @@
         .card-title { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
         .card-price { font-size: 0.85rem; color: var(--text-secondary); }
 
-        input[type="radio"], input[type="checkbox"] { display: none; }
-
+        /* Pos Card */
         .pos-card {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
@@ -78,6 +86,7 @@
         }
         .pos-card.active .check-icon { background: var(--text-secondary); border-color: var(--text-secondary); }
 
+        /* Steppers */
         .stepper-row {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
             display: flex; align-items: center; justify-content: space-between;
@@ -86,7 +95,6 @@
         .stepper-info { display: flex; flex-direction: column; }
         .stepper-name { font-weight: bold; font-size: 1rem; }
         .stepper-price { font-size: 0.8rem; color: var(--text-secondary); }
-        
         .stepper-ctrl {
             display: flex; align-items: center; gap: 10px;
             background: #F5F5F5; padding: 4px; border-radius: 20px;
@@ -99,6 +107,7 @@
         .btn-step:active { transform: scale(0.9); }
         .step-val { font-weight: bold; width: 20px; text-align: center; }
 
+        /* Input */
         .input-pill {
             background: #F5F5F5; border-radius: 20px; padding: 0 15px; height: 40px; width: 130px;
             display: flex; align-items: center;
@@ -108,10 +117,8 @@
             font-size: 1rem; outline: none; color: var(--text-primary); padding: 0; margin: 0; font-weight: bold;
         }
         .input-pill input::placeholder { color: #AAA; font-weight: normal; font-size: 0.9rem; }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-
+        
+        /* Total */
         .total-card {
             background-color: var(--total-bg); color: white; border-radius: 20px;
             padding: 25px; margin-top: 40px; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3); text-align: center;
@@ -133,7 +140,6 @@
             padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: bold;
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-copy:active { opacity: 0.9; transform: translateY(2px); }
         .btn-reset {
             margin-top: 15px; background: transparent; border: 1px solid var(--text-secondary);
             color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer;
@@ -149,17 +155,12 @@
         input:checked + .slider { background-color: var(--text-secondary); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        #loading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-color); z-index: 999;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; color: var(--text-secondary);
-        }
+        input[type="checkbox"] { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="loading">載入價格表中...</div>
+    <div id="loading">讀取價格表...</div>
 
     <header>
         <h1>Fairy. L</h1>
@@ -167,13 +168,12 @@
     </header>
 
     <div class="role-tabs">
-        <div class="role-tab" id="tab_manager" onclick="setRole('manager')">店長</div>
         <div class="role-tab active" id="tab_artist" onclick="setRole('artist')">美甲師</div>
+        <div class="role-tab" id="tab_manager" onclick="setRole('manager')">店長</div>
         <div class="role-tab" id="tab_assistant" onclick="setRole('assistant')">助理</div>
     </div>
 
-    <div class="section-title">基礎服務</div>
-    <div class="grid-container" id="serviceGrid"></div>
+    <div id="dynamic-services"></div>
 
     <div class="section-title">位置</div>
     <label class="pos-card" id="card_pos_hand">
@@ -190,31 +190,9 @@
     <div class="section-title">卸甲服務</div>
     <div class="grid-container" id="removeGrid"></div>
 
-    <div class="section-title">加購及延甲</div>
+    <div class="section-title">加購及其他</div>
     
-    <div class="stepper-row">
-        <div class="stepper-info">
-            <span class="stepper-name">跳色</span>
-            <span class="stepper-price" id="label_jump_price">$100 / 指</span>
-        </div>
-        <div class="stepper-ctrl">
-            <button class="btn-step" onclick="updateStepper('jump_color', -1)">-</button>
-            <span class="step-val" id="val_jump_color">0</span>
-            <button class="btn-step" onclick="updateStepper('jump_color', 1)">+</button>
-        </div>
-    </div>
-
-    <div class="stepper-row">
-        <div class="stepper-info">
-            <span class="stepper-name">足部單指延甲</span>
-            <span class="stepper-price" id="price_toe_ext">$120 / 指</span>
-        </div>
-        <div class="stepper-ctrl">
-            <button class="btn-step" onclick="updateStepper('toe_ext', -1)">-</button>
-            <span class="step-val" id="val_toe_ext">0</span>
-            <button class="btn-step" onclick="updateStepper('toe_ext', 1)">+</button>
-        </div>
-    </div>
+    <div id="dynamic-addons"></div>
 
     <div class="stepper-row">
         <div class="stepper-info">
@@ -246,127 +224,180 @@
     </div>
 
     <script>
-        let PRICES = {};
-        let REMOVE_PRICES = {};
-        let REMOVE_NAMES = {};
-        let EXTRA_PRICES = {};
+        // 資料容器
+        let DATA = {
+            categories: [],
+            removals: [],
+            add_ons: []
+        };
+        // 快速查找表 (ID -> Item)
+        let ITEMS_MAP = {}; 
 
         let currentRole = 'artist'; 
-        let selectedService = 'single';
-        let selectedRemove = 'none';
-        let counts = { 'jump_color': 0, 'toe_ext': 0 };
+        let selectedServiceId = null; // 當前選中的主服務 ID
+        let selectedRemoveId = null;
+        let counts = {}; // 紀錄加購項目的數量 { id: count }
 
         window.onload = async function() {
             try {
                 const response = await fetch('data.json?v=' + new Date().getTime());
-                if (!response.ok) throw new Error("讀取失敗");
-                
-                const data = await response.json();
-                PRICES = data.PRICES;
-                REMOVE_PRICES = data.REMOVE_PRICES;
-                REMOVE_NAMES = data.REMOVE_NAMES;
-                EXTRA_PRICES = data.EXTRA_PRICES;
+                if (!response.ok) throw new Error("Load failed");
+                DATA = await response.json();
 
-                document.getElementById('label_jump_price').innerText = `$${EXTRA_PRICES.jump_color} / 指`;
-                document.getElementById('price_toe_ext').innerText = `$${EXTRA_PRICES.toe_ext} / 指`;
+                // 建立快速查找表，方便計算時抓資料
+                DATA.categories.forEach(cat => {
+                    cat.items.forEach(item => ITEMS_MAP[item.id] = item);
+                });
+                DATA.removals.forEach(item => ITEMS_MAP[item.id] = item);
+                DATA.add_ons.forEach(item => {
+                    ITEMS_MAP[item.id] = item;
+                    counts[item.id] = 0; // 初始化計數器
+                });
 
+                // 預設選中第一個分類的第一個項目
+                if (DATA.categories.length > 0 && DATA.categories[0].items.length > 0) {
+                    selectedServiceId = DATA.categories[0].items[0].id;
+                }
+                if (DATA.removals.length > 0) {
+                    selectedRemoveId = DATA.removals[0].id;
+                }
+
+                // 渲染畫面
+                renderAll();
                 document.getElementById('loading').style.display = 'none';
-                
-                init();
-            } catch (error) {
-                alert("無法讀取價格表 (data.json)，請確認檔案是否存在於 GitHub。");
-                console.error(error);
+
+            } catch (e) {
+                alert("讀取設定檔失敗，請確認 data.json 格式正確");
+                console.error(e);
             }
         };
 
-        function init() {
+        function renderAll() {
             renderServices();
             renderRemoves();
-            togglePos('hand'); 
-            togglePos('foot'); 
+            renderAddOns();
+            togglePos('hand'); // 初始化位置樣式
+            togglePos('foot');
             calculate();
         }
 
-        function resetAll() {
-            selectedService = 'single';
-            selectedRemove = 'none';
-            counts = { 'jump_color': 0, 'toe_ext': 0 };
+        // 1. 自動生成服務分類與卡片
+        function renderServices() {
+            const container = document.getElementById('dynamic-services');
+            container.innerHTML = ''; // 清空
 
-            document.getElementById('pos_hand').checked = true;
-            document.getElementById('pos_foot').checked = false;
-            document.getElementById('addon_price').value = '';
-            document.getElementById('birthday').checked = false;
-            document.getElementById('val_jump_color').innerText = '0';
-            document.getElementById('val_toe_ext').innerText = '0';
+            DATA.categories.forEach(cat => {
+                // 標題
+                const title = document.createElement('div');
+                title.className = 'section-title';
+                title.innerText = cat.title;
+                container.appendChild(title);
 
-            togglePos('hand');
-            togglePos('foot');
-            renderServices();
-            renderRemoves();
-            calculate();
+                // Grid
+                const grid = document.createElement('div');
+                grid.className = 'grid-container';
+                
+                cat.items.forEach(item => {
+                    const price = getPrice(item.prices);
+                    // 若該職位不支援 (null)，就不顯示該卡片，或顯示為無法操作
+                    if (price === null) return; 
+
+                    const card = document.createElement('div');
+                    card.className = `service-card ${selectedServiceId === item.id ? 'active' : ''}`;
+                    card.onclick = () => {
+                        selectedServiceId = item.id;
+                        renderServices(); // 重新渲染以更新 active 狀態
+                        calculate();
+                    };
+
+                    let priceText = Array.isArray(price) ? `$${price[0]}` : `$${price}`;
+                    card.innerHTML = `
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-price">${priceText}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+                container.appendChild(grid);
+            });
+        }
+
+        // 2. 自動生成卸甲
+        function renderRemoves() {
+            const grid = document.getElementById('removeGrid');
+            grid.innerHTML = '';
+            
+            DATA.removals.forEach(item => {
+                const price = getPrice(item.prices);
+                const card = document.createElement('div');
+                card.className = `service-card ${selectedRemoveId === item.id ? 'active' : ''}`;
+                card.onclick = () => {
+                    selectedRemoveId = item.id;
+                    renderRemoves();
+                    calculate();
+                };
+                card.innerHTML = `
+                    <div class="card-title">${item.name}</div>
+                    <div class="card-price">${price === 0 ? '免費' : '$'+price}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 3. 自動生成加購項目 (Steppers)
+        function renderAddOns() {
+            const container = document.getElementById('dynamic-addons');
+            container.innerHTML = '';
+
+            DATA.add_ons.forEach(item => {
+                let priceVal = item.price; // 可能是數字
+                if (item.prices) { // 也可能是依職位的物件
+                    priceVal = getPrice(item.prices);
+                }
+                
+                // 如果該職位不支援此加購 (null)，則不顯示
+                if (priceVal === null) return;
+
+                const row = document.createElement('div');
+                row.className = 'stepper-row';
+                row.innerHTML = `
+                    <div class="stepper-info">
+                        <span class="stepper-name">${item.name}</span>
+                        <span class="stepper-price">$${priceVal} ${item.unit_desc || ''}</span>
+                    </div>
+                    <div class="stepper-ctrl">
+                        <button class="btn-step" onclick="updateCount('${item.id}', -1)">-</button>
+                        <span class="step-val">${counts[item.id]}</span>
+                        <button class="btn-step" onclick="updateCount('${item.id}', 1)">+</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // --- 邏輯輔助 ---
+
+        // 根據當前職位取得價格 (支援 數字、陣列、物件)
+        function getPrice(priceObj) {
+            // 如果直接是數字 (例如加購項目)
+            if (typeof priceObj === 'number') return priceObj;
+            
+            // 如果是 { manager: ..., artist: ... }
+            return priceObj[currentRole]; 
         }
 
         function setRole(role) {
             currentRole = role;
             document.querySelectorAll('.role-tab').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab_${role}`).classList.add('active');
-            renderServices();
+            // 職位改變，價格與顯示項目可能會變，全部重繪
+            renderAll(); 
+        }
+
+        function updateCount(id, delta) {
+            counts[id] += delta;
+            if (counts[id] < 0) counts[id] = 0;
+            renderAddOns(); // 更新數字顯示
             calculate();
-        }
-
-        function renderServices() {
-            const grid = document.getElementById('serviceGrid');
-            grid.innerHTML = '';
-            for (const key in PRICES) {
-                const item = PRICES[key];
-                const priceData = item[currentRole];
-                if (priceData === null) continue;
-
-                let priceDisplay = '';
-                if (Array.isArray(priceData)) {
-                    priceDisplay = `$${priceData[0]} / 次`;
-                } else {
-                    priceDisplay = `$${priceData} / 次`;
-                }
-
-                const card = document.createElement('div');
-                card.className = `service-card ${selectedService === key ? 'active' : ''}`;
-                card.onclick = () => selectService(key);
-                card.innerHTML = `
-                    <div class="card-title">${item.name}</div>
-                    <div class="card-price">${priceDisplay}</div>
-                `;
-                grid.appendChild(card);
-            }
-        }
-
-        function selectService(key) {
-            selectedService = key;
-            renderServices(); 
-            calculate();
-        }
-
-        function renderRemoves() {
-            const grid = document.getElementById('removeGrid');
-            grid.innerHTML = '';
-            const removeRoleIdx = currentRole === 'manager' ? 0 : (currentRole === 'artist' ? 1 : 2);
-
-            for (const key in REMOVE_PRICES) {
-                const price = REMOVE_PRICES[key][removeRoleIdx];
-                const name = REMOVE_NAMES[key];
-                const card = document.createElement('div');
-                card.className = `service-card ${selectedRemove === key ? 'active' : ''}`;
-                card.onclick = () => {
-                    selectedRemove = key;
-                    renderRemoves();
-                    calculate();
-                };
-                card.innerHTML = `
-                    <div class="card-title">${name}</div>
-                    <div class="card-price">${price === 0 ? '免費' : '$'+price}</div>
-                `;
-                grid.appendChild(card);
-            }
         }
 
         function togglePos(type) {
@@ -380,86 +411,103 @@
             calculate();
         }
 
-        function updateStepper(key, delta) {
-            counts[key] += delta;
-            if (counts[key] < 0) counts[key] = 0;
-            document.getElementById(`val_${key}`).innerText = counts[key];
-            calculate();
+        function resetAll() {
+            // 重置選項
+            if (DATA.categories.length > 0) selectedServiceId = DATA.categories[0].items[0].id;
+            if (DATA.removals.length > 0) selectedRemoveId = DATA.removals[0].id;
+            for (let k in counts) counts[k] = 0;
+            
+            document.getElementById('pos_hand').checked = true;
+            document.getElementById('pos_foot').checked = false;
+            document.getElementById('addon_price').value = '';
+            document.getElementById('birthday').checked = false;
+
+            renderAll();
         }
 
+        // --- 核心計算 ---
         function calculate() {
-            let detailHtml = '';
-            let total = 0;
+            if (!selectedServiceId) return; // 資料還沒載入
 
-            const serviceData = PRICES[selectedService];
-            const priceInfo = serviceData[currentRole];
+            let total = 0;
+            let html = '';
+
+            // 1. 主服務
+            const serviceItem = ITEMS_MAP[selectedServiceId];
+            const priceData = getPrice(serviceItem.prices);
             
             const isHand = document.getElementById('pos_hand').checked;
             const isFoot = document.getElementById('pos_foot').checked;
 
             if (isHand || isFoot) {
-                if (Array.isArray(priceInfo)) {
+                if (Array.isArray(priceData)) {
+                    // 手足分開價 [手, 足]
                     if (isHand) {
-                        total += priceInfo[0];
-                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (手)</span><span>$${priceInfo[0]}</span></div>`;
+                        total += priceData[0];
+                        html += rowHTML(`${serviceItem.name} (手)`, priceData[0]);
                     }
                     if (isFoot) {
-                        total += priceInfo[1];
-                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (足)</span><span>$${priceInfo[1]}</span></div>`;
+                        total += priceData[1];
+                        html += rowHTML(`${serviceItem.name} (足)`, priceData[1]);
                     }
                 } else {
-                    let itemPrice = priceInfo;
+                    // 統一價 (足部加價)
+                    let base = priceData;
                     if (isHand) {
-                        total += itemPrice;
-                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (手)</span><span>$${itemPrice}</span></div>`;
+                        total += base;
+                        html += rowHTML(`${serviceItem.name} (手)`, base);
                     }
                     if (isFoot) {
-                        let surcharge = 0;
-                        if (['mirror', 'french', 'gradient', 'custom'].includes(selectedService)) {
-                            surcharge = 200;
-                        }
-                        total += (itemPrice + surcharge);
-                        detailHtml += `<div class="detail-row"><span>${serviceData.name} (足)</span><span>$${itemPrice+surcharge}</span></div>`;
+                        // 特殊邏輯：如果是造型類，足部 +200
+                        // 這裡我們可以簡單判定：只要是統一價模式，足部就是 +200
+                        // 或者未來可以在 JSON 裡加個欄位 "foot_surcharge": 200
+                        let surcharge = 200; 
+                        total += (base + surcharge);
+                        html += rowHTML(`${serviceItem.name} (足)`, base + surcharge);
                     }
                 }
             }
 
-            const removeRoleIdx = currentRole === 'manager' ? 0 : (currentRole === 'artist' ? 1 : 2);
-            const removePrice = REMOVE_PRICES[selectedRemove][removeRoleIdx];
+            // 2. 卸甲
+            const removeItem = ITEMS_MAP[selectedRemoveId];
+            const removePrice = getPrice(removeItem.prices);
             if (removePrice > 0) {
                 total += removePrice;
-                detailHtml += `<div class="detail-row"><span>卸甲: ${REMOVE_NAMES[selectedRemove]}</span><span>$${removePrice}</span></div>`;
+                html += rowHTML(`卸甲: ${removeItem.name}`, removePrice);
             }
 
-            const jumpPrice = counts['jump_color'] * EXTRA_PRICES.jump_color;
-            if (jumpPrice > 0) {
-                total += jumpPrice;
-                detailHtml += `<div class="detail-row"><span>跳色 x${counts['jump_color']}</span><span>$${jumpPrice}</span></div>`;
+            // 3. 加購 (Steppers)
+            for (let id in counts) {
+                if (counts[id] > 0) {
+                    const item = ITEMS_MAP[id];
+                    let unitPrice = item.price || getPrice(item.prices);
+                    let subTotal = unitPrice * counts[id];
+                    total += subTotal;
+                    html += rowHTML(`${item.name} x${counts[id]}`, subTotal);
+                }
             }
 
-            let toePriceUnit = EXTRA_PRICES.toe_ext; 
-            if (currentRole === 'assistant') toePriceUnit = 0; 
-            const toeTotal = counts['toe_ext'] * toePriceUnit;
-            if (toeTotal > 0 && currentRole !== 'assistant') {
-                total += toeTotal;
-                detailHtml += `<div class="detail-row"><span>足部延甲 x${counts['toe_ext']}</span><span>$${toeTotal}</span></div>`;
+            // 4. 自訂金額
+            const customAddon = parseInt(document.getElementById('addon_price').value) || 0;
+            if (customAddon > 0) {
+                total += customAddon;
+                html += rowHTML("其他加購", customAddon);
             }
 
-            const addon = parseInt(document.getElementById('addon_price').value) || 0;
-            if (addon > 0) {
-                total += addon;
-                detailHtml += `<div class="detail-row"><span>其他加購</span><span>$${addon}</span></div>`;
-            }
-
+            // 5. 優惠
             const isBirthday = document.getElementById('birthday').checked;
             if (isBirthday) {
                 let discount = Math.round(total * 0.1);
                 total = Math.round(total * 0.9);
-                detailHtml += `<div class="detail-row" style="color:#FFCC80;"><span>🎂 壽星優惠 (9折)</span><span>-$${discount}</span></div>`;
+                html += `<div class="detail-row" style="color:#FFCC80;"><span>🎂 壽星優惠</span><span>-$${discount}</span></div>`;
             }
 
             document.getElementById('total_display').innerText = `$${total}`;
-            document.getElementById('detail_box').innerHTML = detailHtml || '<div style="text-align:center; opacity:0.5;">尚未選擇項目</div>';
+            document.getElementById('detail_box').innerHTML = html || '<div style="text-align:center; opacity:0.5">尚未選擇項目</div>';
+        }
+
+        function rowHTML(name, price) {
+            return `<div class="detail-row"><span>${name}</span><span>$${price}</span></div>`;
         }
 
         function copyQuote() {
@@ -472,20 +520,16 @@
             text += `👤 服務人員：${roleName}\n`;
             text += `----------------------\n`;
             
-            const rows = document.querySelectorAll('.detail-row');
-            rows.forEach(row => {
-                const name = row.children[0].innerText;
-                const price = row.children[1].innerText;
-                text += `${name} ... ${price}\n`;
+            // 抓取明細
+            document.querySelectorAll('.detail-row').forEach(row => {
+                text += `${row.children[0].innerText} ... ${row.children[1].innerText}\n`;
             });
             
             text += `----------------------\n`;
             text += `💰 總計：${total}\n`;
             text += `\n＊提醒：本店作品享有一週保固`;
 
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ 價格明細已複製！');
-            });
+            navigator.clipboard.writeText(text).then(() => alert("✅ 已複製！"));
         }
     </script>
 </body>
