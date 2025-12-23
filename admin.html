@@ -396,10 +396,11 @@
         }
         function addAddonItem(isSingle) {
             let newItem;
+            // ★ 修改：這裡將預設名稱加入了 "/指"
             if(isSingle) {
-                newItem = { id:'a'+Date.now(), name:"新加購", price:100 };
+                newItem = { id:'a'+Date.now(), name:"新加購/指", price:100 };
             } else {
-                newItem = { id:'a'+Date.now(), name:"新加購", prices:{manager:100, artist:100, assistant:100} };
+                newItem = { id:'a'+Date.now(), name:"新加購/指", prices:{manager:100, artist:100, assistant:100} };
             }
             currentData.add_ons.push(newItem);
             renderOthers();
@@ -441,7 +442,6 @@
                     <div class="price-col"><span class="price-label">助理</span><input type="number" class="price-input" value="${getPrice(p.assistant)}" onchange="updateSimplePrice('${type}', ${idx}, 'assistant', this.value)"></div>`;
             }
 
-            // ★ 更新：加入 上下移動 按鈕
             return `
             <div class="item-row">
                 <div class="row-top">
@@ -490,8 +490,6 @@
             currentData[type].push(newItem); renderOthers(); checkChanges();
         }
         function deleteSimple(type, idx) { if(!confirm("刪除？")) return; currentData[type].splice(idx,1); renderOthers(); checkChanges(); }
-        
-        // ★ 新增：其他項目的移動邏輯
         function moveSimple(type, idx, d) {
             let list = currentData[type];
             if(idx+d < 0 || idx+d >= list.length) return;
