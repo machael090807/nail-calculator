@@ -2,179 +2,194 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fairy. L 後台管理</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fairy. L 後台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- 全域變數 --- */
-        :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --btn: #4E342E; --danger: #E57373; --input-bg: #F5F5F5; }
-        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; margin: 0; padding: 0; height: 100vh; }
-        
-        /* --- 登入畫面 --- */
-        #login_view { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999; background: var(--bg); transition: 0.3s; }
-        .login-header { text-align: center; margin-bottom: 20px; }
-        .login-header h1 { font-size: 1.5rem; margin: 0 0 5px 0; color: #4E342E; font-weight: bold; }
-        .login-header span { color: #8D6E63; font-size: 0.9rem; }
-        
-        .login-card { background: white; width: 320px; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.1); text-align: center; }
-        .login-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 25px; color: #333; }
-        
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-control { width: 100%; padding: 12px 15px; border: none; background: #F5F5F5; border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none; color: #333; }
-        .form-control:focus { box-shadow: 0 0 0 2px #D7CCC8; background: #FFF; }
-        
-        select.form-control { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto; }
-        
-        .btn-login { background: #4E342E; color: white; width: 100%; padding: 12px; border-radius: 50px; border: none; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 10px rgba(78, 52, 46, 0.3); }
-        .btn-login:active { transform: scale(0.98); }
-        .error-msg { color: #E57373; font-size: 0.85rem; margin-top: 15px; min-height: 20px; }
-
-        /* --- 🥷 忍者按鈕 --- */
-        .btn-ninja { 
-            margin-top: 60px; 
-            background: var(--bg); color: var(--bg); border: none; font-size: 0.8rem;
-            cursor: default; transition: 0.2s;
+        /* --- 1. 核心變數與重置 --- */
+        :root { 
+            --bg: #F8F6F4; --card: #FFFFFF; 
+            --text-main: #4E342E; --text-sub: #8D6E63;
+            --primary: #5D4037; --danger: #EF5350;
+            --input-bg: #F2F2F7; --radius: 16px;
+            --shadow: 0 4px 20px rgba(109, 76, 65, 0.05);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
-        .btn-ninja:hover { cursor: pointer; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Noto Sans TC', sans-serif; margin: 0; padding: 0; padding-bottom: 100px; }
 
-        /* --- 產生器視窗 --- */
-        #gen_modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .gen-box { background: white; padding: 30px; border-radius: 16px; width: 320px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.2rem; color: #999; }
-        .gen-result { background: #EEE; padding: 10px; border-radius: 8px; margin-top: 15px; word-break: break-all; font-family: monospace; display: none; color: #333; font-size: 0.9rem; }
+        /* --- 2. 頂部導航 (App Header) --- */
+        .app-header {
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            padding: 15px 20px; position: sticky; top: 0; z-index: 50;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .app-title { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin: 0; }
+        .btn-logout { background: #F5F5F5; border: none; padding: 6px 12px; border-radius: 20px; color: var(--text-sub); font-size: 0.85rem; font-weight: bold; cursor: pointer; }
 
-        /* --- 後台主介面 --- */
-        #admin_view { display: none; padding: 20px; padding-bottom: 80px; max-width: 800px; margin: 0 auto; }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab { flex: 1; min-width: 80px; text-align: center; padding: 10px; background: #E0D8D4; border-radius: 10px; cursor: pointer; color: #795548; font-weight: bold; white-space: nowrap; transition: 0.2s; }
-        .tab.active { background: #8D7B6F; color: white; transform: scale(1.02); }
-        .page { display: none; animation: fadeIn 0.3s; }
+        /* --- 3. iOS 分頁選單 --- */
+        .tabs-wrapper { padding: 10px 20px; background: var(--bg); position: sticky; top: 60px; z-index: 40; }
+        .tabs { display: flex; background: #E0E0E0; padding: 4px; border-radius: 12px; }
+        .tab { flex: 1; text-align: center; padding: 8px 0; border-radius: 9px; font-size: 0.9rem; font-weight: bold; color: #9E9E9E; cursor: pointer; transition: 0.2s; }
+        .tab.active { background: var(--card); color: var(--text-main); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+        /* --- 4. 內容卡片 --- */
+        .page { display: none; padding: 10px 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--card); padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
-        .section-header { font-size: 1.1rem; font-weight: bold; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        label { display: block; margin-top: 12px; font-size: 0.9rem; color: #8D6E63; font-weight: bold; margin-bottom: 4px; }
-        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: none; background: var(--input-bg); border-radius: 8px; font-size: 1rem; color: var(--text); outline: none; box-sizing: border-box; }
-        button.btn-act { border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
-        .btn-add { background: #81C784; color: white; width: 100%; margin-top: 10px; padding: 12px; }
-        .btn-del { background: transparent; color: var(--danger); border: 1px solid var(--danger); position: absolute; top: 15px; right: 15px; padding: 4px 10px; font-size: 0.8rem; }
-        .btn-save { background: #4E342E; color: white; width: 100%; padding: 16px; font-size: 1.1rem; position: fixed; bottom: 0; left: 0; border:none; border-radius: 20px 20px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 50; cursor: pointer; }
-        .price-group { background: #FAFAFA; padding: 10px; border-radius: 10px; margin-top: 8px; border: 1px dashed #E0E0E0; }
+        .card { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 15px; box-shadow: var(--shadow); position: relative; }
+        .section-header { font-size: 1.1rem; font-weight: 800; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; color: var(--text-main); }
+
+        /* --- 5. 輸入元件 --- */
+        label { display: block; margin-top: 15px; font-size: 0.85rem; color: var(--text-sub); font-weight: bold; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px; border: none; background: var(--input-bg); border-radius: 10px; font-size: 1rem; color: var(--text-main); outline: none; font-weight: 500; transition: 0.2s; }
+        input:focus { background: #EAEAEA; }
+
+        /* 價格群組 */
+        .price-group { background: #FAFAFA; padding: 12px; border-radius: 12px; margin-top: 10px; border: 1px dashed #E0E0E0; }
         .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .price-label { width: 50px; font-size: 0.85rem; color: #999; }
+        .price-row:last-child { margin-bottom: 0; }
+        .price-label { width: 50px; font-size: 0.85rem; color: #9E9E9E; font-weight: bold; }
+
+        /* --- 6. 按鈕 --- */
+        .btn-act { border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+        .btn-act:active { transform: scale(0.95); }
+        .btn-add { background: var(--primary); color: white; width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; font-size: 1rem; }
+        .btn-del { background: #FFEBEE; color: var(--danger); border: none; width: 28px; height: 28px; border-radius: 50%; position: absolute; top: 15px; right: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight:bold; }
+
+        /* --- 7. 底部浮動操作列 (App Toolbar) --- */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: white; 
+            padding: 15px 20px calc(15px + var(--safe-bottom));
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+            z-index: 90;
+            display: flex; gap: 12px;
+            transform: translateY(100%); /* 預設隱藏 */
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .bottom-bar.show { transform: translateY(0); } /* 顯示時滑上來 */
+
+        .btn-cancel { flex: 1; background: #F5F5F5; color: #757575; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn-save { flex: 2; background: var(--primary); color: white; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(93, 64, 55, 0.3); }
+
+        /* --- 8. 登入 & 產生器 --- */
+        #login_view { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background: var(--bg); transition: 0.3s; }
+        .login-card { background: white; width: 85%; max-width: 350px; padding: 40px 30px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center; }
+        .login-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 25px; }
+        .btn-login { background: var(--primary); color: white; width: 100%; padding: 14px; border-radius: 50px; border: none; font-size: 1rem; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 15px rgba(93, 64, 55, 0.2); cursor: pointer; }
+        select.form-control { width: 100%; padding: 12px; border: none; background: var(--input-bg); border-radius: 10px; font-size: 1rem; outline: none; -webkit-appearance: none; color: var(--text-main); margin-bottom: 15px; }
+        
+        .btn-ninja { margin-top: 50px; background: transparent; color: var(--bg); border: none; font-size: 1rem; width: 100px; height: 50px; cursor: default; }
+        .btn-ninja:hover { cursor: pointer; }
+
+        #gen_modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 200; justify-content: center; align-items: center; }
+        .gen-box { background: white; padding: 30px; border-radius: 20px; width: 320px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
     <div id="login_view">
-        <div class="login-header">
-            <h1>Fairy. L 後台管理</h1>
-            <span>Fairy. L System</span>
+        <div style="text-align:center; margin-bottom:30px;">
+            <h1 style="margin:0; font-size:1.8rem; color:var(--text-main);">Fairy. L</h1>
+            <span style="color:var(--text-sub);">後台管理系統</span>
         </div>
         <div class="login-card">
             <div class="login-title">管理者登入</div>
-            <div class="form-group">
-                <select id="user_select" class="form-control">
-                    <option value="" disabled selected>讀取使用者中...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input type="password" id="password_input" class="form-control" placeholder="•••••">
-            </div>
+            <select id="user_select" class="form-control">
+                <option value="" disabled selected>讀取使用者中...</option>
+            </select>
+            <input type="password" id="password_input" placeholder="輸入密碼" style="text-align:center; letter-spacing:3px;">
             <button class="btn-login" onclick="attemptLogin()">登入</button>
-            <div id="login_msg" class="error-msg"></div>
+            <div id="login_msg" style="color:#EF5350; font-size:0.85rem; margin-top:15px; height:20px;"></div>
         </div>
-        
-        <button class="btn-ninja" onclick="document.getElementById('gen_modal').style.display='flex'">• 產生金鑰 •</button>
+        <button class="btn-ninja" onclick="document.getElementById('gen_modal').style.display='flex'">•</button>
     </div>
 
     <div id="gen_modal">
         <div class="gen-box">
-            <div class="close-btn" onclick="document.getElementById('gen_modal').style.display='none'">✕</div>
-            <h3 style="margin-top:0; text-align:center; color:#4E342E">🔐 產生 Cipher 亂碼</h3>
-            <p style="text-align:center; color:#999; font-size:0.85rem; margin-bottom:15px;">只需 Token，帳號與 Repo 已內建</p>
-            
+            <div onclick="document.getElementById('gen_modal').style.display='none'" style="position:absolute; top:15px; right:15px; cursor:pointer; font-size:1.2rem; padding:5px;">✕</div>
+            <h3 style="margin-top:0; text-align:center; color:var(--text-main);">🔐 產生金鑰</h3>
+            <p style="text-align:center; font-size:0.85rem; color:#999; margin-bottom:20px;"> Token 會被加密打包</p>
             <label>GitHub Token</label>
             <input type="text" id="g_token" placeholder="ghp_xxxxxxxx...">
-            
             <label>設定密碼</label>
-            <input type="text" id="g_pass" placeholder="輸入你想設定的密碼">
-
-            <button class="btn-login" style="margin-top:25px" onclick="generateCipher()">產生並顯示</button>
-            
-            <div id="g_result" class="gen-result"></div>
-            <div id="g_msg" style="color:green; font-size:0.8rem; text-align:center; margin-top:5px; display:none;">✅ 已複製！請貼到 JSON</div>
+            <input type="text" id="g_pass" placeholder="設定你的登入密碼">
+            <button class="btn-login" style="margin-top:25px" onclick="generateCipher()">產生並複製</button>
+            <div id="g_result" style="display:none; margin-top:15px; padding:10px; background:#F5F5F5; word-break:break-all; font-family:monospace; border-radius:8px; font-size:0.8rem; color:#333;"></div>
+            <div id="g_msg" style="display:none; color:green; text-align:center; font-size:0.8rem; margin-top:5px;">✅ 已複製！請貼到 JSON</div>
         </div>
     </div>
 
-    <div id="admin_view">
-        <div class="header-bar">
-            <h2 style="margin:0">後台管理</h2>
-            <button onclick="location.reload()" style="background:#EEE; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">登出</button>
+    <div id="admin_view" style="display:none;">
+        <div class="app-header">
+            <div class="app-title">後台管理</div>
+            <button class="btn-logout" onclick="location.reload()">登出</button>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('tab_settings')">全域設定</div>
-            <div class="tab" onclick="switchTab('tab_categories')">服務菜單</div>
-            <div class="tab" onclick="switchTab('tab_others')">卸甲 & 加購</div>
+        <div class="tabs-wrapper">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tab_settings')">全域設定</div>
+                <div class="tab" onclick="switchTab('tab_categories')">服務菜單</div>
+                <div class="tab" onclick="switchTab('tab_others')">其他項目</div>
+            </div>
         </div>
 
         <div id="tab_settings" class="page active">
             <div class="card">
                 <div class="section-header">🎂 優惠與其他</div>
                 <label>當月壽星折扣 (0.9 = 9折)</label>
-                <input type="number" id="set_birthday" step="0.01" placeholder="0.9">
+                <input type="number" id="set_birthday" step="0.01" oninput="checkChanges()">
             </div>
             <div class="card">
                 <div class="section-header">📍 位置加價</div>
                 <label>手部顯示名稱</label>
-                <input type="text" id="set_hand_name" placeholder="🖐️ 手部">
+                <input type="text" id="set_hand_name" oninput="checkChanges()">
                 <label>足部顯示名稱</label>
-                <input type="text" id="set_foot_name" placeholder="🦶 足部">
+                <input type="text" id="set_foot_name" oninput="checkChanges()">
                 <label>足部加價金額 ($)</label>
-                <input type="number" id="set_foot_price" placeholder="200">
+                <input type="number" id="set_foot_price" oninput="checkChanges()">
             </div>
         </div>
 
         <div id="tab_categories" class="page">
             <div id="categories_container"></div>
-            <button class="btn-act btn-add" onclick="addCategory()">+ 新增服務大分類</button>
+            <button class="btn-add" onclick="addCategory()">+ 新增服務大分類</button>
         </div>
 
         <div id="tab_others" class="page">
-            <div class="section-header"><span>💅 卸甲項目</span><button class="btn-act" style="background:#8D6E63; color:white;" onclick="addRemoval()">+ 新增</button></div>
+            <div class="section-header"><span>💅 卸甲項目</span><button class="btn-act" style="background:#D7CCC8; color:var(--text-main);" onclick="addRemoval()">新增</button></div>
             <div id="removals_container"></div>
-            <div class="section-header" style="margin-top:30px"><span>➕ 加購項目</span><button class="btn-act" style="background:#8D6E63; color:white;" onclick="addAddon()">+ 新增</button></div>
+            <div class="section-header" style="margin-top:30px"><span>➕ 加購項目</span><button class="btn-act" style="background:#D7CCC8; color:var(--text-main);" onclick="addAddon()">新增</button></div>
             <div id="addons_container"></div>
         </div>
 
-        <button class="btn-save" onclick="saveData()">💾 儲存並發布更新</button>
+        <div class="bottom-bar" id="action_bar">
+            <button class="btn-cancel" onclick="cancelChanges()">取消復原</button>
+            <button class="btn-save" onclick="saveData()">確認儲存</button>
+        </div>
     </div>
 
     <script>
-        // --- 核心設定 (請確認這裡是否正確) ---
-        const GITHUB_CONFIG = {
-            user: "machael090807",     // 你的 GitHub 帳號
-            repo: "nail-calculator",   // 你的 Repo 名稱
-            path: "data.json"          // 檔案名稱
-        };
+        // --- 核心設定 ---
+        const GITHUB_CONFIG = { user: "machael090807", repo: "nail-calculator", path: "data.json" };
 
         let DATA = { settings: {}, categories: [], removals: [], add_ons: [], sha: "" };
+        let ORIGINAL_DATA_STR = ""; // 用來儲存「剛讀取時」的狀態
         let USER_LIST = [];
-        let CURRENT_TOKEN = ""; // 登入後儲存 Token
+        let CURRENT_TOKEN = "";
 
+        // --- 初始化 ---
         window.onload = async function() {
             try {
                 const res = await fetch('admin_user.json?v=' + Date.now());
                 if(res.ok) {
                     USER_LIST = await res.json();
                     renderUserSelect();
-                } else { throw new Error(""); }
-            } catch(e) {
-                document.getElementById('login_msg').innerText = "⚠️ 找不到 admin_user.json";
-            }
+                }
+            } catch(e) {}
         };
 
         function renderUserSelect() {
@@ -182,138 +197,139 @@
             select.innerHTML = '';
             USER_LIST.forEach((u, idx) => {
                 const opt = document.createElement('option');
-                opt.value = idx;
-                opt.innerText = u.name;
+                opt.value = idx; opt.innerText = u.name;
                 select.appendChild(opt);
             });
         }
 
-        // --- 產生亂碼 (只加密 Token) ---
-        function generateCipher() {
-            const t = document.getElementById('g_token').value.trim();
-            const p = document.getElementById('g_pass').value.trim();
-            
-            if(!t || !p) return alert("請填寫 Token 和 密碼");
-
-            // 這裡只加密 Token
-            const cipher = btoa(xor_process(t, p)); 
-
-            const box = document.getElementById('g_result');
-            box.innerText = cipher;
-            box.style.display = 'block';
-            
-            navigator.clipboard.writeText(cipher).then(() => {
-                document.getElementById('g_msg').style.display = 'block';
-            });
-        }
-
-        // --- 登入功能 ---
+        // --- 登入邏輯 ---
         function attemptLogin() {
-            const userIdx = document.getElementById('user_select').value;
+            const idx = document.getElementById('user_select').value;
             const pwd = document.getElementById('password_input').value;
             const msg = document.getElementById('login_msg');
             
-            if(!pwd) return msg.innerText = "請輸入密碼";
-            const targetUser = USER_LIST[userIdx];
-            if(!targetUser) return;
-
+            if(!pwd || idx === "") return msg.innerText = "請輸入密碼";
+            
+            const target = USER_LIST[idx];
             msg.innerText = "驗證中...";
             
-            // 解密得到 Token
-            const decryptedToken = xor_process(atob(targetUser.cipher), pwd);
+            const token = xor_process(atob(target.cipher), pwd);
 
-            // 驗證 Token 格式
-            if(decryptedToken.startsWith('ghp_') || decryptedToken.length > 20) {
-                CURRENT_TOKEN = decryptedToken;
-                
-                // 使用解開的 Token + 內建的 User/Repo 連線
+            if(token.startsWith('ghp_') || token.length > 20) {
+                CURRENT_TOKEN = token;
                 loadDataFromGitHub().then(() => {
                     document.getElementById('login_view').style.opacity = '0';
                     setTimeout(() => {
                         document.getElementById('login_view').style.display = 'none';
                         document.getElementById('admin_view').style.display = 'block';
                     }, 300);
-                }).catch((e) => {
-                    console.log(e);
-                    msg.innerText = "❌ 密碼正確但 Token 無效";
-                });
+                }).catch(() => msg.innerText = "❌ 密碼正確但無法連線");
             } else {
                 msg.innerText = "❌ 密碼錯誤";
             }
         }
 
-        function xor_process(text, key) {
-            let result = '';
-            for (let i = 0; i < text.length; i++) {
-                result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-            }
-            return result;
-        }
-
+        // --- GitHub API 讀取 ---
         async function loadDataFromGitHub() {
-            // 使用 CURRENT_TOKEN 和 GITHUB_CONFIG 連線
             const url = `https://api.github.com/repos/${GITHUB_CONFIG.user}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
             const res = await fetch(url, { headers: { 'Authorization': `token ${CURRENT_TOKEN}` } });
             if (!res.ok) throw new Error("API Error");
             const json = await res.json();
             const content = decodeURIComponent(escape(atob(json.content)));
+            
             DATA = JSON.parse(content);
             DATA.sha = json.sha;
             if (!DATA.settings) DATA.settings = {};
+
+            // ★ 關鍵：把原始資料存起來，之後對比用
+            ORIGINAL_DATA_STR = JSON.stringify(DATA);
+            
             renderAll();
         }
 
-        // --- 渲染與操作邏輯 (完全相同) ---
-        function switchTab(id) {
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
+        // --- 核心：檢查是否有修改 (Dirty Check) ---
+        function checkChanges() {
+            // 1. 收集 Settings 的即時資料
+            DATA.settings.birthday_discount = parseFloat(document.getElementById('set_birthday').value);
+            DATA.settings.location_hand_name = document.getElementById('set_hand_name').value;
+            DATA.settings.location_foot_name = document.getElementById('set_foot_name').value;
+            DATA.settings.location_foot_surcharge = parseInt(document.getElementById('set_foot_price').value);
+
+            // 2. 比較目前的 DATA 跟 原始 DATA 是否一樣
+            const currentStr = JSON.stringify(DATA);
+            const bar = document.getElementById('action_bar');
+
+            if (currentStr !== ORIGINAL_DATA_STR) {
+                bar.classList.add('show'); // 有修改 -> 顯示按鈕
+            } else {
+                bar.classList.remove('show'); // 沒修改 -> 隱藏按鈕
+            }
         }
 
+        // --- 核心：取消復原 ---
+        function cancelChanges() {
+            if(confirm("確定要放棄所有修改，恢復成原本的樣子嗎？")) {
+                DATA = JSON.parse(ORIGINAL_DATA_STR); // 還原資料
+                renderAll(); // 重畫畫面
+                document.getElementById('action_bar').classList.remove('show'); // 隱藏按鈕
+            }
+        }
+
+        // --- 渲染畫面 ---
         function renderAll() {
             document.getElementById('set_birthday').value = DATA.settings.birthday_discount || 0.9;
             document.getElementById('set_hand_name').value = DATA.settings.location_hand_name || "🖐️ 手部";
             document.getElementById('set_foot_name').value = DATA.settings.location_foot_name || "🦶 足部";
             document.getElementById('set_foot_price').value = DATA.settings.location_foot_surcharge || 200;
 
-            const catContainer = document.getElementById('categories_container');
-            catContainer.innerHTML = '';
+            renderCategories();
+            renderRemovals();
+            renderAddons();
+        }
+
+        // 渲染 Helper
+        function renderCategories() {
+            const container = document.getElementById('categories_container');
+            container.innerHTML = '';
             (DATA.categories || []).forEach((cat, cIdx) => {
                 let itemsHtml = '';
                 cat.items.forEach((item, iIdx) => { itemsHtml += createItemHTML('cat', cIdx, iIdx, item); });
                 const div = document.createElement('div');
                 div.className = 'card';
                 div.innerHTML = `
-                    <button class="btn-del" onclick="delCategory(${cIdx})">刪除分類</button>
+                    <button class="btn-del" onclick="delCategory(${cIdx})">✕</button>
                     <label>分類標題</label>
-                    <input type="text" value="${cat.title}" onchange="DATA.categories[${cIdx}].title = this.value" style="font-weight:bold; font-size:1.1rem; color:#4E342E;">
-                    <div style="margin-top:15px; padding-left:10px; border-left: 3px solid #EFEBE9;">${itemsHtml}<button class="btn-act" style="background:#D7CCC8; color:#4E342E; margin-top:10px; width:100%" onclick="addItem(${cIdx})">+ 新增項目</button></div>`;
-                catContainer.appendChild(div);
+                    <input type="text" value="${cat.title}" oninput="DATA.categories[${cIdx}].title = this.value; checkChanges()">
+                    <div style="margin-top:15px; padding-left:10px; border-left: 3px solid #EFEBE9;">${itemsHtml}<button class="btn-act" style="background:#EEE; width:100%; margin-top:10px" onclick="addItem(${cIdx})">+ 新增項目</button></div>`;
+                container.appendChild(div);
             });
+        }
 
-            const rmContainer = document.getElementById('removals_container');
-            rmContainer.innerHTML = '';
+        function renderRemovals() {
+            const container = document.getElementById('removals_container');
+            container.innerHTML = '';
             (DATA.removals || []).forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'card';
                 div.innerHTML = createItemHTML('rm', null, idx, item);
-                rmContainer.appendChild(div);
+                container.appendChild(div);
             });
+        }
 
-            const addContainer = document.getElementById('addons_container');
-            addContainer.innerHTML = '';
+        function renderAddons() {
+            const container = document.getElementById('addons_container');
+            container.innerHTML = '';
             (DATA.add_ons || []).forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = 'card';
                 let priceHtml = item.prices && typeof item.prices === 'object' 
                     ? getPriceInputsHTML('addon', null, idx, item.prices)
-                    : `<label>單價</label><input type="number" value="${item.price||0}" onchange="updateAddonSimplePrice(${idx}, this.value)">`;
+                    : `<label>單價</label><input type="number" value="${item.price||0}" oninput="updateAddonSimplePrice(${idx}, this.value)">`;
                 div.innerHTML = `
-                    <button class="btn-del" onclick="delAddon(${idx})">刪除</button>
-                    <label>項目名稱</label><input type="text" value="${item.name}" onchange="DATA.add_ons[${idx}].name = this.value">
-                    <div style="display:flex; gap:10px"><div style="flex:1"><label>單位</label><input type="text" value="${item.unit_desc||''}" onchange="DATA.add_ons[${idx}].unit_desc = this.value"></div></div>${priceHtml}`;
-                addContainer.appendChild(div);
+                    <button class="btn-del" onclick="delAddon(${idx})">✕</button>
+                    <label>項目名稱</label><input type="text" value="${item.name}" oninput="DATA.add_ons[${idx}].name = this.value; checkChanges()">
+                    <div style="display:flex; gap:10px"><div style="flex:1"><label>單位</label><input type="text" value="${item.unit_desc||''}" oninput="DATA.add_ons[${idx}].unit_desc = this.value; checkChanges()"></div></div>${priceHtml}`;
+                container.appendChild(div);
             });
         }
 
@@ -321,9 +337,9 @@
             let prices = item.prices;
             let delFunc = type === 'cat' ? `delItem(${cIdx}, ${iIdx})` : `delRemoval(${iIdx})`;
             let nameChange = type === 'cat' ? `DATA.categories[${cIdx}].items[${iIdx}].name = this.value` : `DATA.removals[${iIdx}].name = this.value`;
-            return `<div style="background:#FAFAFA; padding:15px; border-radius:10px; margin-bottom:10px; position:relative; border:1px solid #EEE;">
-                    <button class="btn-del" style="top:5px; right:5px; padding:2px 8px" onclick="${delFunc}">x</button>
-                    <label style="margin-top:0">名稱</label><input type="text" value="${item.name}" onchange="${nameChange}" style="background:white">
+            return `<div style="background:#FAFAFA; padding:15px; border-radius:12px; margin-bottom:12px; position:relative; border:1px solid #EEE;">
+                    <button class="btn-del" style="width:24px; height:24px; font-size:0.8rem; top:10px; right:10px" onclick="${delFunc}">✕</button>
+                    <label style="margin-top:0">名稱</label><input type="text" value="${item.name}" oninput="${nameChange}; checkChanges()" style="background:white">
                     ${getPriceInputsHTML(type, cIdx, iIdx, prices)}</div>`;
         }
 
@@ -337,11 +353,12 @@
             };
             const val = (v) => Array.isArray(v) ? v[0] : (v === null ? '' : v);
             return `<div class="price-group">
-                    <div class="price-row"><span class="price-label">店長</span><input type="number" placeholder="無" value="${val(p.manager)}" onchange="${update('manager')}"></div>
-                    <div class="price-row"><span class="price-label">美甲師</span><input type="number" placeholder="無" value="${val(p.artist)}" onchange="${update('artist')}"></div>
-                    <div class="price-row"><span class="price-label">助理</span><input type="number" placeholder="無" value="${val(p.assistant)}" onchange="${update('assistant')}"></div></div>`;
+                    <div class="price-row"><span class="price-label">店長</span><input type="number" placeholder="無" value="${val(p.manager)}" oninput="${update('manager')}"></div>
+                    <div class="price-row"><span class="price-label">美甲師</span><input type="number" placeholder="無" value="${val(p.artist)}" oninput="${update('artist')}"></div>
+                    <div class="price-row"><span class="price-label">助理</span><input type="number" placeholder="無" value="${val(p.assistant)}" oninput="${update('assistant')}"></div></div>`;
         }
 
+        // --- 資料更新與變更檢查 ---
         function updatePrice(type, cIdx, iIdx, role, val) {
             let target;
             if (type === 'cat') target = DATA.categories[cIdx].items[iIdx];
@@ -349,40 +366,65 @@
             else if (type === 'addon') target = DATA.add_ons[iIdx];
             if (!target.prices || typeof target.prices !== 'object') target.prices = { manager:null, artist:null, assistant:null };
             target.prices[role] = val === '' ? null : parseInt(val);
+            checkChanges();
         }
-        function updateAddonSimplePrice(idx, val) { DATA.add_ons[idx].price = parseInt(val) || 0; delete DATA.add_ons[idx].prices; }
+        function updateAddonSimplePrice(idx, val) { DATA.add_ons[idx].price = parseInt(val) || 0; delete DATA.add_ons[idx].prices; checkChanges(); }
 
-        function addCategory() { DATA.categories.push({ title: "新分類", items: [] }); renderAll(); }
-        function delCategory(idx) { if(confirm("確定刪除此分類？")) { DATA.categories.splice(idx, 1); renderAll(); } }
-        function addItem(cIdx) { DATA.categories[cIdx].items.push({ id: 'i'+Date.now(), name: "新項目", prices: { manager:0, artist:0, assistant:0 } }); renderAll(); }
-        function delItem(cIdx, iIdx) { DATA.categories[cIdx].items.splice(iIdx, 1); renderAll(); }
-        function addRemoval() { DATA.removals.push({ id: 'r'+Date.now(), name: "新卸甲", prices: { manager:0, artist:0, assistant:0 } }); renderAll(); }
-        function delRemoval(idx) { DATA.removals.splice(idx, 1); renderAll(); }
-        function addAddon() { DATA.add_ons.push({ id: 'a'+Date.now(), name: "新加購", price: 100 }); renderAll(); }
-        function delAddon(idx) { DATA.add_ons.splice(idx, 1); renderAll(); }
+        // --- 新增/刪除 (都需要觸發 render 和 checkChanges) ---
+        function addCategory() { DATA.categories.push({ title: "新分類", items: [] }); renderAll(); checkChanges(); }
+        function delCategory(idx) { if(confirm("確定刪除此分類？")) { DATA.categories.splice(idx, 1); renderAll(); checkChanges(); } }
+        function addItem(cIdx) { DATA.categories[cIdx].items.push({ id: 'i'+Date.now(), name: "新項目", prices: { manager:0, artist:0, assistant:0 } }); renderAll(); checkChanges(); }
+        function delItem(cIdx, iIdx) { DATA.categories[cIdx].items.splice(iIdx, 1); renderAll(); checkChanges(); }
+        function addRemoval() { DATA.removals.push({ id: 'r'+Date.now(), name: "新卸甲", prices: { manager:0, artist:0, assistant:0 } }); renderAll(); checkChanges(); }
+        function delRemoval(idx) { DATA.removals.splice(idx, 1); renderAll(); checkChanges(); }
+        function addAddon() { DATA.add_ons.push({ id: 'a'+Date.now(), name: "新加購", price: 100 }); renderAll(); checkChanges(); }
+        function delAddon(idx) { DATA.add_ons.splice(idx, 1); renderAll(); checkChanges(); }
 
+        // --- 儲存 ---
         async function saveData() {
-            DATA.settings.birthday_discount = parseFloat(document.getElementById('set_birthday').value);
-            DATA.settings.location_hand_name = document.getElementById('set_hand_name').value;
-            DATA.settings.location_foot_name = document.getElementById('set_foot_name').value;
-            DATA.settings.location_foot_surcharge = parseInt(document.getElementById('set_foot_price').value);
-            
             const btn = document.querySelector('.btn-save');
             const originalText = btn.innerText;
-            btn.innerText = "⏳ 儲存中...";
+            btn.innerText = "⏳ 處理中...";
             
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
-            const body = { message: "Update via Admin Panel", content: content, sha: DATA.sha };
+            const body = { message: "Update via Admin", content: content, sha: DATA.sha };
             
             try {
-                // 使用內建的 GITHUB_CONFIG + 解密的 CURRENT_TOKEN
                 const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.user}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${CURRENT_TOKEN}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
-                if (res.ok) { const json = await res.json(); DATA.sha = json.content.sha; alert("✅ 儲存成功！"); } else throw new Error("Save Failed");
+                if (res.ok) { 
+                    const json = await res.json(); 
+                    DATA.sha = json.content.sha; 
+                    ORIGINAL_DATA_STR = JSON.stringify(DATA); // 更新原始資料狀態
+                    document.getElementById('action_bar').classList.remove('show'); // 隱藏按鈕
+                    alert("✅ 儲存成功！請稍待幾分鐘刷新前台"); 
+                } else throw new Error();
             } catch (e) { alert("❌ 儲存失敗"); } finally { btn.innerText = originalText; }
+        }
+
+        // --- 工具 ---
+        function switchTab(id) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+        function generateCipher() {
+            const t = document.getElementById('g_token').value.trim();
+            const p = document.getElementById('g_pass').value.trim();
+            if(!t || !p) return alert("請填寫資料");
+            const c = btoa(xor_process(t, p));
+            document.getElementById('g_result').innerText = c;
+            document.getElementById('g_result').style.display='block';
+            navigator.clipboard.writeText(c).then(() => document.getElementById('g_msg').style.display='block');
+        }
+        function xor_process(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) { result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length)); }
+            return result;
         }
     </script>
 </body>
