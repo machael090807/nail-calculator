@@ -207,14 +207,14 @@
     ],
     "add_ons": [
         {
-            "id": "jump_color",
-            "name": "跳色",
-            "unit_desc": "/ 指",
+            "id": "a1766500305205",
+            "name": "新加購1111",
             "price": 100
         },
         {
-            "id": "a1766500305205",
-            "name": "新加購1111",
+            "id": "jump_color",
+            "name": "跳色",
+            "unit_desc": "/ 指",
             "price": 100
         },
         {
