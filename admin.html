@@ -88,8 +88,8 @@
                     // 登入成功
                     document.getElementById('welcome-text').innerText = `👋 歡迎回來，${foundUser.name}`;
                     
-                    // 3. 解碼 Token
-                    realToken = atob(foundUser.encodedToken);
+                    // 3. 直接讀取 Token (不解碼)
+                    realToken = foundUser.encodedToken;
 
                     // 4. 連線 GitHub 讀取價格表
                     btn.innerText = '讀取價格表中...';
