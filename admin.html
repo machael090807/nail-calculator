@@ -29,15 +29,19 @@
         .btn-login:active { transform: scale(0.98); }
         .error-msg { color: #E57373; font-size: 0.85rem; margin-top: 15px; min-height: 20px; }
 
-        /* --- 🥷 忍者按鈕 --- */
+        /* --- 🥷 忍者按鈕 (隱藏版) --- */
         .btn-ninja { 
             margin-top: 60px; 
-            background: var(--bg); color: var(--bg); border: none; font-size: 0.8rem;
-            cursor: default; transition: 0.2s;
+            background: var(--bg); 
+            color: var(--bg); 
+            border: none; 
+            font-size: 0.8rem;
+            cursor: default; 
+            transition: 0.2s;
         }
         .btn-ninja:hover { cursor: pointer; }
 
-        /* --- 產生器視窗 --- */
+        /* --- 產生器視窗 (Modal) --- */
         #gen_modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .gen-box { background: white; padding: 30px; border-radius: 16px; width: 320px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.2rem; color: #999; }
@@ -93,17 +97,11 @@
         <div class="gen-box">
             <div class="close-btn" onclick="document.getElementById('gen_modal').style.display='none'">✕</div>
             <h3 style="margin-top:0; text-align:center; color:#4E342E">🔐 產生 Cipher 亂碼</h3>
-            <p style="text-align:center; color:#999; font-size:0.85rem; margin-bottom:15px;">資訊將會被打包並加密</p>
+            <p style="text-align:center; color:#999; font-size:0.85rem; margin-bottom:20px;">僅加密 Token，其餘資訊請填於 JSON</p>
             
             <label>GitHub Token</label>
             <input type="text" id="g_token" placeholder="ghp_xxxxxxxx...">
             
-            <label>GitHub 帳號 (User)</label>
-            <input type="text" id="g_user" placeholder="machael090807">
-
-            <label>Repo 名稱</label>
-            <input type="text" id="g_repo" placeholder="nail-calculator" value="nail-calculator">
-
             <label>設定密碼</label>
             <input type="text" id="g_pass" placeholder="輸入你想設定的密碼">
 
@@ -186,18 +184,15 @@
             });
         }
 
-        // --- 產生亂碼 (打包所有資訊) ---
+        // --- 產生亂碼 (只加密 Token) ---
         function generateCipher() {
             const t = document.getElementById('g_token').value.trim();
-            const u = document.getElementById('g_user').value.trim();
-            const r = document.getElementById('g_repo').value.trim();
             const p = document.getElementById('g_pass').value.trim();
             
-            if(!t || !u || !r || !p) return alert("請填寫所有欄位");
+            if(!t || !p) return alert("請填寫 GitHub Token 和密碼");
 
-            // 格式：token|user|repo
-            const raw = `${t}|${u}|${r}`;
-            const cipher = btoa(xor_process(raw, p)); 
+            // 直接加密 Token (不包含 user/repo)
+            const cipher = btoa(xor_process(t, p)); 
 
             const box = document.getElementById('g_result');
             box.innerText = cipher;
@@ -208,7 +203,7 @@
             });
         }
 
-        // --- 登入功能 (解密並拆解) ---
+        // --- 登入功能 ---
         function attemptLogin() {
             const userIdx = document.getElementById('user_select').value;
             const pwd = document.getElementById('password_input').value;
@@ -218,17 +213,21 @@
             const targetUser = USER_LIST[userIdx];
             if(!targetUser) return;
 
+            // 檢查 JSON 格式是否完整
+            if(!targetUser.user || !targetUser.repo) {
+                return msg.innerText = "❌ JSON 設定檔缺少 user 或 repo 欄位";
+            }
+
             msg.innerText = "驗證中...";
             
-            // 解密
-            const decrypted = xor_process(atob(targetUser.cipher), pwd);
-            const parts = decrypted.split('|');
+            // 解密只會得到 Token
+            const decryptedToken = xor_process(atob(targetUser.cipher), pwd);
 
-            // 檢查格式是否正確 (必須包含 gh_token, user, repo)
-            if(parts.length >= 3 && parts[0].startsWith('ghp_')) {
-                CURRENT_CONFIG.token = parts[0];
-                CURRENT_CONFIG.user = parts[1];
-                CURRENT_CONFIG.repo = parts[2];
+            // 簡單驗證 Token 格式 (ghp 開頭 或 長度足夠)
+            if(decryptedToken.startsWith('ghp_') || decryptedToken.length > 20) {
+                CURRENT_CONFIG.token = decryptedToken;
+                CURRENT_CONFIG.user = targetUser.user;
+                CURRENT_CONFIG.repo = targetUser.repo;
                 
                 loadDataFromGitHub().then(() => {
                     document.getElementById('login_view').style.opacity = '0';
@@ -236,8 +235,9 @@
                         document.getElementById('login_view').style.display = 'none';
                         document.getElementById('admin_view').style.display = 'block';
                     }, 300);
-                }).catch(() => {
-                    msg.innerText = "❌ 密碼正確但無法連線 GitHub (請檢查 Token)";
+                }).catch((e) => {
+                    console.log(e);
+                    msg.innerText = "❌ 密碼正確但 Token 無效或連線失敗";
                 });
             } else {
                 msg.innerText = "❌ 密碼錯誤";
