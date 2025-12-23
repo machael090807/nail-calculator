@@ -80,7 +80,7 @@
         }
         .pos-card.active .check-icon { background: var(--text-secondary); border-color: var(--text-secondary); }
 
-        /* Stepper & Input Row 樣式 */
+        /* Stepper & Input Row */
         .stepper-row {
             background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
             display: flex; align-items: center; justify-content: space-between;
@@ -102,34 +102,16 @@
         .btn-step:active { transform: scale(0.9); }
         .step-val { font-weight: bold; width: 20px; text-align: center; }
 
-        /* 👇👇👇 新增：膠囊型輸入框樣式 (修復破版) 👇👇👇 */
+        /* 膠囊輸入框 */
         .input-pill {
-            background: #F5F5F5; /* 與加減按鈕一致的灰色背景 */
-            border-radius: 20px;
-            padding: 0 15px;
-            height: 40px;
-            width: 130px; /* 固定寬度，防止手機版擠壓 */
-            display: flex;
-            align-items: center;
+            background: #F5F5F5; border-radius: 20px; padding: 0 15px; height: 40px; width: 130px;
+            display: flex; align-items: center;
         }
         .input-pill input {
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: right;
-            font-size: 1rem;
-            outline: none;
-            color: var(--text-primary);
-            padding: 0;
-            margin: 0;
-            font-weight: bold;
+            border: none; background: transparent; width: 100%; text-align: right;
+            font-size: 1rem; outline: none; color: var(--text-primary); padding: 0; margin: 0; font-weight: bold;
         }
-        .input-pill input::placeholder {
-            color: #AAA;
-            font-weight: normal;
-            font-size: 0.9rem;
-        }
-        /* 移除瀏覽器預設的數字箭頭 */
+        .input-pill input::placeholder { color: #AAA; font-weight: normal; font-size: 0.9rem; }
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -182,9 +164,9 @@
     </header>
 
     <div class="role-tabs">
-        <div class="role-tab active" onclick="setRole('manager')">店長</div>
-        <div class="role-tab" onclick="setRole('artist')">美甲師</div>
-        <div class="role-tab" onclick="setRole('assistant')">助理</div>
+        <div class="role-tab" id="tab_manager" onclick="setRole('manager')">店長</div>
+        <div class="role-tab active" id="tab_artist" onclick="setRole('artist')">美甲師</div>
+        <div class="role-tab" id="tab_assistant" onclick="setRole('assistant')">助理</div>
     </div>
 
     <div class="section-title">基礎服務</div>
@@ -261,7 +243,7 @@
     </div>
 
     <div style="text-align:center;">
-        <button class="btn-reset" onclick="location.reload()">重新計算</button>
+        <button class="btn-reset" onclick="resetAll()">清除重算 (保留職位)</button>
     </div>
 
 
@@ -288,10 +270,9 @@
         };
         const REMOVE_NAMES = {'none':'無', 'our_shop':'本店卸甲', 'other_shop':'他店卸甲', 'pure':'純卸甲'};
 
-        let currentRole = 'artist'; 
+        let currentRole = 'artist'; // ✅ 預設為美甲師，與 HTML class="active" 保持一致
         let selectedService = 'single';
         let selectedRemove = 'none';
-        
         let counts = { 'jump_color': 0, 'toe_ext': 0 };
 
         function init() {
@@ -302,10 +283,36 @@
             calculate();
         }
 
+        // ✅ 新增：清除重算功能 (不重整網頁，保留職位)
+        function resetAll() {
+            // 重置變數
+            selectedService = 'single';
+            selectedRemove = 'none';
+            counts = { 'jump_color': 0, 'toe_ext': 0 };
+
+            // 重置介面數值
+            document.getElementById('pos_hand').checked = true;
+            document.getElementById('pos_foot').checked = false;
+            document.getElementById('addon_price').value = '';
+            document.getElementById('birthday').checked = false;
+            document.getElementById('val_jump_color').innerText = '0';
+            document.getElementById('val_toe_ext').innerText = '0';
+
+            // 重新渲染與計算
+            togglePos('hand');
+            togglePos('foot');
+            renderServices();
+            renderRemoves();
+            calculate();
+            
+            // 提示一下
+            // alert('已清除選項，職位保留'); 
+        }
+
         function setRole(role) {
             currentRole = role;
             document.querySelectorAll('.role-tab').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+            document.getElementById(`tab_${role}`).classList.add('active');
             renderServices();
             calculate();
         }
