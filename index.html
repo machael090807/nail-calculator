@@ -14,18 +14,6 @@
         :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --sub-text: #8D6E63; --brown: #8D7B6F; --radius: 16px; }
         body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 20px 20px 50px; margin: 0; -webkit-tap-highlight-color: transparent; }
         
-        /* [新增] Logo 樣式：圓形、置中、陰影 */
-        .app-logo {
-            display: block;
-            width: 80px;            /* 圖片寬度，可自行調整 */
-            height: 80px;           /* 圖片高度 */
-            border-radius: 50%;     /* 變成圓形 */
-            object-fit: cover;      /* 確保圖片比例不變形 */
-            margin: 0 auto 10px;    /* 置中並與下方文字保持距離 */
-            box-shadow: 0 5px 15px rgba(141, 123, 111, 0.2); /* 淡淡的陰影增加質感 */
-            border: 3px solid white; /* 加上白邊框更像 app icon */
-        }
-
         h1 { text-align: center; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
         .subtitle { text-align: center; font-size: 0.9rem; color: var(--sub-text); margin-bottom: 25px; }
         .section-title { font-size: 1.1rem; font-weight: bold; margin: 30px 0 15px; }
@@ -65,7 +53,6 @@
     <div id="loading">讀取設定檔...</div>
 
     <header>
-        <img src="logo.jpg" class="app-logo" alt="Fairy. L Logo">
         <h1>Fairy. L</h1>
         <div class="subtitle">美甲計算機</div>
     </header>
@@ -150,8 +137,15 @@
                 if (DATA.add_ons) DATA.add_ons.forEach(i => { ITEMS[i.id] = i; STATE.addons[i.id] = 0; });
 
                 // 預設選取
-                if (DATA.categories && DATA.categories.length > 0) STATE.serviceId = DATA.categories[0].items[0].id;
-                if (DATA.removals && DATA.removals.length > 0) STATE.removeId = DATA.removals[0].id;
+                if (DATA.categories && DATA.categories.length > 0) {
+                     // 需確保預設選取的項目不是 null
+                     const firstValid = DATA.categories[0].items.find(i => getPrice(i) !== null);
+                     if(firstValid) STATE.serviceId = firstValid.id;
+                }
+                if (DATA.removals && DATA.removals.length > 0) {
+                     const firstValidRemove = DATA.removals.find(i => getPrice(i) !== null);
+                     if(firstValidRemove) STATE.removeId = firstValidRemove.id;
+                }
 
                 renderAll();
                 document.getElementById('loading').style.display = 'none';
@@ -166,19 +160,16 @@
             renderServices();
             renderRemoves();
             renderAddons();
-            updateGlobalUI(); // 更新位置名稱與優惠折數顯示
-            updateUI(); // 更新勾選狀態
+            updateGlobalUI(); 
+            updateUI(); 
             calculate();
         }
 
-        // 更新介面上的文字 (從設定檔讀取)
         function updateGlobalUI() {
             const s = DATA.settings;
-            // 位置名稱 + 價格
             document.getElementById('txt_hand').innerText = s.location_hand_name || "🖐️ 手部";
             document.getElementById('txt_foot').innerText = `${s.location_foot_name || "🦶 足部"} (+$${s.location_foot_surcharge})`;
             
-            // 壽星優惠折數顯示
             const discountRate = s.birthday_discount || 0.9;
             let discountText = (discountRate * 10).toString().replace('.5', '.5') + "折"; 
             if (discountRate === 1) discountText = "無折扣";
@@ -191,6 +182,7 @@
             if (!DATA.categories) return;
 
             DATA.categories.forEach(cat => {
+                // 邏輯修改：過濾掉價格為 null 的項目
                 const validItems = cat.items.filter(item => getPrice(item) !== null);
                 if (validItems.length === 0) return;
 
@@ -198,7 +190,15 @@
                 validItems.forEach(item => {
                     const price = getPrice(item);
                     const isActive = STATE.serviceId === item.id ? 'active' : '';
-                    const priceTxt = Array.isArray(price) ? `$${price[0]}` : `$${price}`;
+                    
+                    // 邏輯修改：若非陣列且為0，顯示免費
+                    let priceTxt = '';
+                    if (Array.isArray(price)) {
+                        priceTxt = `$${price[0]}`;
+                    } else {
+                        priceTxt = (price === 0) ? '免費' : `$${price}`;
+                    }
+
                     html += `
                         <div class="card ${isActive}" onclick="selectService('${item.id}')">
                             <div style="font-weight:bold">${item.name}</div>
@@ -215,8 +215,14 @@
             if (!DATA.removals) return;
             container.innerHTML = DATA.removals.map(item => {
                 const price = getPrice(item);
+                
+                // 邏輯修改：價格為 null 直接回傳空字串 (不顯示)
+                if (price === null) return '';
+
                 const isActive = STATE.removeId === item.id ? 'active' : '';
+                // 邏輯修改：0元顯示免費
                 const priceTxt = price === 0 ? '免費' : `$${price}`;
+                
                 return `
                     <div class="card ${isActive}" onclick="selectRemove('${item.id}')">
                         <div style="font-weight:bold">${item.name}</div>
@@ -230,12 +236,18 @@
             if (!DATA.add_ons) return;
             container.innerHTML = DATA.add_ons.map(item => {
                 const price = getPrice(item);
+                
+                // 邏輯修改：價格為 null 不顯示
                 if (price === null) return '';
+
+                // 邏輯修改：0元顯示免費
+                const priceTxt = (price === 0) ? '免費' : `$${price}`;
+
                 return `
                     <div class="card card-row" style="margin-bottom:10px">
                         <div>
                             <div style="font-weight:bold">${item.name}</div>
-                            <div style="font-size:0.8rem; color:#8D6E63">$${price} ${item.unit_desc||''}</div>
+                            <div style="font-size:0.8rem; color:#8D6E63">${priceTxt} ${item.unit_desc||''}</div>
                         </div>
                         <div class="stepper">
                             <button class="btn-step" onclick="updateAddon('${item.id}', -1)">-</button>
@@ -278,8 +290,16 @@
         }
 
         function resetAll() {
-            if (DATA.categories && DATA.categories.length) STATE.serviceId = DATA.categories[0].items[0].id;
-            if (DATA.removals && DATA.removals.length) STATE.removeId = DATA.removals[0].id;
+            // 重置時也要考慮過濾掉 null 的項目
+            if (DATA.categories && DATA.categories.length) {
+                 const firstValid = DATA.categories[0].items.find(i => getPrice(i) !== null);
+                 if(firstValid) STATE.serviceId = firstValid.id;
+            }
+            if (DATA.removals && DATA.removals.length) {
+                 const firstValidRemove = DATA.removals.find(i => getPrice(i) !== null);
+                 if(firstValidRemove) STATE.removeId = firstValidRemove.id;
+            }
+
             for(let k in STATE.addons) STATE.addons[k] = 0;
             STATE.hand = true; STATE.foot = false;
             document.getElementById('custom_price').value = '';
@@ -296,14 +316,17 @@
             const item = ITEMS[STATE.serviceId];
             if (item) {
                 const price = getPrice(item);
-                const surcharge = DATA.settings.location_foot_surcharge || 200;
-                
-                if (Array.isArray(price)) {
-                    if (STATE.hand) { total += price[0]; details += row(item.name+' (手)', price[0]); }
-                    if (STATE.foot) { total += price[1]; details += row(item.name+' (足)', price[1]); }
-                } else {
-                    if (STATE.hand) { total += price; details += row(item.name+' (手)', price); }
-                    if (STATE.foot) { total += (price + surcharge); details += row(item.name+' (足)', price + surcharge); }
+                // 防呆：如果當前選到的項目變成了 null (切換角色時可能發生)，則跳過
+                if (price !== null) {
+                    const surcharge = DATA.settings.location_foot_surcharge || 200;
+                    
+                    if (Array.isArray(price)) {
+                        if (STATE.hand) { total += price[0]; details += row(item.name+' (手)', price[0]); }
+                        if (STATE.foot) { total += price[1]; details += row(item.name+' (足)', price[1]); }
+                    } else {
+                        if (STATE.hand) { total += price; details += row(item.name+' (手)', price); }
+                        if (STATE.foot) { total += (price + surcharge); details += row(item.name+' (足)', price + surcharge); }
+                    }
                 }
             }
 
@@ -311,7 +334,14 @@
             const remove = ITEMS[STATE.removeId];
             if (remove) {
                 const removePrice = getPrice(remove);
-                if (removePrice > 0) { total += removePrice; details += row('卸甲: ' + remove.name, removePrice); }
+                // 0 元或以上才計算，但 null 不算
+                if (removePrice !== null) {
+                     // 顯示邏輯：就算是 0 元 (免費)，明細要不要顯示？通常免費卸甲也會列出來
+                     // 但如果不想要列出 0 元項目，可以在這裡加 if (removePrice > 0)
+                     // 目前保留顯示「卸甲: xxx $0」或「免費」
+                     total += removePrice; 
+                     details += row('卸甲: ' + remove.name, removePrice); 
+                }
             }
 
             // 3. 加購
@@ -319,8 +349,10 @@
                 if (STATE.addons[id] > 0) {
                     const add = ITEMS[id];
                     const p = getPrice(add);
-                    total += p * STATE.addons[id];
-                    details += row(`${add.name} x${STATE.addons[id]}`, p * STATE.addons[id]);
+                    if (p !== null) {
+                        total += p * STATE.addons[id];
+                        details += row(`${add.name} x${STATE.addons[id]}`, p * STATE.addons[id]);
+                    }
                 }
             }
 
@@ -332,7 +364,6 @@
             if (document.getElementById('birthday').checked) {
                 const rate = DATA.settings.birthday_discount || 0.9;
                 let originalTotal = total;
-                // 無條件捨去小數點
                 total = Math.floor(total * rate);
                 let saved = originalTotal - total;
                 details += `<div class="detail-item" style="color:#FFCC80"><span>🎂 壽星優惠</span><span>-$${saved}</span></div>`;
@@ -342,7 +373,12 @@
             document.getElementById('detail_box').innerHTML = details || '<div style="text-align:center; opacity:0.5">尚未選擇項目</div>';
         }
 
-        function row(name, money) { return `<div class="detail-item"><span>${name}</span><span>$${money}</span></div>`; }
+        // 修改 row 顯示邏輯，如果是 0 元也顯示「免費」字樣嗎？
+        // 報價單明細通常建議保留金額格式 $0 比較好計算，或者維持原樣
+        // 這裡維持原樣 $money，若 money 是 0 會顯示 $0
+        function row(name, money) { 
+            return `<div class="detail-item"><span>${name}</span><span>$${money}</span></div>`; 
+        }
 
         function copyQuote() {
             const roleName = {'manager':'店長', 'artist':'美甲師', 'assistant':'助理'}[STATE.role];
