@@ -1,6 +1,6 @@
 {
     "PRICES": {
-        "single": { "manager": [1200, 1300], "artist": [1000, 1200], "assistant": [900, 1000], "name": "單色凝膠" },
+        "single": { "manager": [1255, 1300], "artist": [1000, 1200], "assistant": [900, 1000], "name": "單色凝膠" },
         "cateye": { "manager": [1300, 1400], "artist": [1100, 1300], "assistant": [1000, 1100], "name": "貓眼凝膠" },
         "mirror": { "manager": 1500, "artist": 1300, "assistant": 1100, "name": "十指鏡面" },
         "french": { "manager": 1600, "artist": 1500, "assistant": 1200, "name": "十指法式" },
