@@ -237,6 +237,15 @@
                 "artist": 1100,
                 "assistant": 100
             }
+        },
+        {
+            "id": "a1766502501524",
+            "name": "猜猜我有指還是沒指",
+            "prices": {
+                "manager": 1000,
+                "artist": 100,
+                "assistant": null
+            }
         }
     ],
     "sha": "5cbed726d55c5f851779414e9f12a6ee3a881cbe"
