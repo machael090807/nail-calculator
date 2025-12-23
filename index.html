@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS 樣式保持不變 */
+        /* CSS 樣式維持不變 */
         :root {
             --bg-color: #F6F1ED;
             --card-bg: #FFFFFF;
@@ -149,7 +149,6 @@
         input:checked + .slider { background-color: var(--text-secondary); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* Loading 遮罩 */
         #loading {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-color); z-index: 999;
@@ -163,7 +162,7 @@
     <div id="loading">載入價格表中...</div>
 
     <header>
-        <h1>COKICLAWS</h1>
+        <h1>Fairy. L</h1>
         <div class="subtitle">美甲計算機</div>
     </header>
 
@@ -247,7 +246,6 @@
     </div>
 
     <script>
-        // 定義全域變數，等待 JSON 載入
         let PRICES = {};
         let REMOVE_PRICES = {};
         let REMOVE_NAMES = {};
@@ -258,10 +256,8 @@
         let selectedRemove = 'none';
         let counts = { 'jump_color': 0, 'toe_ext': 0 };
 
-        // 頁面載入後，先去抓 data.json
         window.onload = async function() {
             try {
-                // 加個時間戳記 ?v=... 避免手機瀏覽器快取舊資料
                 const response = await fetch('data.json?v=' + new Date().getTime());
                 if (!response.ok) throw new Error("讀取失敗");
                 
@@ -271,14 +267,11 @@
                 REMOVE_NAMES = data.REMOVE_NAMES;
                 EXTRA_PRICES = data.EXTRA_PRICES;
 
-                // 更新畫面上的價格文字
                 document.getElementById('label_jump_price').innerText = `$${EXTRA_PRICES.jump_color} / 指`;
                 document.getElementById('price_toe_ext').innerText = `$${EXTRA_PRICES.toe_ext} / 指`;
 
-                // 隱藏 Loading，顯示內容
                 document.getElementById('loading').style.display = 'none';
                 
-                // 初始化
                 init();
             } catch (error) {
                 alert("無法讀取價格表 (data.json)，請確認檔案是否存在於 GitHub。");
