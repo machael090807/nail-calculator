@@ -199,7 +199,7 @@
       "id": "pure",
       "name": "純卸甲",
       "prices": {
-        "manager": 500,
+        "manager": null,
         "artist": 500,
         "assistant": 500
       }
@@ -221,7 +221,12 @@
         "artist": 120,
         "assistant": null
       }
+    },
+    {
+      "id": "a1766489287165",
+      "name": "新加購",
+      "price": 100
     }
   ],
-  "sha": "16ec819f39d16ae675a6f6e7dcba31c46071dc77"
+  "sha": "5cbed726d55c5f851779414e9f12a6ee3a881cbe"
 }
