@@ -10,7 +10,7 @@
     <style>
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         :root { --bg: #F6F1ED; --card: #FFFFFF; --text: #4E342E; --accent: #8D6E63; --danger: #d32f2f; --gray: #f5f5f5; }
-        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 15px; margin: 0; padding-bottom: 100px; }
+        body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; padding: 15px; margin: 0; padding-bottom: 100px; position: relative; min-height: 100vh; }
         h1 { text-align: center; margin: 10px 0 5px 0; font-size: 1.5rem; }
         .subtitle { text-align: center; font-size: 0.9rem; color: var(--accent); margin-bottom: 20px; }
         
@@ -57,6 +57,20 @@
         .btn-save { background: white; color: var(--text); border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         .btn-cancel { background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 15px; border-radius: 30px; cursor: pointer; }
         
+        /* 🔥 神秘按鈕樣式 */
+        .btn-secret {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: transparent;
+            border: none;
+            color: var(--bg); /* 與背景同色，達成隱形效果 */
+            font-size: 0.8rem;
+            cursor: default; /* 不顯示手指游標，避免被發現 */
+            padding: 20px;
+        }
+
         details summary { cursor: pointer; list-style: none; outline: none; }
     </style>
 </head>
@@ -67,25 +81,19 @@
 
     <div id="login-panel" class="card-panel">
         <h3>管理者登入</h3>
-        
         <select id="user-select">
-            <option value="" disabled selected>載入使用者中...</option>
+            <option value="" disabled>載入使用者中...</option>
         </select>
-
-        <input type="password" id="password-input" placeholder="請輸入短密碼 (例如 8888)">
+        <input type="password" id="password-input" placeholder="請輸入密碼">
         <button class="btn-main" onclick="login()">登入</button>
-        
-        <button class="btn-link" onclick="toggleGenerator()">🛠️ 我是第一次設定，我要產生代碼</button>
-    </div>
+        </div>
 
     <div id="generator-panel" class="card-panel">
         <h3>🔐 產生加密代碼</h3>
         <p style="font-size:0.8rem; color:#666;">將原本的 Token 加上密碼鎖，產生安全的代碼貼到 admin_user.json</p>
-        
         <input type="text" id="gen-token" placeholder="貼上 GitHub Token (ghp_...)">
         <input type="text" id="gen-pass" placeholder="設定您的短密碼 (例如 8888)">
         <button class="btn-main" onclick="generateCode()">產生加密碼</button>
-        
         <div id="gen-result" class="result-box" style="display:none;"></div>
         <button class="btn-link" onclick="toggleGenerator()">返回登入</button>
     </div>
@@ -105,6 +113,8 @@
         </div>
     </div>
 
+    <button class="btn-secret" onclick="toggleGenerator()">初次設定</button>
+
     <script>
         const REPO_CONFIG = { owner: 'machael090807', repo: 'nail-calculator', path: 'data.json' };
         
@@ -114,28 +124,30 @@
         let fileSha = null;
         let ghToken = null;
 
-        // 頁面載入：抓取 admin_user.json 填入選單
         window.onload = async function() {
             try {
-                // ✅ 這裡改成了 admin_user.json
                 const res = await fetch('admin_user.json?v=' + new Date().getTime());
                 if(res.ok) {
                     usersList = await res.json();
                     const select = document.getElementById('user-select');
-                    select.innerHTML = '<option value="" disabled selected>請選擇使用者</option>';
+                    select.innerHTML = ''; 
+
                     usersList.forEach((u, idx) => {
                         const opt = document.createElement('option');
                         opt.value = idx;
                         opt.innerText = u.name;
                         select.appendChild(opt);
                     });
+
+                    if(usersList.length > 0) {
+                        select.value = 0;
+                    }
                 } else {
                     document.getElementById('user-select').innerHTML = '<option>找不到 admin_user.json</option>';
                 }
             } catch(e) { console.error(e); }
         };
 
-        // --- 加密核心 (XOR + Base64) ---
         function cipher(text, pass) {
             let result = '';
             for (let i = 0; i < text.length; i++) {
@@ -155,7 +167,6 @@
             } catch(e) { return ''; }
         }
 
-        // --- 產生代碼功能 ---
         function toggleGenerator() {
             const login = document.getElementById('login-panel');
             const gen = document.getElementById('generator-panel');
@@ -163,6 +174,8 @@
                 gen.style.display = 'none'; login.style.display = 'block';
             } else {
                 gen.style.display = 'block'; login.style.display = 'none';
+                // 為了方便操作，打開時自動滾動到產生器
+                gen.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -179,7 +192,6 @@
             alert("✅ 代碼已產生！\n請複製下方灰色區塊的亂碼，貼到 admin_user.json 的 cipher 欄位。");
         }
 
-        // --- 登入功能 ---
         async function login() {
             const select = document.getElementById('user-select');
             const pass = document.getElementById('password-input').value.trim();
@@ -190,7 +202,6 @@
             const userIdx = select.value;
             const user = usersList[userIdx];
             
-            // 嘗試解鎖
             const unlockedToken = decipher(user.cipher, pass);
             
             if(!unlockedToken.startsWith('ghp_')) {
@@ -228,7 +239,6 @@
             }
         }
 
-        // --- 編輯與渲染 ---
         function renderEditor() { renderCategories(); renderAddons(); }
         
         function checkChanges() {
@@ -275,7 +285,6 @@
             container.innerHTML = html + `</div>`;
         }
 
-        // CRUD Helpers
         function getPrice(p) { return Array.isArray(p) ? p[0] : p; }
         function updateCatTitle(i, v) { currentData.categories[i].title = v; checkChanges(); }
         function updateItemName(ci, ii, v) { currentData.categories[ci].items[ii].name = v; checkChanges(); }
