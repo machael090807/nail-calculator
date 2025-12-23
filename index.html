@@ -14,12 +14,12 @@
 
     <style>
         :root {
-            --bg-color: #F6F1ED; /* 參考圖的淺米色背景 */
+            --bg-color: #F6F1ED;
             --card-bg: #FFFFFF;
-            --text-primary: #4E342E; /* 深咖啡色 */
-            --text-secondary: #8D6E63; /* 淺咖啡色 */
-            --accent-color: #A1887F; /* 裝飾色 */
-            --total-bg: #8D7B6F; /* 下方總計區塊的深色背景 */
+            --text-primary: #4E342E;
+            --text-secondary: #8D6E63;
+            --accent-color: #A1887F;
+            --total-bg: #8D7B6F;
             --border-radius: 16px;
         }
 
@@ -33,302 +33,144 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 標題區 */
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin: 0;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 5px;
-        }
+        header { text-align: center; margin-bottom: 25px; }
+        h1 { font-size: 1.8rem; margin: 0; color: var(--text-primary); letter-spacing: 1px; text-transform: uppercase; }
+        .subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; }
 
-        /* 職級切換 (保留功能但美化) */
+        /* 職級切換 */
         .role-tabs {
-            display: flex;
-            background: #EBE5DF;
-            border-radius: 50px;
-            padding: 4px;
-            margin-bottom: 30px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; background: #EBE5DF; border-radius: 50px; padding: 4px;
+            margin-bottom: 30px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
         .role-tab {
-            flex: 1;
-            text-align: center;
-            padding: 10px 0;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #9E9E9E;
-            cursor: pointer;
-            transition: 0.3s;
+            flex: 1; text-align: center; padding: 10px 0; border-radius: 50px;
+            font-size: 0.95rem; font-weight: bold; color: #9E9E9E; cursor: pointer; transition: 0.3s;
         }
         .role-tab.active {
-            background-color: var(--card-bg);
-            color: var(--text-primary);
+            background-color: var(--card-bg); color: var(--text-primary);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* 分區標題 */
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            margin-top: 30px;
-        }
+        .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-primary); margin-bottom: 15px; margin-top: 30px; }
 
-        /* 卡片網格系統 */
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        /* 服務卡片樣式 */
+        /* 卡片網格 */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .service-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 2px solid transparent;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 80px;
+            background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
+            cursor: pointer; transition: 0.2s; border: 2px solid transparent;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column;
+            justify-content: center; height: 80px;
         }
-        
-        /* 選中狀態 */
-        .service-card.active {
-            border-color: var(--text-secondary);
-            background-color: #FFFBF8;
-        }
+        .service-card.active { border-color: var(--text-secondary); background-color: #FFFBF8; }
+        .card-title { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
+        .card-price { font-size: 0.85rem; color: var(--text-secondary); }
 
-        .card-title {
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 4px;
-        }
-        .card-price {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
+        input[type="radio"], input[type="checkbox"] { display: none; }
 
-        /* 隱藏原生 Radio/Checkbox */
-        input[type="radio"], input[type="checkbox"] {
-            display: none;
-        }
-
-        /* 位置選擇 (改成更像按鈕) */
+        /* 位置選擇 */
         .pos-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            cursor: pointer;
-            border: 2px solid transparent;
+            background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; border: 2px solid transparent;
         }
-        .pos-card.active {
-            border-color: var(--text-secondary);
-            color: var(--text-primary);
-        }
+        .pos-card.active { border-color: var(--text-secondary); color: var(--text-primary); }
         .check-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 2px solid #DDD;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: 0.2s;
+            width: 20px; height: 20px; border-radius: 4px; border: 2px solid #DDD;
+            display: flex; align-items: center; justify-content: center; color: white; transition: 0.2s;
         }
-        .pos-card.active .check-icon {
-            background: var(--text-secondary);
-            border-color: var(--text-secondary);
-        }
+        .pos-card.active .check-icon { background: var(--text-secondary); border-color: var(--text-secondary); }
 
-        /* 計數器樣式 (Stepper) */
+        /* Stepper & Input Row 樣式 */
         .stepper-row {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            background: var(--card-bg); border-radius: var(--border-radius); padding: 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .stepper-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .stepper-name {
-            font-weight: bold;
-            font-size: 1rem;
-        }
-        .stepper-price {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
+        .stepper-info { display: flex; flex-direction: column; }
+        .stepper-name { font-weight: bold; font-size: 1rem; }
+        .stepper-price { font-size: 0.8rem; color: var(--text-secondary); }
         
         .stepper-ctrl {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #F5F5F5;
-            padding: 4px;
-            border-radius: 20px;
+            display: flex; align-items: center; gap: 10px;
+            background: #F5F5F5; padding: 4px; border-radius: 20px;
         }
         .btn-step {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: white;
-            color: var(--text-primary);
-            font-size: 1.2rem;
+            width: 32px; height: 32px; border-radius: 50%; border: none; background: white;
+            color: var(--text-primary); font-size: 1.2rem; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-step:active { transform: scale(0.9); }
+        .step-val { font-weight: bold; width: 20px; text-align: center; }
+
+        /* 👇👇👇 新增：膠囊型輸入框樣式 (修復破版) 👇👇👇 */
+        .input-pill {
+            background: #F5F5F5; /* 與加減按鈕一致的灰色背景 */
+            border-radius: 20px;
+            padding: 0 15px;
+            height: 40px;
+            width: 130px; /* 固定寬度，防止手機版擠壓 */
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .btn-step:active {
-            transform: scale(0.9);
-        }
-        .step-val {
+        .input-pill input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: right;
+            font-size: 1rem;
+            outline: none;
+            color: var(--text-primary);
+            padding: 0;
+            margin: 0;
             font-weight: bold;
-            width: 20px;
-            text-align: center;
         }
+        .input-pill input::placeholder {
+            color: #AAA;
+            font-weight: normal;
+            font-size: 0.9rem;
+        }
+        /* 移除瀏覽器預設的數字箭頭 */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
 
-        /* 總計與明細卡片 (深色區塊) */
+        /* 總計與明細 */
         .total-card {
-            background-color: var(--total-bg);
-            color: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-top: 40px;
-            box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3);
-            text-align: center;
+            background-color: var(--total-bg); color: white; border-radius: 20px;
+            padding: 25px; margin-top: 40px; box-shadow: 0 10px 30px rgba(141, 123, 111, 0.3); text-align: center;
         }
-        .total-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        .total-price {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1;
-        }
-        
+        .total-label { font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px; }
+        .total-price { font-size: 3rem; font-weight: 800; margin-bottom: 20px; line-height: 1; }
         .detail-box {
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: left;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            min-height: 100px;
+            background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px;
+            text-align: left; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; min-height: 100px;
         }
         .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            border-bottom: 1px dashed rgba(255,255,255,0.2);
-            padding-bottom: 5px;
+            display: flex; justify-content: space-between; margin-bottom: 5px;
+            border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px;
         }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
+        .detail-row:last-child { border-bottom: none; }
 
         .btn-copy {
-            width: 100%;
-            background: white;
-            color: var(--total-bg);
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            width: 100%; background: white; color: var(--total-bg); border: none;
+            padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-copy:active {
-            opacity: 0.9;
-            transform: translateY(2px);
-        }
-
+        .btn-copy:active { opacity: 0.9; transform: translateY(2px); }
         .btn-reset {
-            margin-top: 15px;
-            background: transparent;
-            border: 1px solid var(--text-secondary);
-            color: var(--text-secondary);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
+            margin-top: 15px; background: transparent; border: 1px solid var(--text-secondary);
+            color: var(--text-secondary); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer;
         }
         
-        /* 優惠 Toggle */
         .promo-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            padding: 0 10px;
+            display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 0 10px;
         }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 28px;
-        }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { display:none; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px; width: 20px;
-            left: 4px; bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: var(--text-secondary);
-        }
-        input:checked + .slider:before {
-            transform: translateX(22px);
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--text-secondary); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
     </style>
 </head>
@@ -346,8 +188,7 @@
     </div>
 
     <div class="section-title">基礎服務</div>
-    <div class="grid-container" id="serviceGrid">
-        </div>
+    <div class="grid-container" id="serviceGrid"></div>
 
     <div class="section-title">位置</div>
     <label class="pos-card" id="card_pos_hand">
@@ -362,8 +203,7 @@
     </label>
 
     <div class="section-title">卸甲服務</div>
-    <div class="grid-container" id="removeGrid">
-        </div>
+    <div class="grid-container" id="removeGrid"></div>
 
     <div class="section-title">加購及延甲</div>
     
@@ -396,10 +236,8 @@
             <span class="stepper-name">其他加購</span>
             <span class="stepper-price">自訂金額</span>
         </div>
-        <div style="flex:1; margin-left:15px;">
-            <input type="number" id="addon_price" placeholder="輸入金額" 
-                   style="width: 100%; padding: 8px; border:1px solid #ddd; border-radius:8px; text-align:right; font-size:1rem;"
-                   oninput="calculate()">
+        <div class="input-pill">
+            <input type="number" id="addon_price" placeholder="輸入金額" oninput="calculate()">
         </div>
     </div>
 
@@ -415,8 +253,7 @@
         <div class="total-label">總計</div>
         <div class="total-price" id="total_display">$0</div>
         
-        <div class="detail-box" id="detail_box">
-            </div>
+        <div class="detail-box" id="detail_box"></div>
 
         <button class="btn-copy" onclick="copyQuote()">
             📄 複製價格明細
@@ -429,7 +266,6 @@
 
 
     <script>
-        // --- 資料設定 (保持您的原始邏輯) ---
         const PRICES = {
             'single': { 'manager': [1200, 1300], 'artist': [1000, 1200], 'assistant': [900, 1000], name: "單色凝膠" },
             'cateye': { 'manager': [1300, 1400], 'artist': [1100, 1300], 'assistant': [1000, 1100], name: "貓眼凝膠" },
@@ -452,52 +288,38 @@
         };
         const REMOVE_NAMES = {'none':'無', 'our_shop':'本店卸甲', 'other_shop':'他店卸甲', 'pure':'純卸甲'};
 
-        let currentRole = 'artist'; // 預設美甲師
+        let currentRole = 'artist'; 
         let selectedService = 'single';
         let selectedRemove = 'none';
         
-        // 計數器數值
-        let counts = {
-            'jump_color': 0,
-            'toe_ext': 0
-        };
+        let counts = { 'jump_color': 0, 'toe_ext': 0 };
 
-        // 初始化
         function init() {
             renderServices();
             renderRemoves();
-            togglePos('hand'); // 初始化樣式
-            togglePos('foot'); // 初始化樣式
+            togglePos('hand'); 
+            togglePos('foot'); 
             calculate();
         }
 
-        // 1. 職級切換
         function setRole(role) {
             currentRole = role;
-            // 更新 UI
             document.querySelectorAll('.role-tab').forEach(el => el.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // 重新渲染價格
             renderServices();
             calculate();
         }
 
-        // 2. 渲染服務卡片 (根據職級顯示不同價格)
         function renderServices() {
             const grid = document.getElementById('serviceGrid');
             grid.innerHTML = '';
-            
             for (const key in PRICES) {
                 const item = PRICES[key];
                 const priceData = item[currentRole];
-                
-                // 如果該職級沒有此服務，跳過
                 if (priceData === null) continue;
 
                 let priceDisplay = '';
                 if (Array.isArray(priceData)) {
-                    // 手足不同價，顯示手部價當代表
                     priceDisplay = `$${priceData[0]} / 次`;
                 } else {
                     priceDisplay = `$${priceData} / 次`;
@@ -516,21 +338,18 @@
 
         function selectService(key) {
             selectedService = key;
-            renderServices(); // 更新選中樣式
+            renderServices(); 
             calculate();
         }
 
-        // 3. 渲染卸甲卡片
         function renderRemoves() {
             const grid = document.getElementById('removeGrid');
             grid.innerHTML = '';
-
             const removeRoleIdx = currentRole === 'manager' ? 0 : (currentRole === 'artist' ? 1 : 2);
 
             for (const key in REMOVE_PRICES) {
                 const price = REMOVE_PRICES[key][removeRoleIdx];
                 const name = REMOVE_NAMES[key];
-                
                 const card = document.createElement('div');
                 card.className = `service-card ${selectedRemove === key ? 'active' : ''}`;
                 card.onclick = () => {
@@ -546,7 +365,6 @@
             }
         }
 
-        // 4. 位置切換 UI
         function togglePos(type) {
             const checkbox = document.getElementById(`pos_${type}`);
             const card = document.getElementById(`card_pos_${type}`);
@@ -558,7 +376,6 @@
             calculate();
         }
 
-        // 5. 計數器邏輯
         function updateStepper(key, delta) {
             counts[key] += delta;
             if (counts[key] < 0) counts[key] = 0;
@@ -566,12 +383,10 @@
             calculate();
         }
 
-        // --- 核心計算 (移植原本邏輯) ---
         function calculate() {
             let detailHtml = '';
             let total = 0;
 
-            // 1. 基礎服務
             const serviceData = PRICES[selectedService];
             const priceInfo = serviceData[currentRole];
             
@@ -580,7 +395,6 @@
 
             if (isHand || isFoot) {
                 if (Array.isArray(priceInfo)) {
-                    // 分開計價 (單色/貓眼)
                     if (isHand) {
                         total += priceInfo[0];
                         detailHtml += `<div class="detail-row"><span>${serviceData.name} (手)</span><span>$${priceInfo[0]}</span></div>`;
@@ -590,7 +404,6 @@
                         detailHtml += `<div class="detail-row"><span>${serviceData.name} (足)</span><span>$${priceInfo[1]}</span></div>`;
                     }
                 } else {
-                    // 統一價 + 足部加價
                     let itemPrice = priceInfo;
                     if (isHand) {
                         total += itemPrice;
@@ -607,7 +420,6 @@
                 }
             }
 
-            // 2. 卸甲
             const removeRoleIdx = currentRole === 'manager' ? 0 : (currentRole === 'artist' ? 1 : 2);
             const removePrice = REMOVE_PRICES[selectedRemove][removeRoleIdx];
             if (removePrice > 0) {
@@ -615,32 +427,26 @@
                 detailHtml += `<div class="detail-row"><span>卸甲: ${REMOVE_NAMES[selectedRemove]}</span><span>$${removePrice}</span></div>`;
             }
 
-            // 3. 加購 (跳色)
             const jumpPrice = counts['jump_color'] * 100;
             if (jumpPrice > 0) {
                 total += jumpPrice;
                 detailHtml += `<div class="detail-row"><span>跳色 x${counts['jump_color']}</span><span>$${jumpPrice}</span></div>`;
             }
 
-            // 4. 足部單指延甲
-            // 只有店長/美甲師有，助理 null
-            let toePriceUnit = 120; // 預設
-            if (currentRole === 'assistant') toePriceUnit = 0; // 助理不做
-            
+            let toePriceUnit = 120; 
+            if (currentRole === 'assistant') toePriceUnit = 0; 
             const toeTotal = counts['toe_ext'] * toePriceUnit;
             if (toeTotal > 0 && currentRole !== 'assistant') {
                 total += toeTotal;
                 detailHtml += `<div class="detail-row"><span>足部延甲 x${counts['toe_ext']}</span><span>$${toeTotal}</span></div>`;
             }
 
-            // 5. 其他自訂金額
             const addon = parseInt(document.getElementById('addon_price').value) || 0;
             if (addon > 0) {
                 total += addon;
                 detailHtml += `<div class="detail-row"><span>其他加購</span><span>$${addon}</span></div>`;
             }
 
-            // 6. 優惠
             const isBirthday = document.getElementById('birthday').checked;
             if (isBirthday) {
                 let discount = Math.round(total * 0.1);
@@ -652,20 +458,16 @@
             document.getElementById('detail_box').innerHTML = detailHtml || '<div style="text-align:center; opacity:0.5;">尚未選擇項目</div>';
         }
 
-        // 複製功能
         function copyQuote() {
             const roleName = {'manager':'店長', 'artist':'美甲師', 'assistant':'助理'}[currentRole];
             const date = new Date().toLocaleDateString();
             const total = document.getElementById('total_display').innerText;
-            const details = document.getElementById('detail_box').innerText.replace(/\n/g, '\n'); // 簡單格式化
             
-            // 重新組裝漂亮的文字
             let text = `【Fairy. L 美甲報價單】\n`;
             text += `📅 日期：${date}\n`;
             text += `👤 服務人員：${roleName}\n`;
             text += `----------------------\n`;
             
-            // 抓取明細文字
             const rows = document.querySelectorAll('.detail-row');
             rows.forEach(row => {
                 const name = row.children[0].innerText;
@@ -682,9 +484,7 @@
             });
         }
 
-        // 啟動
         init();
-
     </script>
 </body>
 </html>
